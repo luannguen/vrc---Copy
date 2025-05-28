@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Preview</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #2c3e50; }
+        .image-container { margin: 20px 0; }
+        img { max-width: 100%; border: 1px solid #ddd; }
+        .thumbnail { max-width: 200px; border: 1px solid #ddd; margin-right: 10px; }
+        .metadata { background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
+        pre { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>File Upload Preview</h1>
+    
+    <div class="image-container">
+        <h2>Original Image</h2>
+        <img src="/uploads/test-image-20250510-201948-d2a20066.png" alt="Uploaded image">
+    </div>
+    
+        <div class="image-container">
+        <h2>Thumbnail</h2>
+        <img src="/uploads/thumbnails/test-image-20250510-201948-d2a20066.png" alt="Image thumbnail" class="thumbnail">
+    </div>
+    
+    <div class="metadata">
+        <h2>File Metadata</h2>
+        <pre>{
+  "hasThumbnail": true,
+  "originalName": "test-image-20250510-201948.png",
+  "uploadedAt": "2025-05-10T20:19:48.9997983+07:00",
+  "size": 7499,
+  "uploadedName": "test-image-20250510-201948-d2a20066.png",
+  "path": "e:\\Download\\european-health-echo-clone-main\\european-health-echo-clone-main\\public\\uploads\\test-image-20250510-201948-d2a20066.png",
+  "mimeType": "image/png"
+}</pre>
+    </div>
+</body>
+</html>

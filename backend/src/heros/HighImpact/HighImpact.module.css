@@ -1,0 +1,113 @@
+/* HighImpact Hero Styles - Improved overlay system for better text readability */
+
+.hero {
+  @apply relative overflow-hidden;
+  min-height: 80vh;
+  margin-top: -10.4rem;
+}
+
+.heroBackground {
+  @apply absolute inset-0 w-full h-full;
+}
+
+.mediaContainer {
+  @apply absolute inset-0;
+}
+
+.mediaImage {
+  @apply object-cover w-full h-full;
+}
+
+/* Multi-layer overlay system for enhanced text readability */
+.overlayBase {
+  @apply absolute inset-0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.overlayGradient {
+  @apply absolute inset-0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  z-index: 15;
+}
+
+/* Additional overlay for very bright images */
+.overlayEnhanced {
+  @apply absolute inset-0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  z-index: 16;
+}
+
+.content {
+  @apply relative w-full h-full flex items-center justify-center text-white;
+  min-height: 80vh;
+  z-index: 20;
+}
+
+.contentContainer {
+  @apply container mb-8 flex items-center justify-center px-4;
+}
+
+.contentInner {
+  @apply max-w-[36.5rem] md:text-center;
+}
+
+.richText {
+  @apply mb-6;
+  /* Text shadow for better readability */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.linksContainer {
+  @apply flex md:justify-center gap-4 flex-wrap;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 60vh;
+    margin-top: -8rem;
+  }
+  
+  .content {
+    min-height: 60vh;
+  }
+  
+  .contentInner {
+    @apply text-center;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .linksContainer {
+    @apply justify-center;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .overlayBase {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .richText {
+    text-shadow: 0 0 4px rgba(0, 0, 0, 1);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .overlayGradient,
+  .overlayEnhanced {
+    background: rgba(0, 0, 0, 0.6);
+  }
+}

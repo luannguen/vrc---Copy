@@ -1,0 +1,225 @@
+/* Product Category Components - Combined Styles */
+
+/* ProductCategoryViewer Styles */
+.product-category-viewer {
+  padding: 20px;
+  background-color: var(--theme-elevation-50, #f9f9f9);
+  border-radius: 4px;
+  border: 1px solid var(--theme-elevation-150, #e6e6e6);
+  margin: 20px 0;
+}
+
+.viewer-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--theme-elevation-100, #eee);
+  color: var(--theme-text, #333);
+}
+
+.categories-tree {
+  margin-top: 10px;
+}
+
+.category-item {
+  padding: 8px 0;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.category-item:hover {
+  background-color: var(--theme-elevation-100, #f1f1f1);
+}
+
+.category-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expand-button {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  background: none;
+  border: 1px solid var(--theme-elevation-200, #ddd);
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  color: var(--theme-text, #555);
+  transition: all 0.2s;
+}
+
+.expand-button:hover {
+  background-color: var(--theme-elevation-100, #eaeaea);
+}
+
+.expand-button.expanded {
+  background-color: var(--theme-success-100, #e6fff0);
+  border-color: var(--theme-success-200, #cceedd);
+  color: var(--theme-success-500, #00a650);
+}
+
+.category-item-bullet {
+  width: 20px;
+  display: inline-flex;
+  justify-content: center;
+  color: var(--theme-text, #888);
+}
+
+.category-item-title {
+  font-weight: 500;
+  color: var(--theme-text, #333);
+  flex: 1;
+}
+
+.category-children {
+  margin-left: 10px;
+  border-left: 1px dashed var(--theme-elevation-200, #ddd);
+  margin-top: 5px;
+}
+
+.category-tag {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.menu-tag {
+  background-color: var(--theme-success-100, #e6fff0);
+  color: var(--theme-success-600, #008a43);
+}
+
+.order-tag {
+  background-color: var(--theme-elevation-100, #eee);
+  color: var(--theme-text, #666);
+}
+
+.loading-state,
+.error-state,
+.empty-state {
+  padding: 20px;
+  text-align: center;
+  color: var(--theme-text, #666);
+  background-color: var(--theme-elevation-100, #f5f5f5);
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.error-state {
+  color: var(--theme-error-500, #ff4d4f);
+  background-color: var(--theme-error-100, #fff1f0);
+}
+
+.empty-state {
+  color: var(--theme-warning-500, #faad14);
+  background-color: var(--theme-warning-100, #fffbe6);
+}
+
+/* ProductCategoryPreview Styles */
+.product-category-preview {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 4px;
+  background-color: var(--theme-elevation-50, #f9f9f9);
+  border: 1px solid var(--theme-elevation-150, #e6e6e6);
+}
+
+.preview-heading {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: var(--theme-text, #333);
+}
+
+.preview-card {
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.preview-image {
+  height: 140px;
+  overflow: hidden;
+  background-color: var(--theme-elevation-100, #f0f0f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-content {
+  padding: 16px;
+}
+
+.preview-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--theme-text, #333);
+}
+
+.preview-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--theme-text, #555);
+  margin-bottom: 16px;
+}
+
+.preview-meta {
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview-parent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-label {
+  font-weight: 500;
+  color: var(--theme-text, #666);
+}
+
+.meta-value {
+  color: var(--theme-text, #333);
+}
+
+.preview-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.preview-flag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.menu-flag {
+  background-color: var(--theme-success-100, #e6fff0);
+  color: var(--theme-success-600, #008a43);
+}
+
+.order-flag {
+  background-color: var(--theme-elevation-100, #eee);
+  color: var(--theme-text, #666);
+}

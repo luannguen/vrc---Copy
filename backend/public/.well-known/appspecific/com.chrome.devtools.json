@@ -1,0 +1,7 @@
+{
+  "protocol_handler": {
+    "allowed_origins": [
+      "chrome-devtools://*"
+    ]
+  }
+}
