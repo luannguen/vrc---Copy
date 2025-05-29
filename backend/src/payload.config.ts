@@ -24,6 +24,7 @@ import { Services } from './collections/Services'
 import { Technologies } from './collections/Technologies'
 import { Tools } from './collections/Tools'
 import { Resources } from './collections/Resources'
+import { Banners } from './collections/Banners'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { CompanyInfo } from './globals/CompanyInfo'
@@ -104,7 +105,8 @@ export default buildConfig({  admin: {
     Services,
     Technologies,
     Tools,
-    Resources
+    Resources,
+    Banners
   ],cors: {
     origins: process.env.NODE_ENV === 'production'
       ? [

@@ -11,13 +11,14 @@ import { seedEventCategories } from './event-categories';
 import { seedEvents } from './events';
 import { seedTools } from './seed-tools';
 import { seedResources } from './seed-resources';
+import { seedBanners } from './seed-banners';
 import { progressManager } from './utils/progressUtils';
 
 export const seed = async (payload: Payload) => {
   console.log('🌱 Starting seed process...');
   console.log('🖼️ Images will be automatically uploaded from the frontend directory during seeding');
   // Tổng số collection/global cần seed
-  const totalSeedTasks = 12;
+  const totalSeedTasks = 13;
   progressManager.initProgressBar(totalSeedTasks, 'Seeding application data');
 
   try {
@@ -58,6 +59,10 @@ export const seed = async (payload: Payload) => {
     progressManager.increment();
 
     await seedResources(payload);
+    progressManager.increment();
+
+    // Seed banner carousel
+    await seedBanners(payload);
     progressManager.increment();
 
     // Hoàn thành progress bar

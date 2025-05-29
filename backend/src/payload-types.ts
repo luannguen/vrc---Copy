@@ -86,6 +86,7 @@ export interface Config {
     technologies: Technology;
     tools: Tool;
     resources: Resource;
+    banners: Banner;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -116,6 +117,7 @@ export interface Config {
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
     tools: ToolsSelect<false> | ToolsSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    banners: BannersSelect<false> | BannersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1705,6 +1707,99 @@ export interface Resource {
   createdAt: string;
 }
 /**
+ * Quản lý banner carousel trên trang chủ
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "banners".
+ */
+export interface Banner {
+  id: string;
+  /**
+   * Tiêu đề chính của banner
+   */
+  title: string;
+  /**
+   * Mô tả ngắn gọn xuất hiện dưới tiêu đề
+   */
+  subtitle?: string | null;
+  /**
+   * Hình ảnh nền cho banner (khuyến nghị: 1920x600px)
+   */
+  image: string | Media;
+  /**
+   * URL đích khi click vào banner (ví dụ: /products, /services)
+   */
+  link?: string | null;
+  /**
+   * Văn bản hiển thị trên nút call-to-action
+   */
+  buttonText?: string | null;
+  /**
+   * Bật/tắt hiển thị banner này
+   */
+  isActive?: boolean | null;
+  /**
+   * Số thứ tự hiển thị (số nhỏ hơn sẽ hiển thị trước)
+   */
+  sortOrder?: number | null;
+  /**
+   * Trạng thái xuất bản của banner
+   */
+  status: 'draft' | 'published' | 'expired';
+  /**
+   * Tùy chọn lên lịch hiển thị banner
+   */
+  scheduleSettings?: {
+    /**
+     * Ngày bắt đầu hiển thị banner (để trống nếu hiển thị ngay)
+     */
+    startDate?: string | null;
+    /**
+     * Ngày ngừng hiển thị banner (để trống nếu hiển thị vô thời hạn)
+     */
+    endDate?: string | null;
+  };
+  /**
+   * Tùy chọn hiển thị banner cho nhóm đối tượng cụ thể
+   */
+  targeting?: {
+    /**
+     * Chọn loại thiết bị hiển thị banner (để trống = tất cả thiết bị)
+     */
+    deviceTypes?: ('desktop' | 'tablet' | 'mobile')[] | null;
+    /**
+     * Chọn nhóm người dùng hiển thị banner (để trống = tất cả)
+     */
+    userRoles?: ('guest' | 'individual' | 'business' | 'partner')[] | null;
+  };
+  /**
+   * Thống kê hiệu suất banner
+   */
+  analytics?: {
+    viewCount?: number | null;
+    clickCount?: number | null;
+    /**
+     * Tỷ lệ click/view * 100
+     */
+    clickThroughRate?: number | null;
+  };
+  /**
+   * Tối ưu hóa SEO cho banner
+   */
+  seo?: {
+    /**
+     * Mô tả hình ảnh cho accessibility và SEO
+     */
+    altText?: string | null;
+    /**
+     * Từ khóa liên quan đến banner (cách nhau bởi dấu phẩy)
+     */
+    keywords?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1951,6 +2046,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'resources';
         value: string | Resource;
+      } | null)
+    | ({
+        relationTo: 'banners';
+        value: string | Banner;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2749,6 +2848,47 @@ export interface ResourcesSelect<T extends boolean = true> {
   lastUpdated?: T;
   seoTitle?: T;
   seoDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "banners_select".
+ */
+export interface BannersSelect<T extends boolean = true> {
+  title?: T;
+  subtitle?: T;
+  image?: T;
+  link?: T;
+  buttonText?: T;
+  isActive?: T;
+  sortOrder?: T;
+  status?: T;
+  scheduleSettings?:
+    | T
+    | {
+        startDate?: T;
+        endDate?: T;
+      };
+  targeting?:
+    | T
+    | {
+        deviceTypes?: T;
+        userRoles?: T;
+      };
+  analytics?:
+    | T
+    | {
+        viewCount?: T;
+        clickCount?: T;
+        clickThroughRate?: T;
+      };
+  seo?:
+    | T
+    | {
+        altText?: T;
+        keywords?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
