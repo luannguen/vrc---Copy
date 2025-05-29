@@ -15,10 +15,10 @@ export function isAdminRequest(req: NextRequest): boolean {
 export async function extractProductId(req: NextRequest): Promise<string | null> {
   // Get URL parameters
   const url = new URL(req.url);
-  
+
   // Direct ID parameter
   let productId = url.searchParams.get('id');
-  
+
   // Handle complex query formats from admin UI
   if (!productId) {
     for (const [key, value] of url.searchParams.entries()) {
@@ -61,13 +61,13 @@ export async function extractProductId(req: NextRequest): Promise<string | null>
       }
     }
   }
-  
+
   // Check request body for ID
   if (!productId) {
     try {
       const clonedReq = req.clone();
       const body = await clonedReq.json();
-      
+
       if (body && body.id) {
         productId = body.id;
         console.log(`Extracted product ID from body: ${productId}`);
@@ -76,20 +76,66 @@ export async function extractProductId(req: NextRequest): Promise<string | null>
       console.log('No JSON body or error parsing body for ID extraction');
     }
   }
-  
+
   return productId;
 }
 
 /**
  * Extracts multiple product IDs from a request
+ * Handles various bulk delete formats from Payload admin
  */
 export function extractProductIds(req: NextRequest): string[] | null {
   const url = new URL(req.url);
-  const productIds = url.searchParams.get('ids');
-  
-  if (!productIds) {
-    return null;
+
+  console.log("🔍 Extracting product IDs from request:");
+  console.log("Full URL:", req.url);
+
+  // Method 1: Direct 'ids' parameter (comma-separated)
+  const directIds = url.searchParams.get('ids');
+  if (directIds) {
+    const ids = directIds.split(',').filter(Boolean);
+    console.log("Found direct 'ids' parameter:", ids);
+    return ids;
   }
-  
-  return productIds.split(',').filter(Boolean);
+
+  // Method 2: Multiple 'id' parameters
+  const allIds = url.searchParams.getAll('id');
+  if (allIds.length > 1) {
+    console.log("Found multiple 'id' parameters:", allIds);
+    return allIds;
+  }
+
+  // Method 3: Array format 'ids[]'
+  const arrayIds = url.searchParams.getAll('ids[]');
+  if (arrayIds.length > 0) {
+    console.log("Found 'ids[]' array format:", arrayIds);
+    return arrayIds;
+  }
+
+  // Method 4: Payload admin 'where' clause with 'in' operator
+  // Format: where[id][in]=id1,id2,id3
+  const whereIdIn = url.searchParams.get('where[id][in]');
+  if (whereIdIn) {
+    const ids = whereIdIn.split(',').filter(Boolean);
+    console.log("Found 'where[id][in]' parameter:", ids);
+    return ids;
+  }
+
+  // Method 5: Complex where clause - parse all parameters
+  const productIds: string[] = [];
+  for (const [key, value] of url.searchParams.entries()) {
+    // Look for patterns like where[id][in][0], where[id][in][1], etc.
+    if (key.includes('where') && key.includes('id') && key.includes('in')) {
+      console.log(`Found complex where clause: ${key} = ${value}`);
+      productIds.push(value);
+    }
+  }
+
+  if (productIds.length > 0) {
+    console.log("Extracted IDs from complex where clauses:", productIds);
+    return productIds;
+  }
+
+  console.log("No product IDs found for bulk operation");
+  return null;
 }

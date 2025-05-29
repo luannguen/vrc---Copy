@@ -19,10 +19,33 @@ export async function handleDELETE(req: NextRequest): Promise<NextResponse> {
     const url = new URL(req.url);
     console.log("\n🔍 === DELETE REQUEST DEBUG ===");
     console.log("Full URL:", req.url);
+    console.log("Method:", req.method);
     console.log("Search params:");
     for (const [key, value] of url.searchParams.entries()) {
       console.log(`  ${key}: ${value}`);
     }
+
+    // Log request body if any
+    try {
+      const bodyText = await req.text();
+      if (bodyText) {
+        console.log("Request body:", bodyText);
+        // Re-create request since we consumed the body
+        req = new NextRequest(req.url, {
+          method: req.method,
+          headers: req.headers,
+          body: bodyText
+        });
+      }
+    } catch (_e) {
+      console.log("No request body");
+    }
+
+    // Log headers
+    console.log("Important headers:");
+    console.log("  Referer:", req.headers.get('referer'));
+    console.log("  Content-Type:", req.headers.get('content-type'));
+    console.log("  User-Agent:", req.headers.get('user-agent'));
     console.log("================================\n");
 
     // Check if this is an admin panel request
@@ -52,6 +75,8 @@ export async function handleDELETE(req: NextRequest): Promise<NextResponse> {
 
     // Handle bulk delete with comma-separated IDs
     if (productIds) {
+      console.log(`🗑️ Processing bulk delete for ${productIds.length} products:`, productIds);
+
       if (productIds.length === 0) {
         return formatApiErrorResponse("Không có ID sản phẩm được cung cấp", null, 400);
       }
@@ -59,17 +84,40 @@ export async function handleDELETE(req: NextRequest): Promise<NextResponse> {
       // Delete multiple products
       const results = [];
       const errors = [];
-        for (const id of productIds) {
+
+      // Process deletions sequentially to avoid race conditions
+      for (const id of productIds) {
         try {
-          const _result = await payload.delete({
+          console.log(`Deleting product ID: ${id}`);
+
+          // Verify product exists first
+          const product = await payload.findByID({
+            collection: "products",
+            id,
+          }).catch(() => null);
+
+          if (!product) {
+            errors.push({ id, error: "Không tìm thấy sản phẩm" });
+            continue;
+          }
+
+          // Delete the product
+          await payload.delete({
             collection: "products",
             id,
           });
-          results.push({ id, success: true });
-        } catch (err: any) {
-          errors.push({ id, error: err.message || "Lỗi không xác định" });
+
+          console.log(`✅ Successfully deleted product: ${id}`);
+          results.push({ id, success: true, name: product.name || `Product ${id}` });
+
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : "Lỗi không xác định";
+          console.error(`❌ Failed to delete product ${id}:`, errorMessage);
+          errors.push({ id, error: errorMessage });
         }
       }
+
+      console.log(`🎯 Bulk delete completed: ${results.length} success, ${errors.length} errors`);
 
       // Return formatted response based on request type
       return formatBulkResponse(results, errors, adminReq);
@@ -149,7 +197,7 @@ export async function handleDELETE(req: NextRequest): Promise<NextResponse> {
         null,
         `Đã xóa sản phẩm thành công: ${product?.name || productId}`
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Delete product error:", err);
 
       if (adminReq) {
@@ -157,10 +205,11 @@ export async function handleDELETE(req: NextRequest): Promise<NextResponse> {
         const headers = createCORSHeaders();
         headers.append('X-Payload-Admin', 'true');
 
+        const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
         return NextResponse.json({
-          message: `Không thể xóa sản phẩm: ${err.message || 'Lỗi không xác định'}`,
+          message: `Không thể xóa sản phẩm: ${errorMessage}`,
           errors: [{
-            message: err.message || 'Lỗi không xác định',
+            message: errorMessage,
             field: 'id'
           }]
         }, {
@@ -169,7 +218,8 @@ export async function handleDELETE(req: NextRequest): Promise<NextResponse> {
         });
       }
 
-      return formatApiErrorResponse(`Không thể xóa sản phẩm: ${err.message || 'Lỗi không xác định'}`, null, 404);
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
+      return formatApiErrorResponse(`Không thể xóa sản phẩm: ${errorMessage}`, null, 404);
     }
   } catch (error) {
     console.error("Products API DELETE Error:", error);

@@ -6,7 +6,7 @@ import { handleOptionsRequest } from '../../../(payload)/api/_shared/cors';
 
 // OPTIONS handler for CORS preflight
 export function OPTIONS(req: NextRequest) {
-  return handleOptionsRequest(req, ['GET', 'PUT', 'DELETE', 'OPTIONS']);
+  return handleOptionsRequest(req, ['GET', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']);
 }
 
 // GET handler - get single product by ID
@@ -27,6 +27,22 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
 // PUT handler - update product
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  // Pass the ID from URL params to the handler
+  const url = new URL(req.url);
+  url.searchParams.set('id', params.id);
+
+  // Create a new request with the ID in query params so existing handler can find it
+  const modifiedReq = new NextRequest(url.toString(), {
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+  });
+
+  return handleUpdate(modifiedReq);
+}
+
+// PATCH handler - update product (used by Payload admin)
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   // Pass the ID from URL params to the handler
   const url = new URL(req.url);
   url.searchParams.set('id', params.id);
