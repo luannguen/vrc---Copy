@@ -1,5 +1,7 @@
 import { Payload } from 'payload';
 import { seedProducts } from './products';
+import { seedProductCategories } from './product-categories';
+import { seedMedia } from './media';
 import { seedServices } from './services';
 import { seedProjects } from './projects';
 import { seedTechnologies } from './technologies';
@@ -19,7 +21,7 @@ export const seed = async (payload: Payload) => {
   console.log('🌱 Starting seed process...');
   console.log('🖼️ Images will be automatically uploaded from the frontend directory during seeding');
   // Tổng số collection/global cần seed
-  const totalSeedTasks = 14; // Increased for homepage settings
+  const totalSeedTasks = 17; // Increased for media, product categories and products
   progressManager.initProgressBar(totalSeedTasks, 'Seeding application data');
 
   try {
@@ -34,6 +36,15 @@ export const seed = async (payload: Payload) => {
     await seedNavigation(payload);
     progressManager.increment();
 
+    // Seed Media trước
+    await seedMedia(payload);
+    progressManager.increment();
+
+    // Seed Product Categories
+    await seedProductCategories(payload);
+    progressManager.increment();
+
+    // Seed Products
     await seedProducts(payload);
     progressManager.increment();
 

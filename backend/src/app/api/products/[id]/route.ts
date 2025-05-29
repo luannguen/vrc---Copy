@@ -10,10 +10,11 @@ export function OPTIONS(req: NextRequest) {
 }
 
 // GET handler - get single product by ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   // Pass the ID from URL params to the handler
   const url = new URL(req.url);
-  url.searchParams.set('id', params.id);
+  url.searchParams.set('id', resolvedParams.id);
 
   // Create a new request with the ID in query params so existing handler can find it
   const modifiedReq = new NextRequest(url.toString(), {
@@ -26,10 +27,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // PUT handler - update product
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   // Pass the ID from URL params to the handler
   const url = new URL(req.url);
-  url.searchParams.set('id', params.id);
+  url.searchParams.set('id', resolvedParams.id);
 
   // Create a new request with the ID in query params so existing handler can find it
   const modifiedReq = new NextRequest(url.toString(), {
@@ -42,10 +44,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // PATCH handler - update product (used by Payload admin)
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   // Pass the ID from URL params to the handler
   const url = new URL(req.url);
-  url.searchParams.set('id', params.id);
+  url.searchParams.set('id', resolvedParams.id);
 
   // Create a new request with the ID in query params so existing handler can find it
   const modifiedReq = new NextRequest(url.toString(), {
@@ -58,10 +61,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // DELETE handler - delete product
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   // Pass the ID from URL params to the handler
   const url = new URL(req.url);
-  url.searchParams.set('id', params.id);
+  url.searchParams.set('id', resolvedParams.id);
 
   // Create a new request with the ID in query params so existing handler can find it
   const modifiedReq = new NextRequest(url.toString(), {
