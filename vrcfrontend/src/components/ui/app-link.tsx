@@ -37,11 +37,10 @@ export const AppLink: React.FC<AppLinkProps> = ({
   let path = routeConfig.path;
   
   // Replace path parameters if any (like :id with actual id)
-  if (params && Object.keys(params).length > 0) {
-    Object.entries(params).forEach(([key, value]) => {
+  if (params && Object.keys(params).length > 0) {    Object.entries(params).forEach(([key, value]) => {
       // Make sure we have a value before replacing
       if (value !== undefined && value !== null) {
-        const paramPattern = new RegExp(`:${key}(?=\/|$)`, 'g');
+        const paramPattern = new RegExp(`:${key}(?=/|$)`, 'g');
         path = (path.replace(paramPattern, encodeURIComponent(value)) as string);
       }
     });
