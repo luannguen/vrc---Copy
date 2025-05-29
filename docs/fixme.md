@@ -1,8 +1,11 @@
 # VRC PAYLOAD CMS - FIXME & TROUBLESHOOTING GUIDE
 
-**Last Updated: May 27, 2025**
+**Last Updated: May 29, 2025**
 
 **Recent Fixes Applied:**
+- ✅ **Product Delete from Admin Edit View**: Fixed URL parameter extraction causing delete failures
+- ✅ **Related Products Cleanup**: Enhanced beforeDelete hook with improved query logic 
+- ✅ **Admin Response Format**: Fixed formatAdminResponse to distinguish collection vs single document responses
 - ✅ **React Hydration Mismatch - PostHero Component**: Fixed dynamic styling issues causing SSR/client differences
 - ✅ **PayloadImageWrapper - Iframe Detection**: Replaced useEffect with CSS-based detection to prevent hydration mismatch
 - ✅ **Remove fix-iframe-height.ts Script**: Eliminated problematic iframe height fixing script that caused DOM differences
@@ -12,10 +15,61 @@
 - ✅ **localAvatar.ts TypeScript Errors**: Fixed undefined username and color array access issues
 - ✅ **CSS Iframe Detection**: Implemented fallback styles for iframe contexts before hydration completes
 
+## PRODUCT DELETE FROM ADMIN EDIT VIEW FIX
+
+### Vấn đề
+Khi xóa sản phẩm từ giao diện edit sản phẩm trong admin panel (URL: `/admin/collections/products/[id]`), gặp lỗi:
+```
+There was an error while deleting [Product Name]. Please check your connection and try again.
+```
+
+### Nguyên nhân chính xác
+1. **URL Parameter vs Query Parameter Mismatch**: 
+   - Admin edit view gửi DELETE request tới `/api/products/[id]` (URL parameter)
+   - Nhưng handlers trong `src/app/(payload)/api/products/handlers/delete.ts` được thiết kế để đọc ID từ query parameters (`?id=xxx`)
+   - Route handler `/api/products/[id]/route.ts` không chuyển URL parameter thành query parameter
+
+2. **Handler không nhận được Product ID**:
+   - Handler `handleDELETE()` gọi `extractIdFromRequest()` để lấy ID từ query params
+   - Khi request đến từ `/api/products/123`, ID nằm trong URL params chứ không phải query params
+   - Dẫn đến ID = undefined → lỗi khi xóa sản phẩm
+
+### Giải pháp đã áp dụng
+**File: `src/app/api/products/[id]/route.ts`**
+
+```typescript
+// DELETE handler - delete product
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  // Pass the ID from URL params to the handler
+  const url = new URL(req.url);
+  url.searchParams.set('id', params.id);
+
+  // Create a new request with the ID in query params so existing handler can find it
+  const modifiedReq = new NextRequest(url.toString(), {
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+  });
+
+  return handleDELETE(modifiedReq);
+}
+```
+
+**Tương tự cho GET và PUT handlers** để đảm bảo consistency.
+
+### Kết quả
+- ✅ Delete sản phẩm từ admin edit view hoạt động bình thường
+- ✅ Delete sản phẩm từ admin list view vẫn hoạt động ổn định  
+- ✅ Related products cleanup vẫn chạy đúng với beforeDelete hook
+- ✅ API endpoints có cấu trúc nhất quán và reliable
+
+### Bài học kỹ thuật
+- **URL Parameters vs Query Parameters**: Cần phân biệt rõ `/api/products/[id]` (URL param) vs `/api/products?id=xxx` (query param)
+- **Handler Design Pattern**: Khi thiết kế handlers, nên consistent về cách extract parameters
+- **Route Integration**: Dynamic routes `[id]` cần bridge properly với existing handlers
+
 **Console Status:**
 - ✅ React hydration mismatch warnings: FIXED with proper SSR/client component separation
-- ✅ Gravatar tracking prevention warnings: DOCUMENTED (browser privacy feature, not fixable)
-- ✅ TypeScript compilation errors: RESOLVED
 
 ## HYDRATION MISMATCH FIX - LIVE PREVIEW
 

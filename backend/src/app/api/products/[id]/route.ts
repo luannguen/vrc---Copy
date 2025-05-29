@@ -10,16 +10,49 @@ export function OPTIONS(req: NextRequest) {
 }
 
 // GET handler - get single product by ID
-export async function GET(req: NextRequest) {
-  return handleGET(req);
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  // Pass the ID from URL params to the handler
+  const url = new URL(req.url);
+  url.searchParams.set('id', params.id);
+
+  // Create a new request with the ID in query params so existing handler can find it
+  const modifiedReq = new NextRequest(url.toString(), {
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+  });
+
+  return handleGET(modifiedReq);
 }
 
 // PUT handler - update product
-export async function PUT(req: NextRequest) {
-  return handleUpdate(req);
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  // Pass the ID from URL params to the handler
+  const url = new URL(req.url);
+  url.searchParams.set('id', params.id);
+
+  // Create a new request with the ID in query params so existing handler can find it
+  const modifiedReq = new NextRequest(url.toString(), {
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+  });
+
+  return handleUpdate(modifiedReq);
 }
 
 // DELETE handler - delete product
-export async function DELETE(req: NextRequest) {
-  return handleDELETE(req);
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  // Pass the ID from URL params to the handler
+  const url = new URL(req.url);
+  url.searchParams.set('id', params.id);
+
+  // Create a new request with the ID in query params so existing handler can find it
+  const modifiedReq = new NextRequest(url.toString(), {
+    method: req.method,
+    headers: req.headers,
+    body: req.body,
+  });
+
+  return handleDELETE(modifiedReq);
 }

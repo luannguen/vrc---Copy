@@ -1,5 +1,5 @@
 import { getPayload } from 'payload';
-import config from './src/payload.config.ts';
+import config from '../src/payload.config.ts';
 
 async function debugCollections() {
   try {

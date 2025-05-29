@@ -6,37 +6,45 @@ import { createCORSHeaders } from '../../_shared/cors';
  */
 export function formatAdminResponse(data: any, status: number = 200): NextResponse {
   const headers = createCORSHeaders();
-  
+
   // Add cache control headers to prevent stale data in admin panel
   headers.append('Cache-Control', 'no-cache, no-store, must-revalidate');
   headers.append('Pragma', 'no-cache');
   headers.append('Expires', '0');
-  
+
   // Thêm header đặc biệt để đảm bảo làm mới danh sách
   headers.append('X-Payload-Admin', 'true');
   headers.append('X-Payload-Refresh', 'products');
-  
-  // Format the response in the specific format expected by the admin UI
-  const adminResponse = {
-    message: null, // Không có thông báo = không có lỗi
-    doc: data,     // Dữ liệu được trả về
-    errors: [],    // Mảng lỗi rỗng = không có lỗi
-  };
-  
-  return NextResponse.json(adminResponse, { status, headers });
+
+  // Check if this is a collection list or single document
+  // Collection list should have docs, totalDocs, page, etc.
+  // Single document should be wrapped in { message, doc, errors }
+  if (data && typeof data === 'object' && 'docs' in data) {
+    // This is a collection list response - return as-is with Payload format
+    return NextResponse.json(data, { status, headers });
+  } else {
+    // This is a single document - wrap in admin format
+    const adminResponse = {
+      message: null, // Không có thông báo = không có lỗi
+      doc: data,     // Dữ liệu được trả về
+      errors: [],    // Mảng lỗi rỗng = không có lỗi
+    };
+
+    return NextResponse.json(adminResponse, { status, headers });
+  }
 }
 
 /**
  * Formats a response for API clients (non-admin)
  */
 export function formatApiResponse(
-  data: any, 
-  message: string = 'Thành công', 
+  data: any,
+  message: string = 'Thành công',
   status: number = 200,
   success: boolean = true
 ): NextResponse {
   const headers = createCORSHeaders();
-  
+
   return NextResponse.json(
     {
       success,
@@ -60,11 +68,11 @@ export function formatAdminErrorResponse(
   const headers = createCORSHeaders();
   headers.append('X-Payload-Admin', 'true');
   headers.append('Cache-Control', 'no-cache, no-store, must-revalidate');
-  
+
   // Chuẩn bị mảng lỗi đúng định dạng
   let formattedErrors: Array<{ message: string, field: string }> = [];
   let errorMessage = 'An error occurred';
-  
+
   if (Array.isArray(errors)) {
     formattedErrors = errors;
     // Kiểm tra cẩn thận để tránh lỗi undefined
@@ -79,7 +87,7 @@ export function formatAdminErrorResponse(
     formattedErrors = [{ message: errorMsg, field: 'general' }];
     errorMessage = errorMsg;
   }
-  
+
   return NextResponse.json(
     {
       message: errorMessage,
@@ -101,7 +109,7 @@ export function formatApiErrorResponse(
   status: number = 400
 ): NextResponse {
   const headers = createCORSHeaders();
-  
+
   return NextResponse.json(
     {
       success: false,
@@ -125,18 +133,18 @@ export function formatBulkResponse(
 ): NextResponse {
   const status = errors.length === 0 ? 200 : 207; // Use 207 Multi-Status for partial success
   const headers = createCORSHeaders();
-  
+
   // Add cache headers
   headers.append('Cache-Control', 'no-cache, no-store, must-revalidate');
   headers.append('Pragma', 'no-cache');
   headers.append('Expires', '0');
   headers.append('X-Reload-Collection', 'products');
-  
+
   if (isAdmin) {
     // Thêm header đặc biệt cho Payload UI
     headers.append('X-Payload-Admin', 'true');
     headers.append('X-Payload-Refresh', 'products');
-    
+
     // Định dạng CHÍNH XÁC theo yêu cầu của Payload CMS admin UI
     // Phát hiện referer để xem request đến từ list view hay edit view
     return NextResponse.json(
@@ -154,7 +162,7 @@ export function formatBulkResponse(
       }
     );
   }
-  
+
   return NextResponse.json(
     {
       success: errors.length === 0,

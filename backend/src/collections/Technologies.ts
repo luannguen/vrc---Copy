@@ -31,9 +31,8 @@ export const Technologies: CollectionConfig = {
         console.log('==========================================\n');
         return data;
       }
-    ],
-    beforeChange: [
-      ({ data, operation, req }) => {
+    ],    beforeChange: [
+      ({ data, operation }) => {
         console.log('\n🔧 === TECHNOLOGIES BEFORE CHANGE HOOK ===');
         console.log('Operation:', operation);
         console.log('Final data:', JSON.stringify(data, null, 2));
@@ -111,15 +110,16 @@ export const Technologies: CollectionConfig = {
         position: 'sidebar',
         description: 'Đánh dấu là đối tác nổi bật để hiện trên trang chủ',
       },
-    },
-    {
+    },    {
       name: 'products',
       type: 'relationship',
       label: 'Sản phẩm liên quan',
-      relationTo: ['products'],
+      relationTo: 'products',
       hasMany: true,
       admin: {
         description: 'Các sản phẩm liên quan đến công nghệ/đối tác này',
+        // Workaround for SortHeader error - add specific admin config
+        isSortable: false,
       },
     },
     {

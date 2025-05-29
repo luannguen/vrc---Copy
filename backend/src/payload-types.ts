@@ -134,11 +134,13 @@ export interface Config {
     header: Header;
     footer: Footer;
     'company-info': CompanyInfo;
+    'homepage-settings': HomepageSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'company-info': CompanyInfoSelect<false> | CompanyInfoSelect<true>;
+    'homepage-settings': HomepageSettingsSelect<false> | HomepageSettingsSelect<true>;
   };
   locale: null;
   user: User & {
@@ -1336,12 +1338,7 @@ export interface Technology {
   /**
    * Các sản phẩm liên quan đến công nghệ/đối tác này
    */
-  products?:
-    | {
-        relationTo: 'products';
-        value: string | Product;
-      }[]
-    | null;
+  products?: (string | Product)[] | null;
   certifications?:
     | {
         title: string;
@@ -3276,6 +3273,98 @@ export interface CompanyInfo {
   createdAt?: string | null;
 }
 /**
+ * Quản lý nội dung và hiển thị trang chủ website
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-settings".
+ */
+export interface HomepageSetting {
+  id: string;
+  heroSection?: {
+    /**
+     * Bật/tắt chế độ carousel tự động
+     */
+    enableCarousel?: boolean | null;
+    autoSlideInterval?: number | null;
+    /**
+     * Chọn banner hiển thị trên trang chủ (theo thứ tự)
+     */
+    banners?: (string | Banner)[] | null;
+  };
+  featuredSection?: {
+    isEnabled?: boolean | null;
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Chọn tối đa 6 sản phẩm hiển thị
+     */
+    featuredProducts?: (string | Product)[] | null;
+    viewAllLink?: string | null;
+  };
+  publicationsSection?: {
+    isEnabled?: boolean | null;
+    title?: string | null;
+    description?: string | null;
+    displayMode?: ('auto' | 'manual') | null;
+    numberOfPosts?: number | null;
+    selectedPosts?: (string | Post)[] | null;
+    viewAllLink?: string | null;
+  };
+  resourcesSection?: {
+    isEnabled?: boolean | null;
+    title?: string | null;
+    description?: string | null;
+    leftPanel?: {
+      title?: string | null;
+      description?: string | null;
+      features?:
+        | {
+            text?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      linkText?: string | null;
+      linkUrl?: string | null;
+    };
+    rightPanel?: {
+      title?: string | null;
+      description?: string | null;
+      features?:
+        | {
+            text?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      linkText?: string | null;
+      linkUrl?: string | null;
+    };
+  };
+  contactSection?: {
+    isEnabled?: boolean | null;
+    backgroundColor?: ('gray' | 'white' | 'primary') | null;
+  };
+  seoSettings?: {
+    /**
+     * Tiêu đề hiển thị trên kết quả tìm kiếm
+     */
+    metaTitle?: string | null;
+    /**
+     * Mô tả hiển thị trên kết quả tìm kiếm
+     */
+    metaDescription?: string | null;
+    /**
+     * Từ khóa SEO, phân cách bằng dấu phẩy
+     */
+    metaKeywords?: string | null;
+    /**
+     * Hình ảnh hiển thị khi chia sẻ trang chủ (1200x630px)
+     */
+    ogImage?: (string | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -3360,6 +3449,91 @@ export interface CompanyInfoSelect<T extends boolean = true> {
       };
   additionalInfo?: T;
   logo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-settings_select".
+ */
+export interface HomepageSettingsSelect<T extends boolean = true> {
+  heroSection?:
+    | T
+    | {
+        enableCarousel?: T;
+        autoSlideInterval?: T;
+        banners?: T;
+      };
+  featuredSection?:
+    | T
+    | {
+        isEnabled?: T;
+        title?: T;
+        description?: T;
+        featuredProducts?: T;
+        viewAllLink?: T;
+      };
+  publicationsSection?:
+    | T
+    | {
+        isEnabled?: T;
+        title?: T;
+        description?: T;
+        displayMode?: T;
+        numberOfPosts?: T;
+        selectedPosts?: T;
+        viewAllLink?: T;
+      };
+  resourcesSection?:
+    | T
+    | {
+        isEnabled?: T;
+        title?: T;
+        description?: T;
+        leftPanel?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              features?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              linkText?: T;
+              linkUrl?: T;
+            };
+        rightPanel?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              features?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              linkText?: T;
+              linkUrl?: T;
+            };
+      };
+  contactSection?:
+    | T
+    | {
+        isEnabled?: T;
+        backgroundColor?: T;
+      };
+  seoSettings?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        metaKeywords?: T;
+        ogImage?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

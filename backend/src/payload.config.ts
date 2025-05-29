@@ -28,6 +28,7 @@ import { Banners } from './collections/Banners'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { CompanyInfo } from './globals/CompanyInfo'
+import { HomepageSettings } from './globals/HomepageSettings'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -129,7 +130,7 @@ export default buildConfig({  admin: {
       'accept',
     ]
   },
-  globals: [Header, Footer, CompanyInfo],
+  globals: [Header, Footer, CompanyInfo, HomepageSettings],
   plugins: [
     ...plugins,
     // storage-adapter-placeholder

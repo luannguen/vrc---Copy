@@ -33,47 +33,83 @@ export const Products: CollectionConfig = {
         try {
           console.log(`Preparing to delete product with ID: ${id}`);
 
-          // Simpler approach: find products that reference this one and update them
-          const referencingProducts = await req.payload.find({
-            collection: 'products',
-            where: {
-              'relatedProducts.value': {
-                equals: id
+          // Find products that reference this one using multiple query approaches
+          // Try both direct ID reference and object.value reference patterns
+          const queries = [
+            // Direct ID reference (most common) - use 'in' which is more reliable
+            {
+              'relatedProducts': {
+                in: [id]
               }
-            },
-          });
+            }
+          ];
 
-          if (referencingProducts.docs.length > 0) {
-            console.log(`Found ${referencingProducts.docs.length} products referencing this product. Updating references...`);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const allReferencingProducts: any[] = [];
 
-            for (const product of referencingProducts.docs) {
+          for (const query of queries) {
+            try {
+              const result = await req.payload.find({
+                collection: 'products',
+                where: query,
+              });
+              if (result.docs.length > 0) {
+                allReferencingProducts.push(...result.docs);
+              }
+            } catch (queryError) {
+              const errorMessage = queryError instanceof Error ? queryError.message : 'Unknown error';
+              console.log(`Query attempt failed (this is expected):`, errorMessage);
+            }
+          }
+
+          // Remove duplicates based on ID
+          const uniqueProducts = allReferencingProducts.filter((product, index, self) =>
+            index === self.findIndex(p => p.id === product.id)
+          );
+
+          if (uniqueProducts.length > 0) {
+            console.log(`Found ${uniqueProducts.length} products referencing this product. Updating references...`);
+
+            for (const product of uniqueProducts) {
               if (product.relatedProducts && Array.isArray(product.relatedProducts)) {
                 // Remove the reference to the product being deleted
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const updatedRelatedProducts = product.relatedProducts.filter((relatedItem: any) => {
+                  // Handle string ID
                   if (typeof relatedItem === 'string') {
                     return relatedItem !== id;
                   }
-                  // Handle case where it's an object with value property
+                  // Handle object with id property (populated)
+                  if (relatedItem && typeof relatedItem === 'object' && 'id' in relatedItem) {
+                    return relatedItem.id !== id;
+                  }
+                  // Handle object with value property (alternative format)
                   if (relatedItem && typeof relatedItem === 'object' && 'value' in relatedItem) {
                     return relatedItem.value !== id;
                   }
                   return true;
                 });
 
-                try {
-                  await req.payload.update({
-                    collection: 'products',
-                    id: product.id,
-                    data: {
-                      relatedProducts: updatedRelatedProducts
-                    }
-                  });
-                  console.log(`Updated references in product: ${product.id}`);
-                } catch (updateError) {
-                  console.error(`Failed to update references in product ${product.id}:`, updateError);
+                // Only update if there was actually a change
+                if (updatedRelatedProducts.length !== product.relatedProducts.length) {
+                  try {
+                    await req.payload.update({
+                      collection: 'products',
+                      id: product.id,
+                      data: {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        relatedProducts: updatedRelatedProducts as any
+                      }
+                    });
+                    console.log(`Updated references in product: ${product.id} (removed ${product.relatedProducts.length - updatedRelatedProducts.length} references)`);
+                  } catch (updateError) {
+                    console.error(`Failed to update references in product ${product.id}:`, updateError);
+                  }
                 }
               }
             }
+          } else {
+            console.log(`No products found referencing product ${id}`);
           }
 
           return true; // Proceed with deletion
@@ -184,17 +220,11 @@ export const Products: CollectionConfig = {
       relationTo: 'products',
       hasMany: true,
       defaultValue: [],
-      filterOptions: ({ id }) => {
-        return {
-          id: {
-            not_in: id ? [id] : [],
-          },
-        };
-      },
       admin: {
         description: 'Chọn các sản phẩm liên quan để hiển thị phía dưới',
         allowCreate: false,
         isSortable: true,
+        position: 'sidebar',
       },
     },
     {
@@ -205,13 +235,13 @@ export const Products: CollectionConfig = {
       fields: [
         {
           name: 'name',
-          type: 'text',
+          type: 'text' as const,
           label: 'Tên thông số',
           required: true,
         },
         {
           name: 'value',
-          type: 'text',
+          type: 'text' as const,
           label: 'Giá trị',
           required: true,
         },
