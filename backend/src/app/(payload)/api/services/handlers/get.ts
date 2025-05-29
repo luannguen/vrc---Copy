@@ -12,7 +12,7 @@ function formatAdminResponse(data: any): NextResponse {
   headers.append('Cache-Control', 'no-cache, no-store, must-revalidate');
   headers.append('Pragma', 'no-cache');
   headers.append('Expires', '0');
-  
+
   return NextResponse.json(data, {
     status: 200,
     headers
@@ -22,7 +22,7 @@ function formatAdminResponse(data: any): NextResponse {
 function formatAdminErrorResponse(message: string, status: number = 404): NextResponse {
   const headers = createCORSHeaders();
   headers.append('X-Payload-Admin', 'true');
-  
+
   return NextResponse.json({
     message,
     errors: []
@@ -34,7 +34,7 @@ function formatAdminErrorResponse(message: string, status: number = 404): NextRe
 
 /**
  * Fetch services with various filters, sorting, and pagination
- * 
+ *
  * GET /api/services - List all services with pagination and filters
  * GET /api/services?slug=example - Get single service by slug
  * GET /api/services?id=123456 - Get single service by ID
@@ -51,15 +51,14 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     });
 
     const url = new URL(req.url);
-    
-    // Parse query parameters - handle both URL params and form data (for method override requests)
-    let queryParams = new URLSearchParams();
-    
+      // Parse query parameters - handle both URL params and form data (for method override requests)
+    const queryParams = new URLSearchParams();
+
     // First, get URL parameters
     url.searchParams.forEach((value, key) => {
       queryParams.set(key, value);
     });
-    
+
     // If this is a POST request with form data (method override), parse form data as query params
     const contentType = req.headers.get('content-type') || '';
     if (req.method === 'POST' && contentType.includes('application/x-www-form-urlencoded')) {
@@ -73,16 +72,16 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
         console.log('GET /api/services: Could not parse form data, using URL params only');
       }
     }
-    
+
     // Check if this is an admin panel request
     const adminRequest = isAdminRequest(req);
     console.log('GET /api/services: Is admin request:', adminRequest);
-    
+
     // Single service by ID
     const id = queryParams.get('id');
     if (id) {
       console.log('GET /api/services: Fetching single service by ID:', id);
-      
+
       const service = await payload.findByID({
         collection: 'services',
         id: id,
@@ -104,7 +103,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     const slug = queryParams.get('slug');
     if (slug) {
       console.log('GET /api/services: Fetching single service by slug:', slug);
-      
+
       const services = await payload.find({
         collection: 'services',
         where: {
@@ -130,16 +129,16 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
 
     // List services with filters and pagination
     console.log('GET /api/services: Fetching services list with filters');
-    
+
     // Build where conditions
     const where: any = {};
-    
+
     // Filter by type
     const type = queryParams.get('type');
     if (type) {
       where.type = { equals: type };
     }
-    
+
     // Search functionality
     const search = queryParams.get('search');
     if (search) {
@@ -160,7 +159,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     // Pagination
     const page = Number(queryParams.get('page')) || 1;
     const limit = Number(queryParams.get('limit')) || 10;
-    
+
     // Sorting
     const sort = queryParams.get('sort') || 'createdAt';
     const sortDirection = queryParams.get('sortDirection') || 'desc';
@@ -168,7 +167,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
 
     // Additional query parameters for admin interface
     const depth = Number(queryParams.get('depth') || 1);
-    
+
     console.log('GET /api/services: Query conditions:', {
       where,
       page,

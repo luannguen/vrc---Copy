@@ -12,7 +12,7 @@ function formatAdminResponse(data: any): NextResponse {
   headers.append('Cache-Control', 'no-cache, no-store, must-revalidate');
   headers.append('Pragma', 'no-cache');
   headers.append('Expires', '0');
-  
+
   return NextResponse.json(data, {
     status: 200,
     headers
@@ -22,7 +22,7 @@ function formatAdminResponse(data: any): NextResponse {
 function formatAdminErrorResponse(message: string, status: number = 404): NextResponse {
   const headers = createCORSHeaders();
   headers.append('X-Payload-Admin', 'true');
-  
+
   return NextResponse.json({
     message,
     errors: []
@@ -35,7 +35,7 @@ function formatAdminErrorResponse(message: string, status: number = 404): NextRe
 /**
  * Fetch projects with various filters, sorting, and pagination
  * Following the successful Related Services pattern
- * 
+ *
  * GET /api/projects - List all projects with pagination and filters
  * GET /api/projects?slug=example - Get single project by slug
  * GET /api/projects?id=123456 - Get single project by ID
@@ -51,19 +51,18 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
       config,
     });
 
-    const url = new URL(req.url);
-      // Parse query parameters - handle both URL params and form data (for method override requests)
-    let queryParams = new URLSearchParams();
-    
+    const url = new URL(req.url);      // Parse query parameters - handle both URL params and form data (for method override requests)
+    const queryParams = new URLSearchParams();
+
     // First, get URL parameters
     url.searchParams.forEach((value, key) => {
       queryParams.set(key, value);
     });
-    
+
     // Debug: Log all query parameters
     console.log('🔍 GET /api/projects: Raw URL searchParams:', Object.fromEntries(url.searchParams.entries()));
     console.log('🔍 GET /api/projects: Processed queryParams:', Object.fromEntries(queryParams.entries()));
-    
+
     // If this is a POST request with form data (method override), parse form data as query params
     const contentType = req.headers.get('content-type') || '';
     if (req.method === 'POST' && contentType.includes('application/x-www-form-urlencoded')) {
@@ -77,16 +76,16 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
         console.log('GET /api/projects: Could not parse form data, using URL params only');
       }
     }
-    
+
     // Check if this is an admin panel request
     const adminRequest = isAdminRequest(req);
     console.log('GET /api/projects: Is admin request:', adminRequest);
-    
+
     // Single project by ID
     const id = queryParams.get('id');
     if (id) {
       console.log('GET /api/projects: Fetching single project by ID:', id);
-      
+
       const project = await payload.findByID({
         collection: 'projects',
         id: id,
@@ -110,7 +109,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     const slug = queryParams.get('slug');
     if (slug) {
       console.log('GET /api/projects: Fetching single project by slug:', slug);
-      
+
       const projects = await payload.find({
         collection: 'projects',
         where: {
@@ -140,20 +139,19 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     console.log('GET /api/projects: Fetching projects list with filters');
       // Build where conditions
     const where: any = {};
-    
+
     console.log('🔍 GET /api/projects: Starting to build where conditions');
-    
-    // Handle Payload CMS-style category filter with nested query parameters
+      // Handle Payload CMS-style category filter with nested query parameters
     // Look for patterns like: where[categories][in][0]=categoryId
-    let categoryIds: string[] = [];
-    
+    const categoryIds: string[] = [];
+
     // Check for direct category parameter
     const directCategory = queryParams.get('category');
     if (directCategory) {
       categoryIds.push(directCategory);
       console.log('🎯 Found direct category:', directCategory);
     }
-    
+
     // Check for Payload CMS style nested parameters
     for (const [key, value] of queryParams.entries()) {
       // Match patterns like: where[categories][in][0], where[categories][in][1], etc.
@@ -163,7 +161,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
         console.log(`🎯 Found nested category parameter ${key}:`, value);
       }
     }
-    
+
     // Filter by category if any found
     if (categoryIds.length > 0) {
       where.categories = { in: categoryIds };
@@ -171,19 +169,19 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     } else {
       console.log('🔍 No category filters found');
     }
-    
+
     // Filter by featured
     const featured = queryParams.get('featured');
     if (featured === 'true') {
       where.featured = { equals: true };
     }
-    
+
     // Filter by service
     const service = queryParams.get('service');
     if (service) {
       where.services = { in: [service] };
     }
-    
+
     // Search functionality
     const search = queryParams.get('search');
     if (search) {
@@ -204,7 +202,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     // Pagination
     const page = Number(queryParams.get('page')) || 1;
     const limit = Number(queryParams.get('limit')) || 10;
-    
+
     // Sorting
     const sort = queryParams.get('sort') || 'createdAt';
     const sortDirection = queryParams.get('sortDirection') || 'desc';
@@ -237,7 +235,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
       limit: projects.limit,
       docsCount: projects.docs.length,
     });
-    
+
     // Debug: Log each project's categories to verify the filter is working
     if (projects.docs && projects.docs.length > 0) {
       console.log('🔍 Projects found with their categories:');

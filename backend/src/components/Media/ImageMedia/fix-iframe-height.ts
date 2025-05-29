@@ -12,10 +12,10 @@ export const fixIframeImageHeight = () => {
 
   if (isInIframe) {
     console.log('Fixing iframe image heights for Payload live preview...')
-    
+
     // Add a class to the body for iframe-specific styling
     document.body.classList.add('payload-live-preview')
-    
+
     // Fix hero image containers
     const heroImageContainers = document.querySelectorAll('.hero-image-container')
     heroImageContainers.forEach((container) => {
@@ -37,7 +37,7 @@ export const fixIframeImageHeight = () => {
       element.style.height = '100%'
       element.style.display = 'block'
     })
-    
+
     // Fix absolute positioned containers that are parents of Media components
     const absoluteContainers = document.querySelectorAll('[class*="absolute"][class*="inset-0"]')
     absoluteContainers.forEach((container) => {
@@ -49,9 +49,8 @@ export const fixIframeImageHeight = () => {
         element.style.minHeight = '300px'
       }
     })
-    
-    // Force re-layout by triggering a reflow
-    document.body.offsetHeight
+      // Force re-layout by triggering a reflow
+    void document.body.offsetHeight
   }
 }
 
@@ -59,20 +58,20 @@ export const fixIframeImageHeight = () => {
 if (typeof window !== 'undefined') {
   // Run immediately
   fixIframeImageHeight()
-  
+
   // Run after DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fixIframeImageHeight)
   }
-  
+
   // Run after window load
   window.addEventListener('load', fixIframeImageHeight)
-  
+
   // Run after short delays to catch dynamically added elements
   setTimeout(fixIframeImageHeight, 100)
   setTimeout(fixIframeImageHeight, 500)
   setTimeout(fixIframeImageHeight, 1000)
-  
+
   // Use MutationObserver to detect new elements
   const observer = new MutationObserver((mutations) => {
     let shouldFix = false
@@ -85,7 +84,7 @@ if (typeof window !== 'undefined') {
       setTimeout(fixIframeImageHeight, 50)
     }
   })
-  
+
   observer.observe(document.body, {
     childList: true,
     subtree: true

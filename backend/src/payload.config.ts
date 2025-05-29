@@ -106,7 +106,7 @@ export default buildConfig({  admin: {
     Technologies,
     Tools,
     Resources,
-    Banners
+    Banners,
   ],cors: {
     origins: process.env.NODE_ENV === 'production'
       ? [

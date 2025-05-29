@@ -22,9 +22,9 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
     const payload = await getPayload({
       config,
     })
-    
+
     const url = new URL(req.url)
-    
+
     // Parse query parameters
     const { postId } = extractPostIdsSync(req);
     const slug = url.searchParams.get('slug')
@@ -34,14 +34,14 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
     const category = url.searchParams.get('category')
     const sort = url.searchParams.get('sort') || 'createdAt'
     const order = url.searchParams.get('order') || 'desc'
-    
+
     // Extract post ID from path if present (e.g. /api/posts/123456) when not found in query
     let pathId = null;
     if (!postId) {
       const path = url.pathname
       const pathSegments = path.split('/')
       pathId = pathSegments[pathSegments.length - 1]
-      
+
       // Only treat as ID if not "posts" (route name)
       if (pathId && pathId !== 'posts') {
         try {
@@ -50,7 +50,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
             id: pathId,
             depth: 1, // Populate references 1 level deep
           })
-          
+
           return createCORSResponse({
             success: true,
             data: post,
@@ -61,7 +61,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
         }
       }
     }
-    
+
     // If fetching a single post by ID
     if (postId) {
       try {
@@ -70,7 +70,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
           id: postId,
           depth: 1, // Populate references 1 level deep
         })
-        
+
         return createCORSResponse({
           success: true,
           data: post,
@@ -80,7 +80,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
         return handleApiError(error, `Không tìm thấy bài viết với ID: ${postId}`, 404)
       }
     }
-    
+
     // If fetching a single post by slug
     if (slug) {
       try {
@@ -93,7 +93,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
           },
           depth: 1,
         })
-        
+
         if (result.docs.length > 0) {
           return createCORSResponse({
             success: true,
@@ -112,15 +112,14 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
     }
       // Otherwise fetch a list of posts with advanced filtering
     const query: any = {}
-    
-    // Handle status filter - allow filtering by any status if specified, default to published
+      // Handle status filter - allow filtering by any status if specified, default to published
     const statusParam = url.searchParams.get('status') || 'published'
     if (statusParam !== 'all') {
-      query.status = {
+      query._status = {
         equals: statusParam
       }
     }
-    
+
     // Add search filter - can search in title and content
     if (search) {
       // Use OR to search in both title and content
@@ -137,32 +136,32 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
         }
       ]
     }
-    
+
     // Add category filter
     if (category) {
       query.categories = {
         contains: category
       }
     }
-    
+
     // Add date range filter if provided
     const fromDate = url.searchParams.get('fromDate')
     const toDate = url.searchParams.get('toDate')
-    
+
     if (fromDate || toDate) {
       query.createdAt = {}
-      
+
       if (fromDate) {
         query.createdAt.greater_than_equal = new Date(fromDate).toISOString()
       }
-      
+
       if (toDate) {
         query.createdAt.less_than_equal = new Date(toDate).toISOString()
       }
     }
-    
+
     console.log('Posts query:', JSON.stringify(query, null, 2))
-    
+
     // Default sort by createdAt in descending order, unless specified otherwise
     const posts = await payload.find({
       collection: 'posts',
@@ -172,7 +171,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
       depth: 1,
       sort: sort ? (order === 'asc' ? sort : `-${sort}`) : '-createdAt',
     })
-    
+
     return createCORSResponse({
       success: true,
       data: posts.docs,
@@ -190,7 +189,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
 
 /**
  * Delete a post or multiple posts
- * 
+ *
  * DELETE /api/posts?id=123456
  * DELETE /api/posts?ids=123456,789012
  * DELETE /api/posts?where[and][1][id][in][0]=123456 (format từ admin panel)
@@ -200,15 +199,15 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     console.log('DELETE /api/posts: Request received');
     console.log('Request URL:', req.url);
     console.log('Referer:', req.headers.get('referer'));
-    
+
     // Special handling for admin panel requests
     const referer = req.headers.get('referer') || '';
     const isAdminRequest = referer.includes('/admin');
-    
+
     if (isAdminRequest) {
       console.log('Detected admin panel request for post deletion');
     }
-    
+
     // Yêu cầu xác thực với bypass cho admin
     const isAuthenticated = await checkAuth(req, !isAdminRequest) // Chỉ yêu cầu nghiêm ngặt xác thực cho các yêu cầu không từ admin
     if (!isAuthenticated && !isAdminRequest) {
@@ -225,7 +224,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
         }
       )
     }
-    
+
     // Khởi tạo Payload
     const payload = await getPayload({
       config,
@@ -237,11 +236,11 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     console.log('Extracted postIds:', postIds);
 
     const headers = createCorsHeaders()
-    
+
     // Xử lý xóa hàng loạt với nhiều ID
     if (postIds && postIds.length > 0) {
       const idsArray = postIds;
-      
+
       if (idsArray.length === 0) {
         return NextResponse.json(
           {
@@ -255,11 +254,11 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
           }
         )
       }
-      
+
       // Xóa nhiều bài viết
       const results = [];
       const errors = [];
-      
+
       // Bỏ qua việc kiểm tra post tồn tại trước khi xóa
       // Thay vào đó, sử dụng try-catch để xử lý lỗi cho từng ID riêng lẻ
       for (const id of idsArray) {        try {
@@ -280,20 +279,20 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
             }
             throw error; // Ném lại các lỗi khác
           });
-          
+
           // Ghi log thành công
           console.log(`Successfully deleted post with ID: ${id}`);
           results.push({ id, success: true });
         } catch (err: any) {
           console.error(`Error deleting post ${id}:`, err);
-          errors.push({ 
-            id, 
+          errors.push({
+            id,
             error: err.message || 'Lỗi không xác định',
-            errorDetail: err.toString() 
+            errorDetail: err.toString()
           });
         }
       }
-      
+
       // Tạo thông báo trạng thái chi tiết hơn về kết quả xóa
       let statusMessage;
       if (results.length === 0) {
@@ -308,7 +307,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       if (isAdminRequest) {
         // Đảm bảo định dạng phản hồi tuân thủ cấu trúc mà Payload CMS mong đợi
         if (errors.length === 0) {
-          // Trả về định dạng thành công của Payload CMS 
+          // Trả về định dạng thành công của Payload CMS
           return NextResponse.json({
             docs: results.map(result => ({ id: result.id })),
             errors: [],
@@ -362,7 +361,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
         }
       )
     }
-    
+
     try {
       // Bỏ qua việc kiểm tra post tồn tại trước khi xóa
       // Thay vào đó, cố gắng xóa trực tiếp và xử lý lỗi nếu có
@@ -392,7 +391,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
           // Định dạng phản hồi tương tự cấu trúc mong đợi của Payload CMS cho admin
           console.log('Returning admin-compatible response format');
           return NextResponse.json(
-            { 
+            {
               ...deletedPost,
               message: `Đã xóa bài viết thành công với ID: ${postId}`
             },
@@ -402,7 +401,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
             }
           );
         }
-        
+
         // Phản hồi API tiêu chuẩn cho các yêu cầu không từ admin
         return NextResponse.json(
           {
@@ -421,7 +420,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       }
     } catch (err: any) {
       console.error(`Error deleting post ${postId}:`, err);
-      
+
       // Kiểm tra nếu yêu cầu từ admin panel và định dạng phản hồi lỗi phù hợp
       if (isAdminRequest) {
         // Định dạng lỗi tương thích với admin
@@ -442,7 +441,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
           }
         );
       }
-      
+
       // Phản hồi lỗi API tiêu chuẩn
       return NextResponse.json(
         {
@@ -461,11 +460,11 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
   } catch (error) {
     console.error('Posts DELETE API Error:', error);
     const headers = createCorsHeaders();
-    
+
     // Kiểm tra nếu yêu cầu từ admin panel
     const referer = req.headers.get('referer') || '';
     const isAdminRequest = referer.includes('/admin');
-    
+
     if (isAdminRequest) {
       // Định dạng lỗi tương thích với admin
       console.log('Returning admin-compatible general error format');
@@ -484,7 +483,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
         }
       );
     }
-    
+
     return NextResponse.json(
       {
         success: false,
@@ -502,7 +501,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
 /**
  * Handle PATCH requests for publishing/unpublishing posts
- * 
+ *
  * PATCH /api/posts?id=123456
  * PATCH /api/posts?where[and][0][_status][not_equals]=draft&where[and][1][id][in][0]=123456
  * PATCH /api/posts?where[and][0][_status][not_equals]=published&where[and][1][id][in][0]=123456&draft=true
@@ -511,16 +510,16 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
   console.log('PATCH /api/posts: Request received');
   console.log('Request URL:', req.url);
   console.log('Referer:', req.headers.get('referer'));
-  
+
   try {
     // Special handling for admin panel requests
     const referer = req.headers.get('referer') || '';
     const isAdminRequest = referer.includes('/admin');
-    
+
     if (isAdminRequest) {
       console.log('Detected admin panel request for post status update');
     }
-    
+
     // Require authentication with bypass for admin
     const isAuthenticated = await checkAuth(req, !isAdminRequest);
     if (!isAuthenticated && !isAdminRequest) {
@@ -537,44 +536,44 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
         }
       );
     }
-    
+
     // Initialize Payload
     const payload = await getPayload({
       config,
     });
-    
+
     const headers = createCorsHeaders();
-    
+
     // Extract post ID using the helper function
     const { postId, postIds } = await extractPostIds(req);
-    
+
     // Parse the request body for update data
     const json = await req.json().catch(() => ({}));
-    
+
     // Check if we're dealing with a publish/unpublish operation
     const url = new URL(req.url);
     const isDraftParam = url.searchParams.get('draft');
     const isDraft = isDraftParam === 'true';
-    
+
     // Check for complex status query param patterns
     const isPublishOperation = url.toString().includes('_status%5D%5Bnot_equals%5D=draft');
     const isUnpublishOperation = url.toString().includes('_status%5D%5Bnot_equals%5D=published');
-    
-    console.log('Status operation details:', { 
-      isDraft, 
-      isPublishOperation, 
+
+    console.log('Status operation details:', {
+      isDraft,
+      isPublishOperation,
       isUnpublishOperation,
       postId,
       postIds: postIds.length > 0 ? postIds : undefined
     });
-    
+
     // Determine the target post ID
     let targetId = postId;
       // If no direct ID, check complex query patterns
     if (!targetId && postIds.length > 0) {
       targetId = postIds[0] || null;
     }
-    
+
     if (!targetId && isAdminRequest) {
       // Try to extract ID from complex query params that Payload admin might use
       for (const [key, value] of url.searchParams.entries()) {
@@ -585,7 +584,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
         }
       }
     }
-    
+
     // If still no ID found, return error
     if (!targetId) {
       return NextResponse.json(
@@ -600,7 +599,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
         }
       );
     }
-    
+
     // Find the post first to get current status
     try {
       const post = await payload.findByID({
@@ -608,7 +607,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
         id: targetId,
         depth: 0
       }).catch(() => null);
-      
+
       if (!post) {
         return NextResponse.json(
           {
@@ -622,32 +621,32 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
           }
         );
       }
-      
+
       // Determine status update operation
       const statusUpdate = json.status || (isDraft ? 'draft' : (isPublishOperation ? 'published' : undefined));
       console.log('Status update:', statusUpdate);
-      
+
       // Prepare update data
-      const updateData: Record<string, any> = { 
+      const updateData: Record<string, any> = {
         ...json
       };
-      
+
       if (statusUpdate) {
         updateData.status = statusUpdate;
       }
-      
+
       // Execute the update
       const updatedPost = await payload.update({
         collection: 'posts',
         id: targetId,
         data: updateData,
       });
-      
+
       // Log successful update
-      const statusMessage = statusUpdate === 'published' ? 'xuất bản' : 
+      const statusMessage = statusUpdate === 'published' ? 'xuất bản' :
                           (statusUpdate === 'draft' ? 'lưu nháp' : 'cập nhật');
       console.log(`Successfully ${statusMessage} post: ${updatedPost.title || targetId}`);
-      
+
       // Format response depending on the source of the request
       if (isAdminRequest) {
         console.log('Returning admin-compatible response format');
@@ -659,7 +658,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
           }
         );
       }
-      
+
       // Standard API response for non-admin requests
       return NextResponse.json(
         {
@@ -674,7 +673,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
       );
     } catch (err: any) {
       console.error(`Error updating post ${targetId}:`, err);
-      
+
       // Check if request is from admin panel and format response accordingly
       if (isAdminRequest) {
         console.log('Returning admin-compatible error format');
@@ -693,7 +692,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
           }
         );
       }
-      
+
       // Standard API error response
       return NextResponse.json(
         {
@@ -711,11 +710,11 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
   } catch (error) {
     console.error('Posts PATCH API Error:', error);
     const headers = createCorsHeaders();
-    
+
     // Check if request is from admin panel
     const referer = req.headers.get('referer') || '';
     const isAdminRequest = referer.includes('/admin');
-    
+
     if (isAdminRequest) {
       // Format admin compatible error
       console.log('Returning admin-compatible general error format');
@@ -734,7 +733,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
         }
       );
     }
-    
+
     return NextResponse.json(
       {
         success: false,
@@ -752,12 +751,12 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
 
 /**
  * Create a new post
- * 
+ *
  * POST /api/posts
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   console.log('POST /api/posts: Request received');
-  const _url = new URL(req.url); 
+  const _url = new URL(req.url);
   const referer = req.headers.get('referer') || '';
   const isAdminRequest = referer.includes('/admin');
   const headers = createCorsHeaders();
@@ -782,7 +781,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       let requestBody;      try {
         requestBody = await req.json();
       } catch (_e) {
-        requestBody = null; 
+        requestBody = null;
         console.log('Admin request: JSON parsing failed or body is empty/malformed.');
       }
 
@@ -798,17 +797,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       if (isQueryOperation) {
         console.log('Admin POST request identified as a query operation for relationship options.');
         const page = Number(requestBody?.page) || 1;
-        const limit = Number(requestBody?.limit) || 30; 
+        const limit = Number(requestBody?.limit) || 30;
         const sortField = typeof requestBody?.sort === 'string' ? requestBody.sort.trim() : 'createdAt';        const sortOrder = typeof requestBody?.order === 'string' && requestBody.order.toLowerCase() === 'desc' ? 'desc' : 'asc';
         const sort = sortOrder === 'desc' ? `-${sortField.replace(/^-/, '')}` : sortField.replace(/^-/, '');
-        
+
         const query: any = requestBody?.where || {};
 
         if (typeof requestBody?.search === 'string' && requestBody.search.trim() !== '') {
           query.or = query.or || [];
           query.or.push({ title: { like: requestBody.search.trim() } });
         }
-        
+
         console.log('Admin query object for posts lookup:', JSON.stringify({ where: query, page, limit, sort }, null, 2));
 
         try {
@@ -817,7 +816,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             where: query,
             page,
             limit,
-            depth: 1, 
+            depth: 1,
             sort,
           });
           return NextResponse.json(results, { status: 200, headers });
@@ -828,7 +827,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             { status: 500, headers },
           );
         }
-      } else { 
+      } else {
         console.log('Admin POST request identified as a create operation.');
         if (!requestBody) {
           return NextResponse.json(
@@ -842,7 +841,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             { status: 400, headers },
           );
         }
-        
+
         const newPost = await payload.create({
           collection: 'posts',
           data: requestBody,
@@ -851,10 +850,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         console.log(`Admin successfully created post with ID: ${newPost.id}`);
         return NextResponse.json(newPost, { status: 201, headers });
       }
-    } else { 
+    } else {
       console.log('Client API POST request for post creation.');
       const clientJsonPayload = await req.json().catch(() => {
-        throw new Error('Invalid JSON in request body'); 
+        throw new Error('Invalid JSON in request body');
       });
 
       if (!clientJsonPayload) {
@@ -869,7 +868,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           { status: 400, headers },
         );
       }
-      
+
       const newPost = await payload.create({
         collection: 'posts',
         data: clientJsonPayload,
@@ -881,7 +880,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         { status: 201, headers },
       );
     }
-  } catch (error: any) { 
+  } catch (error: any) {
     console.error('Posts POST API General Error:', error);
 
     if (error.message === 'Invalid JSON in request body' && !isAdminRequest) {

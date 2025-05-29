@@ -1,0 +1,16 @@
+{
+  "width": 300,
+  "description": "A test image uploaded to the public directory",
+  "height": 200,
+  "updated_at": "2025-05-10T18:24:38.1600480+07:00",
+  "thumbnail": "public/uploads/thumbnails/thumb-test-image-20250510-182437-ua8x6l.jpg",
+  "media_type": "image",
+  "filename": "test-image-20250510-182437-ua8x6l.jpg",
+  "size": 3653,
+  "mime_type": "image/jpeg",
+  "created_at": "2025-05-10T18:24:38.1583558+07:00",
+  "id": "ua8x6l",
+  "file_path": "public/uploads/test-image-20250510-182437-ua8x6l.jpg",
+  "is_public": true,
+  "title": "Test image Upload"
+}

@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "services": "Dịch vụ",
+    "projects": "Dự án",
+    "contact": "Liên hệ",
+    "language": "Ngôn ngữ"
+  },
+  "hero": {
+    "title": "Giải Pháp Kỹ Thuật Lạnh Chuyên Nghiệp",
+    "subtitle": "Chúng tôi tạo ra những ứng dụng web sáng tạo và giải pháp kỹ thuật lạnh thúc đẩy sự phát triển kinh doanh",
+    "cta": "Bắt Đầu",
+    "learnMore": "Tìm Hiểu Thêm"
+  },
+  "about": {
+    "title": "Giới Thiệu",
+    "description": "Chúng tôi là đội ngũ các nhà phát triển và thiết kế đầy đam mê, cam kết cung cấp các giải pháp kỹ thuật lạnh chất lượng cao.",
+    "experience": "Năm Kinh Nghiệm",
+    "projects": "Dự Án Hoàn Thành",
+    "clients": "Khách Hàng Hài Lòng"
+  },
+  "services": {
+    "title": "Dịch Vụ Của Chúng Tôi",
+    "subtitle": "Chúng tôi cung cấp giải pháp kỹ thuật lạnh toàn diện",
+    "webDevelopment": {
+      "title": "Phát Triển Web",
+      "description": "Ứng dụng web tùy chỉnh được xây dựng với công nghệ hiện đại"
+    },
+    "mobileApps": {
+      "title": "Ứng Dụng Di Động",
+      "description": "Phát triển ứng dụng di động native và đa nền tảng"
+    },
+    "ecommerce": {
+      "title": "Giải Pháp Thương Mại Điện Tử",
+      "description": "Phát triển và tích hợp cửa hàng trực tuyến hoàn chỉnh"
+    },
+    "consulting": {
+      "title": "Tư Vấn Công Nghệ Thông Tin",
+      "description": "Tư vấn công nghệ chiến lược cho doanh nghiệp của bạn"
+    }
+  },
+  "contact": {
+    "title": "Liên Hệ",
+    "subtitle": "Liên hệ với đội ngũ của chúng tôi",
+    "name": "Họ và tên",
+    "email": "Email",
+    "message": "Tin nhắn",
+    "send": "Gửi Tin Nhắn",
+    "phone": "Điện thoại",
+    "address": "Địa chỉ",
+    "success": "Tin nhắn đã được gửi thành công!",
+    "error": "Không thể gửi tin nhắn. Vui lòng thử lại."
+  },
+  "footer": {
+    "description": "Giải pháp kỹ thuật lạnh chuyên nghiệp cho doanh nghiệp hiện đại",
+    "quickLinks": "Liên Kết Nhanh",
+    "services": "Dịch Vụ",
+    "contact": "Thông Tin Liên Hệ",
+    "followUs": "Theo Dõi Chúng Tôi",
+    "rights": "Tất cả quyền được bảo lưu"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Đã xảy ra lỗi",
+    "retry": "Thử Lại",
+    "close": "Đóng",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "view": "Xem",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "sort": "Sắp xếp",
+    "previous": "Trước",
+    "next": "Tiếp"
+  }
+}

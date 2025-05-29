@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { VRCLogo } from '@/components/Logo/VRCLogo'
 import { LoginForm } from '@/components/Auth/LoginForm'
 
@@ -182,7 +183,7 @@ export const HomePage: React.FC = () => {
               Xin chào, {user.email}!
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <a
+              <Link
                 href="/admin"
                 style={{
                   display: 'inline-block',
@@ -206,7 +207,7 @@ export const HomePage: React.FC = () => {
                 }}
               >
                 Vào trang quản trị
-              </a>
+              </Link>
               <button
                 onClick={handleLogout}
                 style={{

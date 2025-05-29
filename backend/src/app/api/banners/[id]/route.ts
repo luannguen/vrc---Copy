@@ -6,16 +6,19 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  let id: string = '';
   try {
     // Initialize payload
     const payload = await getPayload({ config });
+    const resolvedParams = await params;
+    id = resolvedParams.id;
 
     const banner = await payload.findByID({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collection: 'banners' as any,
-      id: params.id,
+      id: id,
       depth: 2, // Include related media
     });
 
@@ -42,18 +45,21 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  let id: string = '';
   try {
     // Initialize payload
     const payload = await getPayload({ config });
+    const resolvedParams = await params;
+    id = resolvedParams.id;
 
     const body = await request.json();
 
     const banner = await payload.update({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collection: 'banners' as any,
-      id: params.id,
+      id: id,
       data: body,
     });
 
@@ -74,16 +80,19 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  let id: string = '';
   try {
     // Initialize payload
     const payload = await getPayload({ config });
+    const resolvedParams = await params;
+    id = resolvedParams.id;
 
     await payload.delete({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collection: 'banners' as any,
-      id: params.id,
+      id: id,
     });
 
     return NextResponse.json({

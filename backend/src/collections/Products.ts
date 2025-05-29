@@ -16,7 +16,7 @@ export const Products: CollectionConfig = {
     description: 'Quản lý sản phẩm và thông tin liên quan',
     listSearchableFields: ['name', 'description', 'excerpt', 'slug'],
     pagination: {
-      defaultLimit: 20, 
+      defaultLimit: 20,
       limits: [10, 20, 50, 100],
     },
     enableRichTextLink: false,
@@ -32,7 +32,7 @@ export const Products: CollectionConfig = {
       async ({ req, id }) => {
         try {
           console.log(`Preparing to delete product with ID: ${id}`);
-          
+
           // Simpler approach: find products that reference this one and update them
           const referencingProducts = await req.payload.find({
             collection: 'products',
@@ -42,10 +42,10 @@ export const Products: CollectionConfig = {
               }
             },
           });
-          
+
           if (referencingProducts.docs.length > 0) {
             console.log(`Found ${referencingProducts.docs.length} products referencing this product. Updating references...`);
-            
+
             for (const product of referencingProducts.docs) {
               if (product.relatedProducts && Array.isArray(product.relatedProducts)) {
                 // Remove the reference to the product being deleted
@@ -59,7 +59,7 @@ export const Products: CollectionConfig = {
                   }
                   return true;
                 });
-                
+
                 try {
                   await req.payload.update({
                     collection: 'products',
@@ -75,7 +75,7 @@ export const Products: CollectionConfig = {
               }
             }
           }
-          
+
           return true; // Proceed with deletion
         } catch (error) {
           console.error(`Error in beforeDelete hook for product ${id}:`, error);
@@ -123,11 +123,11 @@ export const Products: CollectionConfig = {
       label: 'Hình ảnh chính',
       relationTo: 'media',
       required: true,
-    },
-    {
+    },    {
       name: 'gallery',
       type: 'array',
       label: 'Thư viện ảnh',
+      defaultValue: [],
       fields: [
         {
           name: 'image',
@@ -142,7 +142,7 @@ export const Products: CollectionConfig = {
           label: 'Chú thích',
         },
       ],
-    },    {
+    },{
       name: 'category',
       type: 'relationship',
       label: 'Danh mục sản phẩm',
@@ -183,6 +183,7 @@ export const Products: CollectionConfig = {
       label: 'Sản phẩm liên quan',
       relationTo: 'products',
       hasMany: true,
+      defaultValue: [],
       filterOptions: ({ id }) => {
         return {
           id: {
@@ -200,6 +201,7 @@ export const Products: CollectionConfig = {
       name: 'specifications',
       type: 'array',
       label: 'Thông số kỹ thuật',
+      defaultValue: [],
       fields: [
         {
           name: 'name',
@@ -219,6 +221,7 @@ export const Products: CollectionConfig = {
       name: 'documents',
       type: 'array',
       label: 'Tài liệu',
+      defaultValue: [],
       fields: [
         {
           name: 'name',

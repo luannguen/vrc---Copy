@@ -6,11 +6,14 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Initialize payload
     const payload = await getPayload({ config });
+
+    // Await params in Next.js 15
+    const { id } = await params;
 
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action'); // 'view' or 'click'
@@ -26,7 +29,7 @@ export async function POST(
     const banner = await payload.findByID({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collection: 'banners' as any,
-      id: params.id,
+      id: id,
     });
 
     if (!banner) {
@@ -72,7 +75,7 @@ export async function POST(
     const updatedBanner = await payload.update({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       collection: 'banners' as any,
-      id: params.id,
+      id: id,
       data: updateData,
     });
 
