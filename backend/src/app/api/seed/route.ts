@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import payload from 'payload';
+import { getPayload } from 'payload';
+import config from '@/payload.config';
 import { seed } from '@/seed';
 // Import các hàm seed riêng lẻ
 import { seedProducts } from '@/seed/products';
@@ -12,16 +13,21 @@ import { seedHeaderFooter } from '@/seed/header-footer';
 import { seedPosts } from '@/seed/posts';
 import { seedEventCategories } from '@/seed/event-categories';
 import { seedEvents } from '@/seed/events';
+import { seedTools } from '@/seed/seed-tools';
+import { seedResources } from '@/seed/seed-resources';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
+    // Initialize payload
+    const payload = await getPayload({ config });
+
     // Chỉ cho phép chạy trong môi trường development
     if (process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ 
-        success: false, 
-        message: 'Seeding is not allowed in production environment' 
+      return NextResponse.json({
+        success: false,
+        message: 'Seeding is not allowed in production environment'
       }, { status: 403 });
     }    // Lấy các tham số truy vấn (nếu có)
     const { searchParams } = new URL(request.url);
@@ -30,13 +36,13 @@ export async function GET(request: Request) {
 
     // Hiển thị thông báo bắt đầu
     console.log(`🌱 Seeding database through API endpoint...${type ? ` (type: ${type})` : ''}`);
-    
-    const result = { 
+
+    const result = {
       success: true,
       message: 'Database seeded successfully!',
       details: {}
     };
-    
+
     // Seed dữ liệu theo loại được chỉ định hoặc tất cả
     if (!type || type === 'all') {
       // Seed tất cả dữ liệu
@@ -76,12 +82,24 @@ export async function GET(request: Request) {
         case 'posts':
           await seedPosts(payload);
           result.details = { type: 'posts', completed: true };
-          break;
-        case 'events':
+          break;        case 'events':
           // Seed categories trước, rồi mới seed events
           await seedEventCategories(payload);
           await seedEvents(payload);
           result.details = { type: 'events', completed: true };
+          break;
+        case 'tools':
+          await seedTools(payload);
+          result.details = { type: 'tools', completed: true };
+          break;
+        case 'resources':
+          await seedResources(payload);
+          result.details = { type: 'resources', completed: true };
+          break;
+        case 'tools-resources':
+          await seedTools(payload);
+          await seedResources(payload);
+          result.details = { type: 'tools-resources', completed: true };
           break;
         default:
           result.success = false;
@@ -90,7 +108,7 @@ export async function GET(request: Request) {
       }
       result.message = `Successfully seeded ${type} data`;
     }
-    
+
     // Trả về kết quả thành công
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
@@ -103,4 +121,9 @@ export async function GET(request: Request) {
       stack: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined
     }, { status: 500 });
   }
+}
+
+// Thêm POST method để hỗ trợ seeding từ UI
+export async function POST(request: Request) {
+  return GET(request); // Sử dụng cùng logic với GET
 }

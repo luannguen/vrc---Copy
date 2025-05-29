@@ -22,6 +22,8 @@ import { Products } from './collections/Products'
 import { Projects } from './collections/Projects'
 import { Services } from './collections/Services'
 import { Technologies } from './collections/Technologies'
+import { Tools } from './collections/Tools'
+import { Resources } from './collections/Resources'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { CompanyInfo } from './globals/CompanyInfo'
@@ -54,7 +56,7 @@ export default buildConfig({  admin: {
         if (process.env.NODE_ENV === 'production') {
           return process.env.FRONTEND_URL || getServerSideURL()
         }
-        
+
         // Development URLs
         return process.env.FRONTEND_URL || 'http://localhost:3000'
       },
@@ -85,14 +87,14 @@ export default buildConfig({  admin: {
   editor: defaultLexical,
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',  }),  collections: [
-    Pages, 
-    Posts, 
-    Media, 
+    Pages,
+    Posts,
+    Media,
     Categories,    ProductCategories,
     ProjectCategories,
     NewsCategories,
     ServiceCategories,
-    Users, 
+    Users,
     ContactSubmissions,
     Navigation,
     Products,
@@ -100,7 +102,10 @@ export default buildConfig({  admin: {
     EventCategories,
     Events,
     Services,
-    Technologies  ],  cors: {
+    Technologies,
+    Tools,
+    Resources
+  ],cors: {
     origins: process.env.NODE_ENV === 'production'
       ? [
           getServerSideURL(),                                  // Backend URL
@@ -114,10 +119,10 @@ export default buildConfig({  admin: {
           '*',                                                 // Allow all origins for development
         ].filter(Boolean) as string[],
     headers: [
-      'authorization', 
-      'content-type', 
-      'x-custom-header', 
-      'cache-control', 
+      'authorization',
+      'content-type',
+      'x-custom-header',
+      'cache-control',
       'x-requested-with',
       'accept',
     ]

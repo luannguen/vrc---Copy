@@ -7,7 +7,7 @@ import { isAdminRequest } from '../utils/requests';
 
 /**
  * Fetch products with various filters, sorting, and pagination
- * 
+ *
  * GET /api/products - List all products with pagination and filters
  * GET /api/products?slug=example - Get single product by slug
  * GET /api/products?id=123456 - Get single product by ID
@@ -22,18 +22,16 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     // Initialize Payload
     const payload = await getPayload({
       config,
-    });
+    });    const url = new URL(req.url);
 
-    const url = new URL(req.url);
-    
     // Parse query parameters - handle both URL params and form data (for method override requests)
-    let queryParams = new URLSearchParams();
-    
+    const queryParams = new URLSearchParams();
+
     // First, get URL parameters
     url.searchParams.forEach((value, key) => {
       queryParams.set(key, value);
     });
-    
+
     // If this is a POST request with form data (method override), parse form data as query params
     const contentType = req.headers.get('content-type') || '';
     if (req.method === 'POST' && contentType.includes('application/x-www-form-urlencoded')) {
@@ -43,11 +41,11 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
           queryParams.set(key, value.toString());
         }
         console.log('GET /api/products: Parsed form data as query params:', Object.fromEntries(queryParams.entries()));
-      } catch (formError) {
+      } catch (_formError) {
         console.log('GET /api/products: Could not parse form data, using URL params only');
       }
     }
-    
+
     // Extract parameters from the combined query params
     const id = queryParams.get("id");
     const slug = queryParams.get("slug");
@@ -61,10 +59,10 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
     const status = queryParams.get("status") || "published";
     const depth = Number(queryParams.get("depth")) || 1;
     const draft = queryParams.get("draft") === "true";
-    
+
     // Handle admin-specific query parameters
     const selectName = queryParams.get("select[name]") === "true";
-    
+
     console.log('GET /api/products: Processed parameters:', {
       id, slug, page, limit, category, featured, search, sort, sortDirection, status, depth, draft, selectName
     });
@@ -89,9 +87,9 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
             status: 200,
             headers,
           }
-        );
-      } catch (err: any) {
-        return formatApiErrorResponse("Không tìm thấy sản phẩm", err.message, 404);
+        );      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        return formatApiErrorResponse("Không tìm thấy sản phẩm", errorMessage, 404);
       }
     }
 
@@ -112,8 +110,8 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
         return formatApiErrorResponse("Sản phẩm không tồn tại", null, 404);
       }
     }    // Build the query conditionally for product listing
-    const query: any = {};
-    
+    const query: Record<string, unknown> = {};
+
     // Handle admin-specific complex query parameters
     // Parse "where[and][1][id][not_in][0]" type parameters
     const excludeIds: string[] = [];
@@ -122,7 +120,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
         excludeIds.push(value);
       }
     }
-    
+
     // If we have IDs to exclude, add them to the query
     if (excludeIds.length > 0) {
       query.id = {
@@ -130,7 +128,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
       };
       console.log('GET /api/products: Excluding IDs:', excludeIds);
     }
-    
+
     // Add status filter
     if (status && status !== "published") {
       query.status = {
@@ -181,12 +179,13 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
         },
       ];
     }
-    
+
     // Sort direction preparation
     let sortOptions = "-createdAt";
     if (sort) {
       sortOptions = sortDirection === "asc" ? sort : `-${sort}`;
     }    // Fetch products with filters, sorting, and pagination
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const findOptions: any = {
       collection: "products",
       where: query,
@@ -195,7 +194,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
       limit,
       depth: depth, // Use dynamic depth from parameters
     };
-    
+
     // Handle field selection for admin requests
     if (selectName) {
       // Admin interface only wants specific fields
@@ -207,7 +206,7 @@ export async function handleGET(req: NextRequest): Promise<NextResponse> {
       };
     }
       console.log('GET /api/products: Find options:', JSON.stringify(findOptions, null, 2));
-    
+
     const products = await payload.find(findOptions);
 
     // Check if this is an admin request

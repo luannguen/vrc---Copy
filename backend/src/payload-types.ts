@@ -84,6 +84,8 @@ export interface Config {
     events: Event;
     services: Service;
     technologies: Technology;
+    tools: Tool;
+    resources: Resource;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -112,6 +114,8 @@ export interface Config {
     events: EventsSelect<false> | EventsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
+    tools: ToolsSelect<false> | ToolsSelect<true>;
+    resources: ResourcesSelect<false> | ResourcesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1349,6 +1353,358 @@ export interface Technology {
   createdAt: string;
 }
 /**
+ * Quản lý các công cụ tính toán và thiết kế HVAC
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tools".
+ */
+export interface Tool {
+  id: string;
+  /**
+   * Tên hiển thị của công cụ
+   */
+  name: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  /**
+   * Phân loại công cụ theo chức năng
+   */
+  category:
+    | 'cooling-load'
+    | 'efficiency-comparison'
+    | 'energy-savings'
+    | 'solution-advisor'
+    | 'standards'
+    | 'guidelines';
+  /**
+   * Mô tả ngắn gọn về chức năng của công cụ
+   */
+  excerpt: string;
+  /**
+   * Mô tả chi tiết về cách sử dụng và lợi ích của công cụ
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Icon hiển thị cho công cụ (sử dụng Lucide icons)
+   */
+  icon: 'calculator' | 'bar-chart-3' | 'thermometer' | 'settings' | 'file-text' | 'book-open' | 'gauge' | 'line-chart';
+  /**
+   * Phân loại loại hình công cụ
+   */
+  toolType: 'calculator' | 'comparison' | 'analysis' | 'advisor' | 'reference';
+  /**
+   * Đường dẫn đến trang công cụ (ví dụ: /data/tools/cooling-load-calculator)
+   */
+  url: string;
+  /**
+   * Danh sách các tính năng chính của công cụ
+   */
+  features: {
+    feature: string;
+    id?: string | null;
+  }[];
+  /**
+   * Các thông số đầu vào cần thiết cho công cụ
+   */
+  inputs?:
+    | {
+        parameter: string;
+        unit?: string | null;
+        description?: string | null;
+        required?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Các kết quả mà công cụ sẽ tính toán
+   */
+  outputs?:
+    | {
+        result: string;
+        unit?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Mức độ phức tạp của công cụ
+   */
+  difficulty?: ('easy' | 'medium' | 'hard') | null;
+  /**
+   * Thời gian ước tính để hoàn thành tính toán (ví dụ: 5-10 phút)
+   */
+  estimatedTime?: string | null;
+  /**
+   * Các công cụ khác có liên quan
+   */
+  relatedTools?: (string | Tool)[] | null;
+  /**
+   * Hướng dẫn chi tiết cách sử dụng công cụ
+   */
+  tutorial?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Các ví dụ minh họa cách sử dụng công cụ
+   */
+  examples?:
+    | {
+        title: string;
+        description?: string | null;
+        /**
+         * Dữ liệu mẫu dưới dạng JSON
+         */
+        inputData?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        /**
+         * Kết quả mong đợi dưới dạng JSON
+         */
+        expectedOutput?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Các thẻ để tìm kiếm và phân loại
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Hiển thị công cụ trong danh sách nổi bật
+   */
+  featured?: boolean | null;
+  /**
+   * Trạng thái hiển thị của công cụ
+   */
+  status: 'draft' | 'published' | 'maintenance' | 'deprecated';
+  publishedAt?: string | null;
+  /**
+   * Số lượt sử dụng công cụ
+   */
+  viewCount?: number | null;
+  /**
+   * Tiêu đề tối ưu SEO (tùy chọn)
+   */
+  seoTitle?: string | null;
+  /**
+   * Mô tả tối ưu SEO (tùy chọn)
+   */
+  seoDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Quản lý tài liệu và tài nguyên HVAC
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources".
+ */
+export interface Resource {
+  id: string;
+  /**
+   * Tiêu đề của tài nguyên
+   */
+  title: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  /**
+   * Phân loại tài nguyên theo chủ đề
+   */
+  category:
+    | 'standards'
+    | 'guidelines'
+    | 'research'
+    | 'technical-docs'
+    | 'video-tutorials'
+    | 'webinars'
+    | 'case-studies'
+    | 'white-papers';
+  /**
+   * Định dạng của tài nguyên
+   */
+  resourceType: 'pdf' | 'video' | 'external-link' | 'article' | 'infographic' | 'spreadsheet' | 'presentation';
+  /**
+   * Tóm tắt ngắn gọn về nội dung tài nguyên
+   */
+  excerpt: string;
+  /**
+   * Mô tả chi tiết về nội dung và giá trị của tài nguyên
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Icon hiển thị cho tài nguyên (sử dụng Lucide icons)
+   */
+  icon: 'file-text' | 'book-open' | 'video' | 'link' | 'download' | 'globe' | 'file-image' | 'presentation-chart';
+  /**
+   * Upload file tài nguyên (PDF, video, image, etc.)
+   */
+  file?: (string | null) | Media;
+  /**
+   * URL đến tài nguyên bên ngoài
+   */
+  externalUrl?: string | null;
+  /**
+   * Nội dung chi tiết của bài viết
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * URL video (YouTube, Vimeo, etc.)
+   */
+  videoUrl?: string | null;
+  /**
+   * Thời lượng video hoặc thời gian đọc ước tính
+   */
+  duration?: string | null;
+  /**
+   * Kích thước file (ví dụ: 2.5 MB)
+   */
+  fileSize?: string | null;
+  /**
+   * Ngôn ngữ của tài nguyên
+   */
+  language?: ('vi' | 'en' | 'bilingual') | null;
+  /**
+   * Mức độ khó của tài nguyên
+   */
+  difficulty?: ('beginner' | 'intermediate' | 'advanced' | 'expert') | null;
+  /**
+   * Đối tượng mà tài nguyên hướng đến
+   */
+  targetAudience?:
+    | {
+        audience:
+          | 'hvac-engineers'
+          | 'architects'
+          | 'contractors'
+          | 'owners'
+          | 'students'
+          | 'distributors'
+          | 'consultants';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Các thẻ để tìm kiếm và phân loại
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Các tài nguyên khác có liên quan
+   */
+  relatedResources?: (string | Resource)[] | null;
+  /**
+   * Các công cụ có liên quan đến tài nguyên này
+   */
+  relatedTools?: (string | Tool)[] | null;
+  /**
+   * Hiển thị tài nguyên trong danh sách nổi bật
+   */
+  featured?: boolean | null;
+  /**
+   * Số lượt tải xuống tài nguyên
+   */
+  downloadCount?: number | null;
+  /**
+   * Số lượt xem tài nguyên
+   */
+  viewCount?: number | null;
+  /**
+   * Trạng thái hiển thị của tài nguyên
+   */
+  status: 'draft' | 'published' | 'updated' | 'deprecated';
+  publishedAt?: string | null;
+  /**
+   * Ngày cập nhật nội dung lần cuối
+   */
+  lastUpdated?: string | null;
+  /**
+   * Tiêu đề tối ưu SEO (tùy chọn)
+   */
+  seoTitle?: string | null;
+  /**
+   * Mô tả tối ưu SEO (tùy chọn)
+   */
+  seoDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1587,6 +1943,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'technologies';
         value: string | Technology;
+      } | null)
+    | ({
+        relationTo: 'tools';
+        value: string | Tool;
+      } | null)
+    | ({
+        relationTo: 'resources';
+        value: string | Resource;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2274,6 +2638,117 @@ export interface TechnologiesSelect<T extends boolean = true> {
         id?: T;
       };
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tools_select".
+ */
+export interface ToolsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  slugLock?: T;
+  category?: T;
+  excerpt?: T;
+  description?: T;
+  icon?: T;
+  toolType?: T;
+  url?: T;
+  features?:
+    | T
+    | {
+        feature?: T;
+        id?: T;
+      };
+  inputs?:
+    | T
+    | {
+        parameter?: T;
+        unit?: T;
+        description?: T;
+        required?: T;
+        id?: T;
+      };
+  outputs?:
+    | T
+    | {
+        result?: T;
+        unit?: T;
+        description?: T;
+        id?: T;
+      };
+  difficulty?: T;
+  estimatedTime?: T;
+  relatedTools?: T;
+  tutorial?: T;
+  examples?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        inputData?: T;
+        expectedOutput?: T;
+        id?: T;
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  featured?: T;
+  status?: T;
+  publishedAt?: T;
+  viewCount?: T;
+  seoTitle?: T;
+  seoDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources_select".
+ */
+export interface ResourcesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  slugLock?: T;
+  category?: T;
+  resourceType?: T;
+  excerpt?: T;
+  description?: T;
+  icon?: T;
+  file?: T;
+  externalUrl?: T;
+  content?: T;
+  videoUrl?: T;
+  duration?: T;
+  fileSize?: T;
+  language?: T;
+  difficulty?: T;
+  targetAudience?:
+    | T
+    | {
+        audience?: T;
+        id?: T;
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  relatedResources?: T;
+  relatedTools?: T;
+  featured?: T;
+  downloadCount?: T;
+  viewCount?: T;
+  status?: T;
+  publishedAt?: T;
+  lastUpdated?: T;
+  seoTitle?: T;
+  seoDescription?: T;
   updatedAt?: T;
   createdAt?: T;
 }
