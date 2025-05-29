@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import payload from 'payload';
+import { getPayload } from 'payload';
+import config from '@payload-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,7 @@ export async function GET(
 ) {
   try {
     const { slug } = params;
+    const payload = await getPayload({ config });
 
     const tools = await payload.find({
       collection: 'tools',
@@ -94,6 +96,7 @@ export async function PUT(
   try {
     const { slug } = params;
     const data = await request.json();
+    const payload = await getPayload({ config });
 
     // Find tool by slug first
     const tools = await payload.find({
@@ -151,6 +154,7 @@ export async function DELETE(
 ) {
   try {
     const { slug } = params;
+    const payload = await getPayload({ config });
 
     // Find tool by slug first
     const tools = await payload.find({

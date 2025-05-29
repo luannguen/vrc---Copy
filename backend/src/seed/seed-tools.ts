@@ -1,49 +1,102 @@
+import { getPayload } from 'payload';
 import type { Payload } from 'payload';
 import { toolsData } from './tools';
 
-export const seedTools = async (payload: Payload): Promise<void> => {
-  try {
-    console.log('🔧 Seeding Tools...');
+export const seedTools = async (payload: Payload) => {
+  console.log('🔧 Seeding Tools...');
 
-    // Clear existing tools (optional)
+  try {
+    // Check if tools already exist
     const existingTools = await payload.find({
       collection: 'tools',
-      limit: 1000,
+      limit: 1,
     });
 
-    if (existingTools.docs.length > 0) {
-      console.log(`Found ${existingTools.docs.length} existing tools. Clearing them...`);
-      for (const tool of existingTools.docs) {
+    if (existingTools.totalDocs > 0) {
+      console.log(`⚠️  Found ${existingTools.totalDocs} existing tools. Clearing them first...`);
+
+      // Delete existing tools before seeding new ones
+      const allTools = await payload.find({
+        collection: 'tools',
+        limit: 1000, // Get all tools
+      });
+
+      for (const tool of allTools.docs) {
         await payload.delete({
           collection: 'tools',
           id: tool.id,
         });
+        console.log(`🗑️  Deleted existing tool: ${tool.name}`);
       }
     }
 
-    // Create new tools
-    for (const toolData of toolsData) {
-      try {
-        console.log(`🔧 Attempting to create tool: ${toolData.name}`);
-        console.log(`   Data structure:`, JSON.stringify(toolData, null, 2).substring(0, 500) + '...');
+    console.log(`📊 Seeding ${toolsData.length} tools...`);
 
-        const tool = await payload.create({
+    const createdTools = [];
+    let successCount = 0;
+    let failureCount = 0;
+
+    for (const tool of toolsData) {
+      try {
+        console.log(`🔧 Creating tool: ${tool.name}`);
+
+        const createdTool = await payload.create({
           collection: 'tools',
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data: toolData as any,
+          data: tool as any,
         });
-        console.log(`✅ Created tool: ${tool.name}`);
+
+        createdTools.push(createdTool);
+        successCount++;
+        console.log(`✅ Created tool: ${tool.name} (ID: ${createdTool.id})`);
+
       } catch (error) {
-        console.error(`❌ Error creating tool ${toolData.name}:`, error);
-        if (error instanceof Error) {
-          console.error(`   Error message: ${error.message}`);
-        }
+        failureCount++;
+        console.error(`❌ Failed to create tool: ${tool.name}`);
+        console.error('Error details:', error instanceof Error ? error.message : String(error));
+
+        // Continue with next tool instead of stopping
+        continue;
       }
     }
 
-    console.log(`✅ Tools seeded successfully! Created ${toolsData.length} tools.`);
+    console.log(`✅ Tools seeding completed:`);
+    console.log(`   - Successfully created: ${successCount} tools`);
+    console.log(`   - Failed: ${failureCount} tools`);
+    console.log(`   - Total processed: ${toolsData.length} tools`);
+
+    return {
+      success: true,
+      message: `Successfully seeded ${successCount} tools`,
+      created: createdTools,
+      successCount,
+      failureCount,
+      totalProcessed: toolsData.length,
+    };
+
   } catch (error) {
-    console.error('❌ Error seeding Tools:', error);
-    throw error;
+    console.error('❌ Error seeding tools:', error);
+    return {
+      success: false,
+      error: 'Failed to seed tools',
+      details: error instanceof Error ? error.message : String(error),
+    };
+  }
+};
+
+// Standalone function for direct execution
+export const runToolsSeeding = async () => {
+  try {
+    const config = (await import('@payload-config')).default;
+    const payload = await getPayload({ config });
+
+    return await seedTools(payload);
+  } catch (error) {
+    console.error('❌ Failed to initialize Payload for tools seeding:', error);
+    return {
+      success: false,
+      error: 'Failed to initialize Payload',
+      details: error instanceof Error ? error.message : String(error),
+    };
   }
 };
