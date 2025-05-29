@@ -24,24 +24,35 @@ const ContactForm = () => {
   const handleSelectChange = (value: string) => {
     setFormData((prev) => ({ ...prev, subject: value }));
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Form submitted:", formData);
-      setSubmitStatus("success");
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "general",
-        message: "",
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setSubmitStatus("success");
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "general",
+          message: "",
+        });
+      } else {
+        setSubmitStatus("error");
+        console.error("Error submitting form:", result.message);
+      }
     } catch (error) {
       setSubmitStatus("error");
       console.error("Error submitting form:", error);
@@ -124,12 +135,15 @@ const ContactForm = () => {
                 <Select value={formData.subject} onValueChange={handleSelectChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Chọn chủ đề" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">Thông tin chung</SelectItem>
-                    <SelectItem value="support">Hỗ trợ kỹ thuật</SelectItem>
-                    <SelectItem value="quote">Yêu cầu báo giá</SelectItem>
-                    <SelectItem value="partnership">Hợp tác kinh doanh</SelectItem>
+                  </SelectTrigger>                  <SelectContent>
+                    <SelectItem value="general">Tư vấn chung</SelectItem>
+                    <SelectItem value="repair">Dịch vụ sửa chữa</SelectItem>
+                    <SelectItem value="maintenance">Bảo trì thiết bị</SelectItem>
+                    <SelectItem value="installation">Lắp đặt</SelectItem>
+                    <SelectItem value="consulting">Tư vấn kỹ thuật</SelectItem>
+                    <SelectItem value="inverter-technology">Công nghệ Inverter</SelectItem>
+                    <SelectItem value="heat-recovery">Giải pháp thu hồi nhiệt</SelectItem>
+                    <SelectItem value="energy-efficiency">Hiệu quả năng lượng</SelectItem>
                     <SelectItem value="other">Khác</SelectItem>
                   </SelectContent>
                 </Select>
