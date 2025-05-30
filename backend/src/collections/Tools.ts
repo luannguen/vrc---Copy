@@ -365,5 +365,104 @@ export const Tools: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    beforeChange: [
+      async ({ data, operation, originalDoc }) => {
+        const docId = originalDoc?.id || 'new';
+        console.log(`\n🔄 === TOOLS BEFORE CHANGE HOOK [${new Date().toISOString()}] ===`);
+        console.log('Operation:', operation);
+        console.log('Document ID:', docId);
+        console.log('Incoming data keys:', data ? Object.keys(data) : 'no data');
+        console.log('Incoming data:', JSON.stringify(data, null, 2));
+        console.log('Original doc exists:', !!originalDoc);
+        if (originalDoc) {
+          console.log('Original doc ID:', originalDoc.id);
+          console.log('Original doc name:', originalDoc.name);
+        }
+        console.log('==========================================\n');
+        return data; // Always return data to allow the operation to continue
+      },
+    ],
+    afterChange: [
+      async ({ doc, operation, previousDoc }) => {
+        console.log(`\n✅ === TOOLS AFTER CHANGE HOOK [${new Date().toISOString()}] ===`);
+        console.log('Operation:', operation);
+        console.log('Document ID:', doc.id);
+        console.log('Document name:', doc.name);
+        console.log('Previous doc exists:', !!previousDoc);
+        if (previousDoc) {
+          console.log('Previous doc name:', previousDoc.name);
+        }
+        console.log('Final doc keys:', Object.keys(doc));
+        console.log('==========================================\n');
+      },
+    ],
+    beforeDelete: [
+      async ({ req, id }) => {
+        console.log(`🗑️ Processing beforeDelete hook for tool: ${id}`);
+
+        try {
+          // Find all tools that reference this tool in their relatedTools field
+          const referencingTools = await req.payload.find({
+            collection: 'tools',
+            where: {
+              relatedTools: {
+                equals: id
+              }
+            },
+            limit: 1000, // Increase limit to handle many references
+          });
+
+          if (referencingTools.docs.length > 0) {
+            console.log(`Found ${referencingTools.docs.length} tools referencing this tool. Updating references...`);
+
+            for (const tool of referencingTools.docs) {
+              if (tool.relatedTools && Array.isArray(tool.relatedTools)) {
+                // Remove the reference to the tool being deleted
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const updatedRelatedTools = tool.relatedTools.filter((relatedItem: any) => {
+                  // Handle string ID
+                  if (typeof relatedItem === 'string') {
+                    return relatedItem !== id;
+                  }
+                  // Handle object with id property (populated)
+                  if (relatedItem && typeof relatedItem === 'object' && 'id' in relatedItem) {
+                    return relatedItem.id !== id;
+                  }
+                  // Handle object with value property (alternative format)
+                  if (relatedItem && typeof relatedItem === 'object' && 'value' in relatedItem) {
+                    return relatedItem.value !== id;
+                  }
+                  return true;
+                });
+
+                // Only update if there was actually a change
+                if (updatedRelatedTools.length !== tool.relatedTools.length) {
+                  try {
+                    await req.payload.update({
+                      collection: 'tools',
+                      id: tool.id,
+                      data: {
+                        relatedTools: updatedRelatedTools,
+                      },
+                    });
+                    console.log(`✅ Updated tool ${tool.id}: removed reference to deleted tool ${id}`);
+                  } catch (updateError) {
+                    console.error(`❌ Failed to update tool ${tool.id}:`, updateError);
+                  }
+                }
+              }
+            }
+            console.log(`🧹 Related tools cleanup completed for tool ${id}`);
+          } else {
+            console.log(`No tools found referencing tool ${id} - no cleanup needed`);
+          }
+        } catch (error) {
+          console.error(`❌ Error in beforeDelete hook for tool ${id}:`, error);
+          // Don't throw the error to avoid blocking the delete operation
+        }
+      },
+    ],
+  },
   timestamps: true,
 };

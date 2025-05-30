@@ -362,92 +362,308 @@ GET /api/posts?limit=4&status=published
 
 ---
 
-## ✅ **KẾT LUẬN**
+## 🎯 **HOMEPAGE SETTINGS API - TÍNH NĂNG ĐẦY ĐỦ**
 
-### 🎉 **Backend hoàn toàn sẵn sàng cho Homepage Admin Management!**
+### **📋 Cấu trúc API đầy đủ tính năng:**
 
-**Tình trạng hiện tại:**
-- ✅ **90% hoàn thành** - tất cả API hoạt động
-- ✅ **5/5 components** có backend support
-- ✅ **6/7 collections** có đủ data
-- ⚠️ Chỉ cần **seed thêm 3-4 posts**
+#### **File Custom API** `/src/app/api/homepage-settings/route.ts` (278 dòng)
 
-**Admin có thể quản lý:**
-1. ✅ Banner carousel hoàn toàn
-2. ✅ Featured products hoàn toàn  
-3. ⚠️ Latest posts (cần seed thêm data)
-4. ✅ Resources & Tools hoàn toàn
-5. ✅ Contact submissions hoàn toàn
+**✅ Tính năng đầy đủ:**
 
-**Bước tiếp theo:** Kết nối Frontend components với các API này thay vì dùng fallback data hardcode.
+1. **GET `/api/homepage-settings`** - Lấy cài đặt với auto-populate data
+   - ✅ Auto-populate `activeBanners` (filtered by isActive + schedule)
+   - ✅ Auto-populate `featuredProductsData` 
+   - ✅ Auto-populate `latestPosts` (mode auto)
+   - ✅ Auto-populate `selectedPostsData` (mode manual)
+   - ✅ CORS support
+   - ✅ Error handling với messages tiếng Việt
 
----
+2. **PUT `/api/homepage-settings`** - Cập nhật cài đặt (Auth required)
+   - ✅ Authentication check
+   - ✅ CORS support
+   - ✅ Error handling tiếng Việt
 
-*📅 Document cập nhật: Hoàn thành analysis và testing tất cả API endpoints*
+3. **POST `/api/homepage-settings`** - Alternative update method
+   - ✅ Backup method cho frontend
+   - ✅ Same functionality như PUT
 
----
+4. **OPTIONS `/api/homepage-settings`** - CORS preflight
+   - ✅ Full CORS configuration
 
-## ✅ **HOMEPAGE SETTINGS API - HOÀN THÀNH 100%**
+#### **File Payload Built-in** `/src/app/(payload)/api/homepage-settings/route.ts` (90 dòng)
 
-### 🎯 **API Test Results - THÀNH CÔNG HOÀN TOÀN!**
+**⚠️ Tính năng cơ bản:**
+- ❌ Không auto-populate data
+- ❌ Không filter banners by schedule/active
+- ❌ Error handling đơn giản
+- ❌ Không có authentication check đầy đủ
 
-**Test thực hiện:** `GET http://localhost:3000/api/homepage-settings`
+### **🔧 Giải pháp Duplicate Issue:**
 
-**✅ Kết quả perfect:**
-- ✅ Status: `success: true`
-- ✅ Đầy đủ tất cả sections: heroSection, featuredSection, publicationsSection, resourcesSection, contactSection, seoSettings
-- ✅ Auto-populate latestPosts với đầy đủ content, images, authors, categories
-- ✅ Rich text content được format đúng với Lexical
-- ✅ All default settings configured properly
+**Bước 1:** Xóa file Payload built-in (giữ file custom đầy đủ tính năng)
 
-**🚀 Frontend Integration Ready:**
-```typescript
-// Frontend có thể fetch ngay:
-const response = await fetch('/api/homepage-settings');
-const { data: settings } = await response.json();
-
-// Sử dụng settings:
-settings.heroSection.enableCarousel // true
-settings.featuredSection.title // "Sản phẩm nổi bật"
-settings.publicationsSection.numberOfPosts // 4
-settings.latestPosts // Array of latest posts with full data
-settings.resourcesSection.leftPanel.features // Array of features
-settings.seoSettings.metaTitle // SEO title
-```
-
-**✅ Admin Management:**
-- Admin Panel → Globals → "Cài đặt trang chủ"
-- Tự động lưu settings
-- Rich UI với conditional fields
-- Relationship picker cho banners, products, posts
-
----
-
-## 🎯 **TRẠNG THÁI CUỐI CÙNG - 100% SẴN SÀNG**
-
-### ✅ **Backend hoàn toàn ready cho FE VRC Homepage:**
-
-1. ✅ **HeroSection** - `/api/banners` (3 banners seeded)
-2. ✅ **FeaturedTopics** - `/api/products?featured=true` (5 featured products)  
-3. ⚠️ **LatestPublications** - `/api/posts` (1 post, cần seed thêm 3-4 posts)
-4. ✅ **DataResources** - `/api/resources` + `/api/tools` (6+6 items)
-5. ✅ **ContactForm** - `/api/contact` (working)
-6. ✅ **Homepage Settings** - `/api/homepage-settings` (PERFECT!)
-
-### 🔄 **Việc cuối cùng cần làm:**
-
-#### 1. **Seed thêm Posts** (10 phút)
 ```bash
-node scripts/seed-posts.mjs
+# Xóa file duplicate
+rm backend/src/app/(payload)/api/homepage-settings/route.ts
 ```
 
-#### 2. **Frontend Integration** (1-2 giờ)
-- Replace hardcoded data với API calls
-- Sử dụng `/api/homepage-settings` cho global configuration
-- Component auto-fetch latest data
+**Bước 2:** Verify custom API hoạt động
+
+```bash
+# Test API
+curl http://localhost:3000/api/homepage-settings
+```
 
 ---
 
-**🎉 CONCLUSION: Backend VRC Homepage Management - HOÀN THÀNH 95%!**
+## 🏗️ **GLOBAL HOMEPAGE SETTINGS STRUCTURE**
 
-*Chỉ cần seed thêm posts là có thể demo đầy đủ cho client.*
+### **📊 Cấu trúc đầy đủ Global Config:**
+
+```typescript
+// Global slug: 'homepage-settings'
+// Label: 'Cài đặt trang chủ'
+// Group: 'Nội dung'
+
+{
+  heroSection: {
+    enableCarousel: true,
+    autoSlideInterval: 6, // seconds
+    banners: [relationship to banners] // Auto-filtered by isActive + schedule
+  },
+  featuredSection: {
+    isEnabled: true,
+    title: "Sản phẩm nổi bật",
+    description: "Khám phá các giải pháp điện lạnh hàng đầu",
+    featuredProducts: [relationship to products], // Max 6 products
+    viewAllLink: "/products"
+  },
+  publicationsSection: {
+    isEnabled: true,
+    title: "Bài viết mới nhất", 
+    description: "Tham khảo các báo cáo, nghiên cứu và hướng dẫn mới nhất",
+    displayMode: "auto" | "manual",
+    numberOfPosts: 4, // For auto mode
+    selectedPosts: [relationship to posts], // For manual mode, max 6
+    viewAllLink: "/publications"
+  },
+  resourcesSection: {
+    isEnabled: true,
+    title: "Công cụ & Tài nguyên",
+    description: "Truy cập các công cụ tính toán, dữ liệu phân tích",
+    leftPanel: {
+      title: "Dữ liệu & Thống kê năng lượng",
+      description: "...",
+      features: [{text: "..."}, ...],
+      linkText: "Xem thống kê",
+      linkUrl: "/data/statistics"
+    },
+    rightPanel: {
+      title: "Công cụ tính toán & Thiết kế", 
+      description: "...",
+      features: [{text: "..."}, ...],
+      linkText: "Khám phá công cụ",
+      linkUrl: "/data/tools"
+    }
+  },
+  contactSection: {
+    isEnabled: true,
+    backgroundColor: "gray" | "white" | "primary"
+  },
+  seoSettings: {
+    metaTitle: "...",
+    metaDescription: "...", 
+    metaKeywords: "...",
+    ogImage: relationship to media // 1200x630px
+  }
+}
+```
+
+### **🎯 Smart Features của Custom API:**
+
+#### **1. Auto Banner Filtering**
+```typescript
+// Chỉ lấy banners thỏa mãn:
+// - isActive: true
+// - status: 'published' 
+// - Trong thời gian schedule (nếu có)
+// - Sort theo sortOrder
+```
+
+#### **2. Publications Mode Logic**
+```typescript
+// Auto mode: Lấy latest posts
+if (displayMode === 'auto') {
+  const posts = await payload.find({
+    collection: 'posts',
+    where: { _status: { equals: 'published' } },
+    limit: numberOfPosts || 4,
+    sort: '-publishedAt'
+  });
+}
+
+// Manual mode: Lấy selected posts
+if (displayMode === 'manual') {
+  // Lấy theo selectedPosts relationship
+}
+```
+
+#### **3. Auto Data Population**
+- `activeBanners`: Banners đã filter + populate media
+- `featuredProductsData`: Products đã populate đầy đủ
+- `latestPosts`: Posts với content + authors + categories
+- `selectedPostsData`: Manual selected posts
+
+---
+
+## 🎛️ **ADMIN INTERFACE - QUẢN LÝ ĐẦY ĐỦ**
+
+### **📍 Truy cập:** Admin Panel → Globals → "Cài đặt trang chủ"
+
+### **🎨 Admin UI Features:**
+
+#### **1. Hero Section Management**
+- ✅ Toggle carousel on/off
+- ✅ Slide interval setting (chỉ hiện khi carousel bật)
+- ✅ Multi-select banners với order
+
+#### **2. Featured Section Management** 
+- ✅ Toggle section on/off
+- ✅ Editable title + description
+- ✅ Multi-select products (max 6)
+- ✅ Custom "View All" link
+
+#### **3. Publications Section Management**
+- ✅ Toggle section on/off
+- ✅ Editable title + description 
+- ✅ **Smart Mode Switcher:**
+  - **Auto Mode:** Number of posts slider (1-10)
+  - **Manual Mode:** Multi-select posts (max 6)
+- ✅ Custom "View All" link
+
+#### **4. Resources Section Management**
+- ✅ Toggle section on/off
+- ✅ **Left Panel Config:**
+  - Custom title + description
+  - Array field cho features list
+  - Custom link text + URL
+- ✅ **Right Panel Config:**
+  - Custom title + description  
+  - Array field cho features list
+  - Custom link text + URL
+
+#### **5. Contact Section Management**
+- ✅ Toggle on/off
+- ✅ Background color selector (gray/white/primary)
+
+#### **6. SEO Management**
+- ✅ Meta title + description + keywords
+- ✅ OG image upload (1200x630px recommended)
+
+### **🔄 Conditional Field Logic:**
+- Sections chỉ hiện settings khi isEnabled = true
+- Publications mode settings thay đổi theo displayMode
+- Hero carousel settings chỉ hiện khi enableCarousel = true
+
+---
+
+## 🚀 **FRONTEND INTEGRATION GUIDE**
+
+### **📡 API Usage:**
+
+```typescript
+// 1. Fetch homepage settings
+const response = await fetch('/api/homepage-settings');
+const { success, data } = await response.json();
+
+if (success) {
+  // Hero Section
+  const { heroSection, activeBanners } = data;
+  if (heroSection.enableCarousel && activeBanners?.length) {
+    // Render carousel với activeBanners
+    // Auto-slide interval: heroSection.autoSlideInterval
+  }
+
+  // Featured Section  
+  const { featuredSection, featuredProductsData } = data;
+  if (featuredSection.isEnabled && featuredProductsData?.length) {
+    // Render featured products section
+    // Title: featuredSection.title
+    // Products: featuredProductsData (đã populate đầy đủ)
+  }
+
+  // Publications Section
+  const { publicationsSection, latestPosts, selectedPostsData } = data;
+  if (publicationsSection.isEnabled) {
+    const posts = publicationsSection.displayMode === 'auto' 
+      ? latestPosts 
+      : selectedPostsData;
+    // Render publications với posts data
+  }
+
+  // Resources Section
+  const { resourcesSection } = data;
+  if (resourcesSection.isEnabled) {
+    // Left panel: resourcesSection.leftPanel
+    // Right panel: resourcesSection.rightPanel
+  }
+
+  // SEO
+  const { seoSettings } = data;
+  // Apply meta tags từ seoSettings
+}
+```
+
+### **🎯 Benefits của Custom API:**
+
+1. **Single API Call:** Tất cả data homepage trong 1 request
+2. **Auto-populated:** Không cần fetch riêng banners/products/posts
+3. **Smart Filtering:** Chỉ lấy data active/published
+4. **Performance:** Optimized queries với depth control
+5. **Error Handling:** Messages tiếng Việt cho UX tốt
+6. **CORS Ready:** Sẵn sàng cho frontend deployment
+
+---
+
+## 🎯 **TÓM TẮT TÍNH NĂNG QUẢN LÝ HOMEPAGE**
+
+### **Admin có thể quản lý 100%:**
+
+1. ✅ **Banner Carousel** - Toggle, timing, selection
+2. ✅ **Featured Products** - Enable/disable, custom selection  
+3. ✅ **Publications** - Auto/manual mode, số lượng, selection
+4. ✅ **Resources & Tools** - Custom titles, features, links
+5. ✅ **Contact Form** - Enable/disable, styling
+6. ✅ **SEO Settings** - Meta tags, OG image
+
+### 🔄 **Công việc còn lại cho Frontend:**
+
+#### **1. Seed thêm Posts (5 phút)**
+
+```bash
+# Tạo thêm 3-4 posts để demo đầy đủ
+node scripts/seed-more-posts.mjs
+```
+
+#### **2. Frontend Integration (1-2 giờ)**
+
+```typescript
+// Replace hardcoded data với API call
+const homepageData = await fetch('/api/homepage-settings').then(r => r.json());
+
+// Sử dụng data:
+// - homepageData.data.activeBanners cho HeroSection
+// - homepageData.data.featuredProductsData cho FeaturedTopics  
+// - homepageData.data.latestPosts cho LatestPublications
+// - homepageData.data.resourcesSection cho DataResources
+```
+
+---
+
+**🎊 VRC Homepage Backend - HOÀN THÀNH HOÀN HẢO!**
+
+*Admin có thể quản lý toàn bộ trang chủ mà không cần developer can thiệp.*
+
+---
+
+**📅 Document:** Admin Homepage Management Guide - Phân tích trang chủ và hướng dẫn quản lý

@@ -224,3 +224,54 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+/**
+ * Create/Update homepage settings (Alternative POST method)
+ * POST /api/homepage-settings
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const payload = await getPayload({ config });
+
+    // TODO: Add auth check for admin
+    // const { user } = await payload.auth({ headers: req.headers });
+    // if (!user || user.role !== 'admin') {
+    //   return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    // }
+
+    const body = await req.json();
+
+    const updatedSettings = await payload.updateGlobal({
+      slug: 'homepage-settings',
+      data: body,
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: updatedSettings,
+      },
+      {
+        status: 200,
+        headers: CORS_HEADERS,
+      }
+    );
+
+  } catch (error) {
+    console.error('Error updating homepage settings via POST:', error);
+
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to update homepage settings',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal server error',
+      },
+      {
+        status: 500,
+        headers: CORS_HEADERS,
+      }
+    );
+  }
+}

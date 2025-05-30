@@ -3,6 +3,7 @@
 **Last Updated: May 29, 2025**
 
 **Recent Fixes Applied:**
+- ✅ **PayloadCMS Admin Panel Save Fix - Tools Collection**: Fixed form data parsing in custom API handlers to handle `_payload` field wrapper
 - ✅ **Product Delete from Admin Edit View**: Fixed URL parameter extraction causing delete failures
 - ✅ **Related Products Cleanup**: Enhanced beforeDelete hook with improved query logic 
 - ✅ **Admin Response Format**: Fixed formatAdminResponse to distinguish collection vs single document responses
@@ -14,6 +15,7 @@
 - ✅ **PayloadImageWrapper Component**: Enhanced with hydration-safe iframe detection using data attributes
 - ✅ **localAvatar.ts TypeScript Errors**: Fixed undefined username and color array access issues
 - ✅ **CSS Iframe Detection**: Implemented fallback styles for iframe contexts before hydration completes
+- ✅ **Tools Admin Integration**: Implemented complete CRUD API for Tools collection with routing conflict resolution
 
 ## PRODUCT DELETE FROM ADMIN EDIT VIEW FIX
 
@@ -1164,3 +1166,241 @@ The VRC Payload CMS system is now fully operational with:
 - **Image Height Fix Guide**: `live-preview-ui-guide.md`
 - **React Hydration Errors**: `react-hydration-error-guide.md`
 - **Payload Live Preview**: `payload-live-preview-correct-guide.md`
+
+---
+
+## VRC HOMEPAGE SETTINGS - DUPLICATE ROUTE ISSUE FIX
+
+### ✅ **DUPLICATE PAGE ISSUE - ĐÃ GIẢI QUYẾT**
+
+**Vấn đề đã khắc phục:** Duplicate API route `/api/homepage-settings`
+
+**Chi tiết lỗi (đã fix):**
+```
+⚠ Duplicate page detected. 
+src\app\api\homepage-settings\route.ts và 
+src\app\(payload)\api\homepage-settings\route.ts 
+resolve to /api/homepage-settings
+```
+
+**Nguyên nhân:**
+- 2 file API route cùng xử lý endpoint `/api/homepage-settings`
+- File custom (278 dòng, đầy đủ tính năng) vs File Payload built-in (90 dòng, cơ bản)
+- Next.js không thể quyết định route nào sẽ xử lý request
+
+**✅ Giải pháp đã áp dụng:** 
+- Xóa file Payload built-in: `src\app\(payload)\api\homepage-settings\route.ts`
+- Giữ file custom đầy đủ tính năng: `src\app\api\homepage-settings\route.ts`
+- **Kết quả:** API hoạt động bình thường, trả về status 200 với data đầy đủ
+
+**Bước đã thực hiện:**
+
+1. **✅ Xóa file Payload built-in duplicate**
+   - Đã xóa: `backend/src/app/(payload)/api/homepage-settings/route.ts`
+   - Giữ lại: `backend/src/app/api/homepage-settings/route.ts` (278 dòng, đầy đủ tính năng)
+
+2. **✅ Verify API hoạt động thành công**
+   ```bash
+   curl http://localhost:3000/api/homepage-settings
+   # Kết quả: Status 200, data đầy đủ
+   ```
+
+3. **✅ Development server hoạt động bình thường**
+   ```bash
+   npm run dev
+   # Ready in 4.4s - Không còn duplicate warning
+   ```
+
+**✅ Duplicate issue đã được giải quyết thành công:**
+- Xóa file Payload built-in trùng lặp
+- API `/api/homepage-settings` hoạt động bình thường
+- Development server chạy không còn warning
+- Status 200, data đầy đủ cho frontend
+
+---
+
+## TOOLS ADMIN INTEGRATION FIX
+
+### Vấn đề
+
+Tools collection thiếu hoàn toàn tích hợp admin panel. Admin không thể thực hiện CRUD operations trên Tools qua giao diện admin của PayloadCMS.
+
+### Nguyên nhân chính xác
+
+1. **Thiếu API handlers cho admin**: Không có handlers cho GET, POST, PUT, PATCH, DELETE operations
+2. **Thiếu routing structure**: Không có route files để wire up các handlers
+3. **Routing conflict**: Next.js phát hiện conflict giữa custom API `/api/tools/[slug]` và admin API `/(payload)/api/tools/[id]`
+
+### Giải pháp đã áp dụng
+
+1. **Tạo complete handler suite**:
+   - `handlers/get.ts` - List và fetch single tools với admin/API dual support
+   - `handlers/post.ts` - Create tools với form data parsing
+   - `handlers/update.ts` - PUT/PATCH operations với complex field support  
+   - `handlers/delete.ts` - Single và bulk delete operations
+   - `handlers/options.ts` - CORS preflight handling
+
+2. **Tạo utility modules**:
+   - `utils/responses.ts` - Format admin vs API responses correctly
+   - `utils/requests.ts` - Parse admin form data và extract parameters
+
+3. **Resolve routing conflict**:
+   - Di chuyển custom API từ `/api/tools/` sang `/api/public-tools/`
+   - Giữ admin API tại `/(payload)/api/tools/` (vị trí chuẩn của Payload)
+   - Sử dụng standard `[id]` parameter cho admin API
+
+4. **Tạo route structure**:
+   ```
+   /(payload)/api/tools/           # Admin API (Payload chuẩn)
+   ├── route.ts (collection operations)
+   ├── [id]/route.ts (single tool operations)
+   ├── handlers/ (business logic)
+   └── utils/ (shared utilities)
+   
+   /api/public-tools/              # Custom public API
+   ├── route.ts (public list)
+   └── [slug]/route.ts (public single tool)
+   ```
+
+### Kết quả
+
+- ✅ Tools admin integration hoàn chính hoạt động
+- ✅ CRUD operations từ admin panel
+- ✅ Bulk operations support
+- ✅ Routing conflicts resolved
+- ✅ Build thành công không có TypeScript errors
+- ✅ Admin vs API response formatting chính xác
+
+### Files tạo mới
+
+```
+backend/src/app/(payload)/api/tools/      # Admin API (vị trí Payload chuẩn)
+├── route.ts                              # Main admin API routes  
+├── [id]/route.ts                        # Single tool operations
+├── handlers/
+│   ├── get.ts                           # GET handler với admin/API dual support
+│   ├── post.ts                          # POST handler với form data parsing
+│   ├── update.ts                        # PUT/PATCH handler
+│   ├── delete.ts                        # DELETE handler với bulk support
+│   └── options.ts                       # CORS preflight handler
+└── utils/
+    ├── responses.ts                     # Response formatting utilities
+    └── requests.ts                      # Request parsing utilities
+
+backend/src/app/api/public-tools/        # Custom public API (di chuyển)
+├── route.ts                             # Public tools list
+└── [slug]/route.ts                      # Public single tool by slug
+```
+
+## PAYLOADCMS ADMIN PANEL SAVE FIX - TOOLS COLLECTION
+
+### Vấn đề
+PayloadCMS admin panel save functionality không hoạt động đúng cho Tools collection. Khi click "Save" trong admin interface, dữ liệu có vẻ được submit thành công (response 200), nhưng dữ liệu thực tế không được lưu vào database.
+
+### Nguyên nhân chính xác
+Phát hiện qua debugging custom API handlers. PayloadCMS admin panel gửi form data theo format khác với expected:
+
+1. **Expected format**: Direct form fields trong request body
+2. **Actual format**: Form data được wrap trong `_payload` field dưới dạng JSON string
+
+**Ví dụ về vấn đề:**
+
+**Chúng ta expect nhận được:**
+```json
+{
+  "name": "Tool Name",
+  "excerpt": "Tool description", 
+  "url": "https://example.com",
+  "difficulty": "beginner"
+}
+```
+
+**Nhưng thực tế nhận được:**
+```json
+{
+  "_payload": "{\"name\":\"Tool Name\",\"excerpt\":\"Tool description\",\"url\":\"https://example.com\",\"difficulty\":\"beginner\"}"
+}
+```
+
+### Giải pháp đã áp dụng
+
+**Files Modified:**
+1. `src/app/(payload)/api/tools/handlers/patch.ts`
+2. `src/app/(payload)/api/tools/handlers/put.ts`
+
+**Code Changes - Added `_payload` field parsing logic:**
+```typescript
+// Process each form field
+for (const [key, value] of formData.entries()) {
+  if (key === '_payload' && typeof value === 'string') {
+    try {
+      const payloadData = JSON.parse(value);
+      Object.assign(toolData, payloadData);
+      console.log('PATCH /api/tools: Parsed _payload field successfully');
+    } catch (payloadError) {
+      console.error('PATCH /api/tools: Failed to parse _payload field:', payloadError);
+    }
+  } else {
+    // Handle regular form fields
+    toolData[key] = value;
+  }
+}
+```
+
+**Key Implementation Details:**
+1. **Detection**: Check if form field key là `_payload`
+2. **Validation**: Ensure value là string before parsing
+3. **Parsing**: Use `JSON.parse()` để convert JSON string thành object
+4. **Merging**: Use `Object.assign()` để merge parsed data vào main data object
+5. **Error Handling**: Wrap parsing trong try-catch để handle malformed JSON
+6. **Logging**: Added comprehensive logging for debugging
+
+### Testing & Verification
+
+**Terminal Logs xác nhận fix thành công:**
+```bash
+PATCH /api/tools: Parsed _payload field successfully
+PATCH /api/tools: Final parsed tool data keys: name,excerpt,url,difficulty,toolType,relatedTools,seoTitle,...
+PATCH /api/tools: Tool updated successfully with ID: [tool-id]
+```
+
+### Kết quả
+- ✅ All form fields trong admin panel save đúng
+- ✅ Text fields (name, excerpt, seoTitle, etc.)
+- ✅ Select fields (difficulty, toolType) 
+- ✅ Relationship fields (relatedTools)
+- ✅ URL fields
+- ✅ Rich text fields
+- ✅ PayloadCMS admin functionality hoàn toàn phục hồi
+
+### Best Practices cho tương lai
+
+**Template cho robust form data processing:**
+```typescript
+const processFormData = (formData) => {
+  const data = {};
+  
+  for (const [key, value] of formData.entries()) {
+    // Handle PayloadCMS admin panel format  
+    if (key === '_payload' && typeof value === 'string') {
+      try {
+        const payloadData = JSON.parse(value);
+        Object.assign(data, payloadData);
+      } catch (error) {
+        console.error('Failed to parse _payload:', error);
+      }
+    } else {
+      // Handle direct form fields
+      data[key] = value;
+    }
+  }
+  
+  return data;
+};
+```
+
+**Debugging tips:**
+1. **Log form data keys**: Always log `Array.from(formData.keys())` để see fields
+2. **Log parsed data**: Log final parsed object keys để verify data structure  
+3. **Check _payload field**: Specifically check và log `_payload` field content
+4. **Test both interfaces**: Test saving từ admin panel và custom forms
