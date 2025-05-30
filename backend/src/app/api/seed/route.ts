@@ -15,11 +15,7 @@ import { seedEventCategories } from '@/seed/event-categories';
 import { seedEvents } from '@/seed/events';
 import { seedTools } from '@/seed/seed-tools';
 import { seedResources } from '@/seed/seed-resources';
-import { seedVrcPosts } from '@/seed/vrc-posts';
 import { seedAllVrcPosts } from '@/seed/all-vrc-posts';
-import { seedVRCToolsAndResources } from '@/seed/vrc-tools-resources';
-import { seedSimpleVRCTools } from '@/seed/simple-test';
-import { seedSingleVRCTool } from '@/seed/test-single-vrc';
 
 export const dynamic = 'force-dynamic';
 
@@ -101,25 +97,9 @@ export async function GET(request: Request) {
           await seedResources(payload);
           result.details = { type: 'resources', completed: true };
           break;
-        case 'vrc-posts':
-          await seedVrcPosts(payload);
-          result.details = { type: 'vrc-posts', completed: true };
-          break;
         case 'all-vrc-posts':
           await seedAllVrcPosts(payload);
           result.details = { type: 'all-vrc-posts', completed: true };
-          break;
-        case 'vrc-tools-resources':
-          await seedVRCToolsAndResources(payload);
-          result.details = { type: 'vrc-tools-resources', completed: true };
-          break;
-        case 'simple-test':
-          await seedSimpleVRCTools(payload);
-          result.details = { type: 'simple-test', completed: true };
-          break;
-        case 'single-vrc':
-          await seedSingleVRCTool(payload);
-          result.details = { type: 'single-vrc', completed: true };
           break;
         case 'tools-resources':
           await seedTools(payload);

@@ -11,54 +11,83 @@ export const resourcesData = [
         children: [
           {
             type: 'paragraph',
+            version: 1,
             children: [
               {
+                type: 'text',
                 text: 'ASHRAE Standard 90.1 là một trong những tiêu chuẩn quan trọng nhất trong ngành HVAC, quy định các yêu cầu tối thiểu về hiệu suất năng lượng cho tòa nhà.',
+                version: 1,
               },
             ],
           },
           {
             type: 'paragraph',
+            version: 1,
             children: [
               {
+                type: 'text',
                 text: 'Tiêu chuẩn này bao gồm:',
+                version: 1,
               },
             ],
           },
           {
             type: 'list',
+            version: 1,
             listType: 'bullet',
             children: [
               {
                 type: 'listItem',
+                version: 1,
                 children: [
                   {
                     type: 'paragraph',
-                    children: [{ text: 'Yêu cầu về hiệu suất thiết bị HVAC' }],
+                    version: 1,
+                    children: [{
+                      type: 'text',
+                      text: 'Yêu cầu về hiệu suất thiết bị HVAC',
+                      version: 1,
+                    }],
                   },
                 ],
               },
               {
                 type: 'listItem',
+                version: 1,
                 children: [
                   {
                     type: 'paragraph',
-                    children: [{ text: 'Quy định về điều khiển hệ thống' }],
+                    version: 1,
+                    children: [{
+                      type: 'text',
+                      text: 'Quy định về điều khiển hệ thống',
+                      version: 1,
+                    }],
                   },
                 ],
               },
               {
                 type: 'listItem',
+                version: 1,
                 children: [
                   {
                     type: 'paragraph',
-                    children: [{ text: 'Tiêu chuẩn cách nhiệt tòa nhà' }],
+                    version: 1,
+                    children: [{
+                      type: 'text',
+                      text: 'Tiêu chuẩn cách nhiệt tòa nhà',
+                      version: 1,
+                    }],
                   },
                 ],
               },
             ],
           },
         ],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
       },
     },
     icon: 'file-text',
@@ -94,13 +123,20 @@ export const resourcesData = [
         children: [
           {
             type: 'paragraph',
+            version: 1,
             children: [
               {
+                type: 'text',
                 text: 'Hướng dẫn toàn diện về thiết kế hệ thống VRF, bao gồm các nguyên lý hoạt động, phương pháp tính toán và quy trình thiết kế.',
+                version: 1,
               },
             ],
           },
         ],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
       },
     },
     icon: 'book-open',
@@ -136,13 +172,20 @@ export const resourcesData = [
         children: [
           {
             type: 'paragraph',
+            version: 1,
             children: [
               {
+                type: 'text',
                 text: 'Video hướng dẫn thực hành về bảo trì hệ thống chiller, giúp kỹ thuật viên nắm vững quy trình và kỹ thuật bảo trì chuyên nghiệp.',
+                version: 1,
               },
             ],
           },
         ],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
       },
     },
     icon: 'video',
@@ -175,12 +218,22 @@ export const resourcesData = [
     description: {
       root: {
         type: 'root',
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
             type: 'paragraph',
+            direction: null,
+            format: '',
+            indent: 0,
+            version: 1,
             children: [
               {
+                type: 'text',
                 text: 'Case study chi tiết về dự án tối ưu hóa năng lượng cho tòa nhà văn phòng, bao gồm phân tích hiện trạng, giải pháp thực hiện và kết quả đạt được.',
+                version: 1,
               },
             ],
           },
@@ -190,11 +243,23 @@ export const resourcesData = [
     content: {
       root: {
         type: 'root',
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
             type: 'heading',
             tag: 'h2',
-            children: [{ text: 'Tổng quan dự án' }],
+            direction: null,
+            format: '',
+            indent: 0,
+            version: 1,
+            children: [{
+              type: 'text',
+              text: 'Tổng quan dự án',
+              version: 1,
+            }],
           },
           {
             type: 'paragraph',
@@ -207,7 +272,11 @@ export const resourcesData = [
           {
             type: 'heading',
             tag: 'h3',
-            children: [{ text: 'Thách thức ban đầu' }],
+            children: [{
+              type: 'text',
+              text: 'Thách thức ban đầu',
+              version: 1,
+            }],
           },
           {
             type: 'list',
@@ -218,7 +287,11 @@ export const resourcesData = [
                 children: [
                   {
                     type: 'paragraph',
-                    children: [{ text: 'Chi phí điện cao (~800 triệu VNĐ/năm)' }],
+                    children: [{
+                      type: 'text',
+                      text: 'Chi phí điện cao (~800 triệu VNĐ/năm)',
+                      version: 1,
+                    }],
                   },
                 ],
               },
@@ -227,7 +300,11 @@ export const resourcesData = [
                 children: [
                   {
                     type: 'paragraph',
-                    children: [{ text: 'Hệ thống chiller cũ, hiệu suất thấp' }],
+                    children: [{
+                      type: 'text',
+                      text: 'Hệ thống chiller cũ, hiệu suất thấp',
+                      version: 1,
+                    }],
                   },
                 ],
               },
@@ -236,7 +313,11 @@ export const resourcesData = [
                 children: [
                   {
                     type: 'paragraph',
-                    children: [{ text: 'Điều khiển thủ công, không tối ưu' }],
+                    children: [{
+                      type: 'text',
+                      text: 'Điều khiển thủ công, không tối ưu',
+                      version: 1,
+                    }],
                   },
                 ],
               },
@@ -275,12 +356,22 @@ export const resourcesData = [
     description: {
       root: {
         type: 'root',
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
             type: 'paragraph',
+            direction: null,
+            format: '',
+            indent: 0,
+            version: 1,
             children: [
               {
+                type: 'text',
                 text: 'White paper phân tích sâu về các công nghệ HVAC mới nổi và dự báo xu hướng phát triển trong tương lai gần.',
+                version: 1,
               },
             ],
           },
@@ -317,12 +408,22 @@ export const resourcesData = [
     description: {
       root: {
         type: 'root',
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
             type: 'paragraph',
+            direction: null,
+            format: '',
+            indent: 0,
+            version: 1,
             children: [
               {
+                type: 'text',
                 text: 'Công cụ Excel chuyên nghiệp để tính toán và phân tích chi phí vận hành hệ thống HVAC một cách chi tiết và chính xác.',
+                version: 1,
               },
             ],
           },
