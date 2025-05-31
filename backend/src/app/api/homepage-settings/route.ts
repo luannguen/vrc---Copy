@@ -88,10 +88,7 @@ export async function GET() {
       const products = await payload.find({
         collection: 'products',
         where: {
-          and: [
-            { id: { in: productIds } },
-            { _status: { equals: 'published' } },
-          ],
+          id: { in: productIds },
         },
         depth: 2,
       });

@@ -1,8 +1,44 @@
 
-import { LineChart, BarChart3, Gauge, ArrowRight } from 'lucide-react';
+import { LineChart, BarChart3, Gauge, ArrowRight, Loader2 } from 'lucide-react';
+import { useDataResourcesSection } from '../hooks/useHomepageSettings';
 
 const DataResources = () => {
-  return (
+  const { settings: dataResourcesData, isLoading, error, isEnabled } = useDataResourcesSection();
+  // Fallback data if API fails
+  const fallbackData = {
+    enabled: true,
+    leftPanel: {
+      title: "Dữ liệu & Thống kê năng lượng",
+      linkUrl: "/data/statistics"
+    },
+    rightPanel: {
+      title: "Công cụ tính toán & Thiết kế", 
+      linkUrl: "/data/tools"
+    }
+  };
+
+  // Use API data or fallback
+  const sectionData = dataResourcesData || fallbackData;
+
+  if (error) {
+    console.warn('DataResources API error, using fallback data:', error);
+  }
+  // Don't render if disabled
+  if (!isEnabled) {
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="container-custom">
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </section>
+    );
+  }  return (
     <section className="py-16 bg-white">
       <div className="container-custom">
         <div className="mb-12">
@@ -13,13 +49,14 @@ const DataResources = () => {
         </div>
         
         <div className="grid md:grid-cols-2 gap-8">
+          {/* Left Panel - Data & Statistics */}
           <div className="bg-muted p-8 rounded-lg">
             <div className="flex items-start mb-6">
               <div className="bg-primary rounded-full p-3 mr-4">
                 <LineChart className="text-white w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold mb-2">Dữ liệu & Thống kê năng lượng</h3>
+                <h3 className="text-xl font-semibold mb-2">{sectionData?.leftPanel?.title || "Dữ liệu & Thống kê năng lượng"}</h3>
                 <p className="text-muted-foreground">
                   Truy cập dữ liệu phân tích và thống kê về hiệu suất năng lượng của các hệ thống điều hòa không khí, 
                   chi phí vận hành và tác động môi trường của các công nghệ khác nhau.
@@ -44,19 +81,23 @@ const DataResources = () => {
                 <span>Dữ liệu phát thải carbon và tác động môi trường</span>
               </li>
             </ul>
-            <a href="/data/statistics" className="inline-flex items-center text-accent hover:text-primary transition-colors font-medium">
+            <a 
+              href={sectionData?.leftPanel?.linkUrl || "/data/statistics"}
+              className="inline-flex items-center text-accent hover:text-primary transition-colors font-medium"
+            >
               Xem thống kê
               <ArrowRight size={18} className="ml-2" />
             </a>
           </div>
           
+          {/* Right Panel - Tools & Design */}
           <div className="bg-muted p-8 rounded-lg">
             <div className="flex items-start mb-6">
               <div className="bg-primary rounded-full p-3 mr-4">
                 <Gauge className="text-white w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold mb-2">Công cụ tính toán & Thiết kế</h3>
+                <h3 className="text-xl font-semibold mb-2">{sectionData?.rightPanel?.title || "Công cụ tính toán & Thiết kế"}</h3>
                 <p className="text-muted-foreground">
                   Sử dụng các công cụ tính toán và thiết kế để lựa chọn hệ thống điều hòa không khí phù hợp, 
                   tối ưu hóa hiệu suất và ước tính chi phí vận hành dài hạn.
@@ -81,7 +122,10 @@ const DataResources = () => {
                 <span>Tư vấn lựa chọn giải pháp phù hợp</span>
               </li>
             </ul>
-            <a href="/data/tools" className="inline-flex items-center text-accent hover:text-primary transition-colors font-medium">
+            <a 
+              href={sectionData?.rightPanel?.linkUrl || "/data/tools"}
+              className="inline-flex items-center text-accent hover:text-primary transition-colors font-medium"
+            >
               Khám phá công cụ
               <ArrowRight size={18} className="ml-2" />
             </a>

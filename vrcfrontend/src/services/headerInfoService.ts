@@ -4,6 +4,7 @@
  */
 
 import { apiService } from '../lib/api';
+import { processHeaderInfo, processCompanyInfo } from '../utils/urlProcessor';
 
 // Header Info Types
 export interface ContactInfo {
@@ -55,13 +56,13 @@ export interface CompanyInfo {
 export class HeaderInfoService {
   /**
    * Get header information for the website header
-   */
-  async getHeaderInfo(): Promise<HeaderInfo> {
+   */  async getHeaderInfo(): Promise<HeaderInfo> {
     try {
-      const response = await apiService.get<{ success: boolean; data: HeaderInfo }>('/header-info');
+      const response = await apiService.get<HeaderInfo>('/header-info');
       
-      if (response.success && response.data) {
-        return response.data;
+      // API trả về trực tiếp dữ liệu, không có wrapper { success, data }
+      if (response && typeof response === 'object') {
+        return processHeaderInfo(response);
       }
       
       throw new Error('Invalid header info response format');
@@ -74,13 +75,13 @@ export class HeaderInfoService {
 
   /**
    * Get company information for footer and other components
-   */
-  async getCompanyInfo(): Promise<CompanyInfo> {
+   */  async getCompanyInfo(): Promise<CompanyInfo> {
     try {
-      const response = await apiService.get<{ success: boolean; data: CompanyInfo }>('/company-info');
+      const response = await apiService.get<CompanyInfo>('/company-info');
       
-      if (response.success && response.data) {
-        return response.data;
+      // API trả về trực tiếp dữ liệu, không có wrapper { success, data }
+      if (response && typeof response === 'object') {
+        return processCompanyInfo(response);
       }
       
       throw new Error('Invalid company info response format');
