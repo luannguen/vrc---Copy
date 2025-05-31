@@ -169,9 +169,23 @@ export const useContactFormSection = () => {
   
   return {
     settings: settings?.contactForm,
+    formSubmissionsStats: settings?.formSubmissionsStats,
     isLoading,
     error,
     isEnabled: settings?.contactForm?.enabled ?? true,
+  };
+};
+
+/**
+ * Helper hook to get form submissions statistics
+ */
+export const useFormSubmissionsStats = () => {
+  const { data: settings, isLoading, error } = useHomepageSettings();
+  
+  return {
+    stats: settings?.formSubmissionsStats,
+    isLoading,
+    error,
   };
 };
 

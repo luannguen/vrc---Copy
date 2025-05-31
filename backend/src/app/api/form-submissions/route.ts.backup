@@ -1,0 +1,298 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400',
+};
+
+// OPTIONS handler for CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: CORS_HEADERS,
+  });
+}
+
+/**
+ * Submit homepage contact form
+ * POST /api/form-submissions
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const payload = await getPayload({ config });
+
+    const body = await req.json();
+    console.log('Homepage form submission:', body);
+
+    // Validate required fields
+    const { name, email, message, subject, phone } = body;
+
+    if (!name || !email || !message) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Vui lòng điền đầy đủ họ tên, email và nội dung.',
+        },
+        {
+          status: 400,
+          headers: CORS_HEADERS,
+        }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Email không hợp lệ.',
+        },
+        {
+          status: 400,
+          headers: CORS_HEADERS,
+        }
+      );
+    }
+
+    // Create form submission data in format expected by FormSubmission
+    const submissionData = [
+      { field: 'name', value: name },
+      { field: 'email', value: email },
+      { field: 'message', value: message },
+      { field: 'subject', value: subject || 'general' },
+      ...(phone ? [{ field: 'phone', value: phone }] : []),
+    ];
+
+    // Find first available form or use hardcoded ID as fallback
+    let formId = 'homepage-contact-form';
+    try {
+      const forms = await payload.find({
+        collection: 'forms',
+        limit: 1
+      });
+      if (forms.docs.length > 0 && forms.docs[0]) {
+        formId = forms.docs[0].id;
+      }
+    } catch (error) {
+      console.warn('Could not fetch forms, using fallback ID:', error);
+    }
+
+    // Create form submission with proper form reference
+    const formSubmission = await payload.create({
+      collection: 'form-submissions',
+      data: {
+        form: formId, // Use actual form ID or fallback
+        submissionData,
+      },
+    });
+
+    console.log('Form submission created:', formSubmission.id);
+
+    // TODO: Send email notification to admin
+    // TODO: Send auto-reply email to customer
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.',
+        data: {
+          id: formSubmission.id,
+          submittedAt: formSubmission.createdAt,
+        },
+      },
+      {
+        status: 201,
+        headers: CORS_HEADERS,
+      }
+    );
+
+  } catch (error) {
+    console.error('Error submitting form:', error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Có lỗi xảy ra khi gửi form. Vui lòng thử lại.',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      {
+        status: 500,
+        headers: CORS_HEADERS,
+      }
+    );
+  }
+}
+
+/**
+ * Get form submissions (admin only)
+ * GET /api/form-submissions
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const payload = await getPayload({ config });
+
+    const url = new URL(req.url);
+    const page = Number(url.searchParams.get('page')) || 1;
+    const limit = Number(url.searchParams.get('limit')) || 20;
+    const form = url.searchParams.get('form');
+    const sort = url.searchParams.get('sort') || 'createdAt';
+    const order = url.searchParams.get('order') || 'desc';
+
+    // Build query
+    let query = {};
+
+    if (form && form !== 'all') {
+      query = { form: { equals: form } };
+    }
+
+    // Build sort
+    const sortField = `${order === 'desc' ? '-' : ''}${sort}`;
+
+    const result = await payload.find({
+      collection: 'form-submissions',
+      where: query,
+      page,
+      limit,
+      sort: sortField,
+      depth: 0,
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: result.docs,
+        pagination: {
+          page: result.page,
+          limit: result.limit,
+          totalPages: result.totalPages,
+          totalDocs: result.totalDocs,
+          hasNextPage: result.hasNextPage,
+          hasPrevPage: result.hasPrevPage,
+        },
+      },
+      {
+        status: 200,
+        headers: CORS_HEADERS,
+      }
+    );
+
+  } catch (error) {
+    console.error('Error fetching form submissions:', error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Có lỗi xảy ra khi lấy danh sách form submissions.',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      {
+        status: 500,
+        headers: CORS_HEADERS,
+      }
+    );
+  }
+}
+
+/**
+ * Delete form submissions (bulk delete)
+ * DELETE /api/form-submissions
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const payload = await getPayload({ config });
+
+    // Get URL search params for where clause (Payload CMS bulk delete format)
+    const { searchParams } = new URL(req.url);
+
+    // Parse the where clause for bulk deletion
+    // Payload sends where[id][in][0]=id1&where[id][in][1]=id2...
+    const idsToDelete: string[] = [];
+    let index = 0;
+    while (searchParams.has(`where[id][in][${index}]`)) {
+      const id = searchParams.get(`where[id][in][${index}]`);
+      if (id) {
+        idsToDelete.push(id);
+      }
+      index++;
+    }
+
+    if (idsToDelete.length === 0) {
+      return NextResponse.json(
+        {
+          message: 'No items selected for deletion.',
+        },
+        {
+          status: 400,
+          headers: CORS_HEADERS,
+        }
+      );
+    }
+
+    console.log('Deleting form submissions with IDs:', idsToDelete);
+
+    // Delete each form submission
+    const deletePromises = idsToDelete.map(async (id) => {
+      try {
+        await payload.delete({
+          collection: 'form-submissions',
+          id,
+        });
+        return { id, success: true };
+      } catch (error) {
+        console.error(`Failed to delete form submission ${id}:`, error);
+        return { id, success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      }
+    });
+
+    const results = await Promise.all(deletePromises);
+    const successful = results.filter(r => r.success);
+    const failed = results.filter(r => !r.success);
+
+    // Return response in Payload CMS compatible format
+    if (failed.length > 0) {
+      // If some deletions failed, return 207 Multi-Status
+      return NextResponse.json(
+        {
+          message: `Đã xóa ${successful.length}/${idsToDelete.length} form submission(s).`,
+          errors: failed.map(f => ({
+            id: f.id,
+            message: f.error || 'Unknown error'
+          }))
+        },
+        {
+          status: 207, // Multi-Status for partial success
+          headers: CORS_HEADERS,
+        }
+      );
+    } else {
+      // All deletions successful - return simple success response like Payload CMS
+      return NextResponse.json(
+        {
+          message: `Successfully deleted ${successful.length} item(s).`
+        },
+        {
+          status: 200,
+          headers: CORS_HEADERS,
+        }
+      );
+    }
+
+  } catch (error) {
+    console.error('Error deleting form submissions:', error);
+
+    return NextResponse.json(
+      {
+        message: 'An error occurred while deleting items.',
+      },
+      {
+        status: 500,
+        headers: CORS_HEADERS,
+      }
+    );
+  }
+}

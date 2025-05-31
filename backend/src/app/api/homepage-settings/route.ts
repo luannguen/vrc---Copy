@@ -9,6 +9,12 @@ interface ExtendedHomepageSettings {
   featuredProductsData?: unknown[];
   latestPosts?: unknown[];
   selectedPostsData?: unknown[];
+  formSubmissionsStats?: {
+    total: number;
+    thisMonth: number;
+    pending: number;
+    lastSubmission?: unknown;
+  };
 }
 
 // Extend NextRequest to include user
@@ -130,6 +136,70 @@ export async function GET() {
       });
 
       extendedSettings.selectedPostsData = posts.docs;
+    }
+
+    // Get form submissions statistics
+    try {
+      const currentDate = new Date();
+      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+
+      // First find the homepage contact form
+      const homepageForm = await payload.find({
+        collection: 'forms',
+        where: {
+          title: { equals: 'Homepage Contact Form' }
+        },
+        limit: 1,
+      });
+
+      let formSubmissionsStats;
+      if (homepageForm.docs.length > 0 && homepageForm.docs[0]) {
+        const formId = homepageForm.docs[0].id;
+        formSubmissionsStats = await payload.find({
+          collection: 'form-submissions',
+          where: {
+            form: { equals: formId }
+          },
+          limit: 1000, // Get all submissions for stats
+          sort: '-createdAt',
+        });
+      } else {
+        // Fallback: get all form submissions if no specific form found
+        formSubmissionsStats = await payload.find({
+          collection: 'form-submissions',
+          limit: 1000, // Get all submissions for stats
+          sort: '-createdAt',
+        });
+      }
+
+      // Type for form submission
+      interface FormSubmission {
+        createdAt: string;
+        submissionData?: Array<{ field: string; value: string }>;
+      }
+
+      const submissions = formSubmissionsStats.docs as FormSubmission[];
+
+      extendedSettings.formSubmissionsStats = {
+        total: submissions.length,
+        thisMonth: submissions.filter((submission: FormSubmission) =>
+          new Date(submission.createdAt) >= firstDayOfMonth
+        ).length,
+        pending: submissions.filter((submission: FormSubmission) =>
+          // Assuming new submissions are "pending" - you can add status field if needed
+          new Date(submission.createdAt) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
+        ).length,
+        lastSubmission: submissions[0] || null
+      };
+    } catch (error) {
+      console.warn('Could not fetch form submissions stats:', error);
+      // Provide default stats if form submissions fetch fails
+      extendedSettings.formSubmissionsStats = {
+        total: 0,
+        thisMonth: 0,
+        pending: 0,
+        lastSubmission: null
+      };
     }
 
     return NextResponse.json(

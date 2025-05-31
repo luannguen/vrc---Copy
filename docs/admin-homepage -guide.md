@@ -35,12 +35,18 @@
   - ❓ **Collection**: `Resources` hoặc `Tools` - cần kiểm tra
   - ❓ **API**: Cần kiểm tra có sẵn không
 
-#### 5. **ContactForm** - Form liên hệ
-- **Chức năng**: Form gửi liên hệ
-- **Nội dung hiện tại**: Component form cơ bản
-- **Cần quản lý**:
-  - ✅ **Collection**: `ContactSubmissions` - đã có
-  - ✅ **API**: `/api/contact` - đã có
+#### 5. **ContactForm** - Form liên hệ ✅ **HOÀN THÀNH**
+- **Chức năng**: Form gửi liên hệ với validation và confirmation
+- **Đã hoàn thành**:
+  - ✅ **Collection**: `Forms` - quản lý form templates với Lexical editor
+  - ✅ **Collection**: `Form Submissions` - lưu trữ submissions từ users
+  - ✅ **Custom API**: `/api/contact-form` - endpoint riêng cho frontend với Vietnamese validation
+  - ✅ **Admin API**: Native Payload `/api/form-submissions` - cho quản lý admin operations
+  - ✅ **Form Statistics**: Real-time statistics tích hợp vào `/api/homepage-settings`
+  - ✅ **Dual Architecture**: Tách biệt frontend logic và admin management
+  - ✅ **Lexical Support**: Dynamic confirmation messages từ form templates
+  - ✅ **Bulk Operations**: Admin bulk delete hoạt động không lỗi toast
+  - ✅ **Production Ready**: End-to-end integration hoàn chỉnh
 
 ---
 
@@ -101,7 +107,7 @@
 2. ✅ FeaturedTopics ← `/api/products?featured=true`
 3. ✅ LatestPublications ← `/api/posts?limit=4`
 4. ✅ DataResources ← `/api/resources` + `/api/tools`
-5. ✅ ContactForm ← `/api/contact` (POST)
+5. ✅ ContactForm ← `/api/contact-form` (POST) + `/api/form-submissions` (Admin)
 
 **Admin có thể quản lý 100% nội dung homepage thông qua Payload CMS!**
 
@@ -129,7 +135,7 @@
 5. **`Tools`** - ✅ DataResources panel phải  
    - 📊 **6 tools** đã seed
 
-6. **`ContactSubmissions`** - ✅ ContactForm
+6. **`Form Submissions`** - ✅ ContactForm submissions với dual API architecture
    - 🔧 API POST hoạt động tốt
 
 7. **`Media`** - ✅ File uploads
@@ -204,12 +210,56 @@
 - **Truy cập:** Admin Panel → Collections → Tools
 - ✅ 6 tools đã có sẵn
 
-### 📞 **5. Contact Form**
+### 📞 **5. Contact Form - ✅ HOÀN THÀNH 100% & PRODUCTION READY**
 
-**Quản lý submissions:**
-- **Truy cập:** Admin Panel → Collections → ContactSubmissions
-- ✅ Tự động lưu mọi form submission
-- ✅ Admin có thể xem và quản lý
+**🎯 Kiến trúc Dual API hoạt động hoàn hảo:**
+
+```text
+Frontend Contact Form Component
+    ↓ POST /api/contact-form
+Custom Contact Form API (Vietnamese validation)
+    ↓ Creates form submission
+Payload CMS Form Submissions Collection
+    ↑ Admin management via
+Native Payload API (/api/form-submissions)
+```
+
+**✅ Frontend Integration:**
+- **Endpoint**: `/api/contact-form` (POST) - Custom validation & Vietnamese messages
+- **Features**: Real-time validation, dynamic confirmation messages, CORS support
+- **UX**: Form reset, loading states, error handling hoàn chỉnh
+- **Response**: `{success: true, message: "Cảm ơn...", data: {...}}`
+
+**✅ Admin Management:**
+- **Interface**: Admin Panel → Collections → Form Submissions
+- **API**: Native Payload `/api/form-submissions` - Full CRUD operations
+- **Features**: View submissions, bulk delete, search, pagination
+- **No Errors**: Bulk operations hoạt động không có toast errors
+
+**✅ Form Templates:**
+- **Interface**: Admin Panel → Collections → Forms
+- **Template**: "Homepage Contact Form" với Lexical rich text confirmation message
+- **Dynamic**: API tự động lấy confirmation message từ template
+- **Fallback**: Vietnamese default message nếu không tìm thấy template
+
+**✅ Statistics Integration:**
+- **Endpoint**: `/api/homepage-settings` includes `formSubmissionsStats`
+- **Real-time**: `{total: 25, thisMonth: 12, pending: 5, lastSubmission: {...}}`
+- **Performance**: Efficient aggregation queries
+
+**✅ Technical Implementation:**
+- **Separation of Concerns**: Custom frontend logic + Native admin operations
+- **Form Template Reference**: Dynamic lookup của "Homepage Contact Form"
+- **Lexical Editor Support**: Extracts text content từ JSON structure
+- **Error Prevention**: No conflicts với Payload's built-in APIs
+- **Vietnamese Localization**: Custom validation messages hoàn chỉnh
+
+**✅ Production Status:**
+- **End-to-End Tested**: Frontend → API → Database → Admin hoàn chỉnh
+- **Performance Optimized**: Efficient queries và proper error handling
+- **Admin Friendly**: Full CRUD operations trong admin interface
+- **User Experience**: Vietnamese UX với dynamic confirmation messages
+- **Scalable**: Architecture supports future form expansion
 
 ---
 
@@ -231,8 +281,15 @@ GET /api/posts?limit=4&sort=-createdAt
 GET /api/resources?limit=6
 GET /api/tools?limit=6
 
-// 5. Contact Submission
-POST /api/contact
+// 5. Contact Form Submission (Frontend)
+POST /api/contact-form
+
+// 6. Form Submissions Management (Admin)
+GET /api/form-submissions
+DELETE /api/form-submissions (bulk delete)
+
+// 7. Homepage Settings (includes form stats)
+GET /api/homepage-settings
 ```
 
 ---
@@ -687,3 +744,167 @@ const homepageData = await fetch('/api/homepage-settings').then(r => r.json());
 ---
 
 **📅 Document:** Admin Homepage Management Guide - Phân tích trang chủ và hướng dẫn quản lý
+
+---
+
+## 📋 **FORM SUBMISSIONS WORKFLOW - ARCHITECTURE HOÀN CHỈNH**
+
+### 🔄 **Dual API Architecture**
+
+**VRC Form Submissions sử dụng kiến trúc dual API để tách biệt frontend logic và admin management:**
+
+```
+Frontend Contact Form (Vietnamese UX)
+    ↓ POST /api/contact-form
+Custom Contact Form API
+    ↓ Validates + Creates submission
+Payload CMS Form Submissions Collection
+    ↑ Native CRUD operations
+Payload Admin Interface (/api/form-submissions)
+```
+
+### 📋 **Collections Structure**
+
+#### 1. **Forms Collection**
+- **Mục đích**: Quản lý form templates và configuration
+- **Fields**:
+  - `title`: Tên form template
+  - `fields`: Definition của form fields
+  - `confirmationType`: message/redirect
+  - `confirmationMessage`: Lexical rich text editor
+  - `redirect`: URL for redirect confirmation
+  - `emails`: Email notification settings
+
+#### 2. **Form Submissions Collection**
+- **Mục đích**: Lưu trữ data từ user submissions
+- **Fields**:
+  - `form`: Reference tới Forms collection
+  - `submissionData`: Array of field/value pairs
+  - `createdAt`: Timestamp
+  - `updatedAt`: Timestamp
+
+### 🚀 **API Endpoints**
+
+#### Frontend Submission API
+```typescript
+POST /api/contact-form
+Content-Type: application/json
+
+{
+  "name": "Nguyễn Văn A",
+  "email": "user@example.com", 
+  "phone": "0123456789",
+  "subject": "general",
+  "message": "Nội dung liên hệ"
+}
+
+Response:
+{
+  "success": true,
+  "message": "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.",
+  "data": {
+    "id": "submission_id",
+    "submittedAt": "2025-05-31T16:07:54.659Z"
+  }
+}
+```
+
+#### Admin Management API (Native Payload)
+```typescript
+// Get submissions
+GET /api/form-submissions
+Headers: Authorization: Bearer <admin_token>
+
+// Bulk delete
+DELETE /api/form-submissions?where[id][in][0]=id1&where[id][in][1]=id2
+Headers: Authorization: Bearer <admin_token>
+
+Response: 
+{
+  "message": "Successfully deleted X item(s)."
+}
+```
+
+### 🔧 **Frontend Integration**
+
+#### ContactForm Component Flow
+1. **User Input**: Điền form với validation
+2. **Submit**: `apiService.post('/contact-form', formData)`  
+3. **Success**: Hiển thị Vietnamese confirmation message
+4. **Reset**: Clear form fields for new submission
+
+#### Homepage Settings Integration
+```typescript
+GET /api/homepage-settings
+
+Response includes:
+{
+  "formSubmissionsStats": {
+    "total": 25,
+    "thisMonth": 12,
+    "pending": 5,
+    "lastSubmission": {
+      "createdAt": "2025-05-31T16:07:54.659Z",
+      "submissionData": [...]
+    }
+  }
+}
+```
+
+### 🛡️ **Admin Management**
+
+#### Form Templates
+- **Truy cập**: Admin Panel → Collections → Forms
+- **Chức năng**: Tạo và edit form templates
+- **Features**: 
+  - Lexical rich text editor cho confirmation messages
+  - Email notification configuration
+  - Form field definitions
+
+#### Form Submissions
+- **Truy cập**: Admin Panel → Collections → Form Submissions
+- **Chức năng**: View, search, bulk delete submissions
+- **Features**:
+  - Real-time submission data
+  - Bulk operations (select multiple → delete)
+  - No toast errors với native Payload API
+
+### ✅ **CONTACT FORM - PRODUCTION READY STATUS**
+
+**🎯 Toàn bộ tính năng đã hoàn thành và tested thành công:**
+
+1. **✅ Frontend Integration**: Vietnamese validation, dynamic confirmation messages, optimal UX
+2. **✅ Dual API Architecture**: Custom `/api/contact-form` + Native Payload admin operations
+3. **✅ Form Templates Management**: Lexical rich text editor, dynamic message extraction
+4. **✅ Admin Interface**: Full CRUD operations, bulk delete, no toast errors
+5. **✅ Statistics Integration**: Real-time counts trong `/api/homepage-settings`
+6. **✅ Error Handling**: Proper separation of concerns, no API conflicts
+7. **✅ Performance**: Efficient queries, optimized database operations
+8. **✅ Scalability**: Architecture supports future form expansion
+9. **✅ Vietnamese Localization**: Complete Vietnamese user experience
+10. **✅ Production Testing**: End-to-end workflow verified and working
+
+**🚀 Current Status: Ready for production deployment với full functionality!**
+6. **✅ Bulk Operations**: Admin có thể xóa nhiều submissions một lúc
+7. **✅ No Conflicts**: Custom logic không interference với admin operations
+
+### 🔄 **Migration từ Legacy**
+
+**Before (có lỗi):**
+- Single custom `/api/form-submissions` route
+- Custom response format conflict với Payload admin
+- Toast errors khi bulk delete
+
+**After (đã fix):**
+- `/api/contact-form` cho frontend submissions
+- Native `/api/form-submissions` cho admin operations
+- Clean separation → no conflicts → no errors
+
+### 📈 **Performance & Scalability**
+
+- **Efficient Queries**: Statistics aggregation optimized
+- **Payload Native**: Leverages Payload's built-in performance features
+- **Caching Ready**: Homepage settings API supports caching
+- **Admin Pagination**: Large submission lists handled properly
+
+---

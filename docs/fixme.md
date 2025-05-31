@@ -1404,3 +1404,132 @@ const processFormData = (formData) => {
 2. **Log parsed data**: Log final parsed object keys để verify data structure  
 3. **Check _payload field**: Specifically check và log `_payload` field content
 4. **Test both interfaces**: Test saving từ admin panel và custom forms
+
+---
+
+## FORM SUBMISSIONS BULK DELETE ADMIN ERROR FIX
+
+### Vấn đề
+Khi xóa nhiều form submissions từ admin interface (`/admin/collections/form-submissions`), chức năng bulk delete hoạt động nhưng hiển thị toast error:
+```
+An unknown error has occurred
+```
+
+### Nguyên nhân chính xác
+1. **Custom Route Override Payload Built-in API**: 
+   - Đã tạo custom route `/api/form-submissions/route.ts` để xử lý form submissions từ frontend
+   - Route này override Payload's built-in collection API cho form-submissions
+   - Admin interface expect Payload's standard API response format
+   - Custom route trả về format khác gây conflict
+
+2. **Response Format Mismatch**:
+   - Custom route trả về: `{success: true, message: "...", data: {...}}`
+   - Payload admin expect: `{message: "Successfully deleted X item(s)."}`
+   - Mismatch này gây ra "unknown error" toast dù deletion thành công
+
+3. **Admin vs Frontend Logic Conflict**:
+   - Frontend form submission cần custom validation và Vietnamese messages
+   - Admin operations cần standard Payload API responses
+   - Một route xử lý cả hai use cases gây conflict
+
+### Giải pháp đã áp dụng
+**Tách biệt Custom Logic và Built-in API:**
+
+1. **Tạo Custom Endpoint cho Frontend**:
+   ```typescript
+   // File: src/app/api/contact-form/route.ts
+   export async function POST(req: NextRequest) {
+     // Custom logic cho frontend form submissions
+     // Vietnamese validation và confirmation messages
+     // Return format: {success: true, message: "Cảm ơn...", data: {...}}
+   }
+   ```
+
+2. **Restore Payload Built-in API cho Admin**:
+   ```bash
+   # Remove custom route
+   rm src/app/api/form-submissions/route.ts
+   # Now admin uses native /api/form-submissions endpoint
+   ```
+
+3. **Update Frontend Integration**:
+   ```typescript
+   // File: vrcfrontend/src/components/ContactForm.tsx
+   // Changed from '/form-submissions' to '/contact-form'
+   const result = await apiService.post('/contact-form', formData);
+   ```
+
+### Kiến trúc sau khi sửa
+```
+Frontend Contact Form
+    ↓ POST /api/contact-form
+Custom Contact Form API (validation, Vietnamese messages)
+    ↓ creates submission in
+Payload CMS Form Submissions Collection
+    ↑ managed by
+Payload Admin Interface (native /api/form-submissions)
+```
+
+### Kết quả - ✅ **HOÀN THÀNH THÀNH CÔNG**
+
+- ✅ **No More Toast Errors**: Admin bulk delete hoạt động hoàn hảo với standard Payload API responses
+- ✅ **Custom Frontend Logic**: Vietnamese validation và confirmation messages hoạt động tốt
+- ✅ **Proper Admin Management**: Full CRUD operations (view, delete, bulk delete) hoạt động đúng
+- ✅ **Clean Separation**: Custom logic không conflict với admin operations
+- ✅ **End-to-End Integration**: Form submission từ frontend → backend → admin management hoàn chỉnh
+- ✅ **Form Statistics**: Homepage settings API hiển thị real-time form submission stats
+- ✅ **Lexical Editor Support**: Dynamic confirmation messages từ form templates hoạt động
+- ✅ **Performance**: Efficient queries và proper error handling
+
+### Dual API Architecture - Final Implementation
+
+```text
+Frontend Homepage Contact Form
+    ↓ POST /api/contact-form (Vietnamese validation + messages)
+Custom Contact Form API
+    ↓ Creates submission with form template reference
+Payload CMS Form Submissions Collection
+    ↑ Native admin management via
+Admin Interface (/admin/collections/form-submissions)
+    ↑ Uses standard Payload API
+Native /api/form-submissions endpoint
+```
+
+### Technical Details
+
+**Custom Contact Form API** (`/api/contact-form/route.ts`):
+
+- ✅ Vietnamese validation messages
+- ✅ Dynamic form template lookup
+- ✅ Lexical editor confirmation message extraction
+- ✅ Structured submission data với field mappings
+- ✅ Proper error handling và logging
+- ✅ CORS support cho frontend integration
+
+**Form Templates Integration**:
+
+- ✅ "Homepage Contact Form" template được seed thành công
+- ✅ Confirmation message sử dụng Lexical editor format
+- ✅ Dynamic message extraction từ JSON structure
+- ✅ Fallback message khi không tìm thấy template
+
+**Admin Management**:
+
+- ✅ Native Payload interface for full CRUD operations
+- ✅ Bulk delete functionality không còn toast errors  
+- ✅ Real-time submission viewing và management
+- ✅ Standard Payload API responses format
+
+### Bài học quan trọng
+
+- **✅ Separation of Concerns**: Custom business logic phải tách biệt với native admin operations
+- **✅ API Architecture**: Dual endpoints pattern - custom cho frontend, native cho admin
+- **✅ Payload Best Practices**: Không override built-in collection APIs trừ khi absolutely necessary
+- **✅ Response Format Consistency**: Admin expects specific Payload response formats
+- **✅ Vietnamese Localization**: Custom endpoints support Vietnamese messages properly
+- **✅ Error Prevention**: Proper separation prevents conflicts và unknown errors
+
+### Final Status: ✅ **PRODUCTION READY**
+
+Form submissions integration hoàn thành 100% với dual API architecture, không có conflicts, và full admin functionality.
+

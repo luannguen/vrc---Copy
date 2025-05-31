@@ -5,6 +5,7 @@ import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Loader2 } from "lucide-react";
 import { useContactFormSection } from "../hooks/useHomepageSettings";
+import { apiService } from "../lib/api";
 
 const ContactForm = () => {
   const { settings: contactFormData, isLoading, error, isEnabled } = useContactFormSection();
@@ -58,24 +59,13 @@ const ContactForm = () => {
 
   const handleSelectChange = (value: string) => {
     setFormData((prev) => ({ ...prev, subject: value }));
-  };
-  const handleSubmit = async (e: React.FormEvent) => {
+  };  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus("idle");
+    setSubmitStatus("idle");    try {
+      const result = await apiService.post('/contact-form', formData);
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/contact`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         setSubmitStatus("success");
         setFormData({
           name: "",

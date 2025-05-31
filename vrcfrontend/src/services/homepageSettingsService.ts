@@ -49,6 +49,17 @@ export interface ContactFormSettings {
   enableNotifications: boolean;
 }
 
+export interface FormSubmissionsStats {
+  total: number;
+  thisMonth: number;
+  pending: number;
+  lastSubmission?: {
+    id: string;
+    createdAt: string;
+    submissionData?: Array<{ field: string; value: string }>;
+  };
+}
+
 export interface SEOSettings {
   metaTitle: string;
   metaDescription: string;
@@ -107,6 +118,7 @@ export interface HomepageSettings {
   featuredProductsData?: ProductData[];
   latestPosts?: PostData[];
   selectedPostsData?: PostData[];
+  formSubmissionsStats?: FormSubmissionsStats;
 }
 
 export interface HomepageSettingsResponse {
@@ -193,6 +205,12 @@ class HomepageSettingsService {  /**
         metaTitle: apiData.seoSettings?.metaTitle || '',
         metaDescription: apiData.seoSettings?.metaDescription || '',
         ogImage: apiData.seoSettings?.ogImage || null
+      },
+      formSubmissionsStats: {
+        total: apiData.formSubmissionsStats?.total || 0,
+        thisMonth: apiData.formSubmissionsStats?.thisMonth || 0,
+        pending: apiData.formSubmissionsStats?.pending || 0,
+        lastSubmission: apiData.formSubmissionsStats?.lastSubmission || null
       }
     };
   }  /**

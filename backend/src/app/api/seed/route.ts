@@ -16,6 +16,7 @@ import { seedEvents } from '@/seed/events';
 import { seedTools } from '@/seed/seed-tools';
 import { seedResources } from '@/seed/seed-resources';
 import { seedAllVrcPosts } from '@/seed/all-vrc-posts';
+import { seedForms } from '@/seed/forms';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,6 +101,10 @@ export async function GET(request: Request) {
         case 'all-vrc-posts':
           await seedAllVrcPosts(payload);
           result.details = { type: 'all-vrc-posts', completed: true };
+          break;
+        case 'forms':
+          await seedForms(payload);
+          result.details = { type: 'forms', completed: true };
           break;
         case 'tools-resources':
           await seedTools(payload);
