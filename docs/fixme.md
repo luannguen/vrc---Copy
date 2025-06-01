@@ -22,6 +22,95 @@
 - ✅ **Tools Admin Integration**: Implemented complete CRUD API for Tools collection with routing conflict resolution
 - ✅ **Lexical Rich Text Format Fix - About Page**: Fixed parsing error with Rich Text in seed API and admin interface
 
+## ABOUT PAGE MEDIA URL FIX
+
+### Vấn đề
+
+Trang `/about` hiển thị lỗi `GET http://localhost:8081/api/placeholder/500/400 500 (Internal Server Error)` và không thể hiển thị hình ảnh background trong company history section.
+
+### Nguyên nhân
+
+1. **Hardcoded Placeholder URL**: Sử dụng `/api/placeholder/500/400` thay vì dữ liệu thực từ API
+2. **Thiếu URL Processing**: `useAboutPage` hook không áp dụng `fixMediaUrl` utility như các components khác
+3. **Không sử dụng API Data**: Background image không được lấy từ `heroSection.backgroundImage` data
+4. **Port Mismatch**: Frontend chạy trên port 8081 nhưng API backend trên port 3000
+
+### Giải pháp đã áp dụng
+
+**1. Thay thế hardcoded placeholder với API data**
+
+File: `vrcfrontend/src/pages/About.tsx`
+
+```tsx
+// OLD - Hardcoded placeholder causing 500 error
+<img 
+  src="/api/placeholder/500/400"
+  alt="VRC Company History" 
+  className="rounded-lg shadow-lg w-full h-auto"
+/>
+
+// NEW - Sử dụng data từ API với fallback an toàn
+<img 
+  src={data.heroSection?.backgroundImage?.url || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=400&fit=crop&crop=center"}
+  alt={data.heroSection?.backgroundImage?.alt || "VRC Company History"} 
+  className="rounded-lg shadow-lg w-full h-auto"
+/>
+```
+
+**2. Cập nhật useAboutPage hook để xử lý media URLs**
+
+File: `vrcfrontend/src/hooks/useAboutPage.ts`
+
+```typescript
+import { fixMediaUrl } from '../utils/urlProcessor';
+
+// Process media URLs to fix potential port issues
+if (aboutData.heroSection?.backgroundImage?.url) {
+  aboutData.heroSection.backgroundImage.url = fixMediaUrl(aboutData.heroSection.backgroundImage.url);
+}
+
+// Fix leadership image URLs
+if (aboutData.leadership) {
+  aboutData.leadership = aboutData.leadership.map((leader: Leader) => ({
+    ...leader,
+    image: leader.image ? {
+      ...leader.image,
+      url: fixMediaUrl(leader.image.url)
+    } : leader.image
+  }));
+}
+```
+
+### Kết quả
+
+- ✅ Không còn lỗi 500 từ placeholder URL
+- ✅ Background image sử dụng data thực từ API về company history
+- ✅ Leadership images được process đúng URL với `fixMediaUrl`
+- ✅ Fallback an toàn từ Unsplash thay vì broken placeholder
+- ✅ Áp dụng cùng pattern như các components khác (tuân thủ CORS Logo Loading Fix)
+- ✅ Runtime logs xác nhận không còn errors
+
+### Test Commands Đã Thực Hiện
+
+```bash
+# Test About page không còn lỗi 500 - ✅ PASSED
+curl -I http://localhost:8081/about
+# Result: HTTP/1.1 200 OK
+
+# Test API endpoint hoạt động với heroSection data - ✅ PASSED  
+curl -s http://localhost:3000/api/about-page | Select-String -Pattern "heroSection"
+# Result: Trả về data với backgroundImage.url = "/api/media/file/tu-van-thiet-ke-he-thong-lanh-1.jpg"
+
+# Test runtime errors - ✅ PASSED
+# Console Ninja: No runtime errors detected
+```
+
+**Pattern này tuân thủ theo CORS Logo Loading Fix guidelines:**
+- ✅ Sử dụng `fixMediaUrl` utility để xử lý URLs 
+- ✅ Áp dụng pattern thống nhất cho tất cả media components
+- ✅ Có fallback mechanism an toàn (Unsplash images)
+- ✅ Fix URL để sử dụng đúng backend domain (port 3000 thay vì 8081)
+
 ## CORS LOGO LOADING FIX
 
 ### Vấn đề

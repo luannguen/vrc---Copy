@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fixMediaUrl } from '../utils/urlProcessor';
+import { apiClient } from '../lib/api';  // Import API client với API key
 
 // Media interface từ Payload CMS
 interface MediaItem {
@@ -80,23 +81,10 @@ const useAboutPage = () => {
         setLoading(true);
         setError(null);
         
-        // VITE_API_URL đã bao gồm /api trong .env
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-        
-        const response = await fetch(
-          `${API_BASE_URL}/about-page`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        // Sử dụng API client đã cấu hình với API key
+        const response = await apiClient.get('/about-page');
+        const aboutData = response.data;
 
-        if (!response.ok) {
-          throw new Error(`API Error: ${response.status} ${response.statusText}`);
-        }        const aboutData = await response.json();
-        
         // Process media URLs to fix potential port issues
         if (aboutData.heroSection?.backgroundImage?.url) {
           aboutData.heroSection.backgroundImage.url = fixMediaUrl(aboutData.heroSection.backgroundImage.url);
