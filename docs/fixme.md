@@ -108,3 +108,36 @@ class ApiService {
 curl -I -H "Origin: http://localhost:5173" http://localhost:3000/media/logo.svg
 # Expected: access-control-allow-origin: * in response headers
 ```
+
+## ZALO CHAT WIDGET INTEGRATION - COMPLETED
+
+### Tính năng mới
+
+✅ **Zalo Official Account (OA) Chat Widget**: Tích hợp widget chat Zalo OA vào Header và Footer
+✅ **Backend Schema Update**: Thêm trường `oaId` vào CompanyInfo schema cho Zalo OA ID
+✅ **Frontend Components**: Tạo ZaloChatWidget component với Zalo Social SDK
+✅ **Conditional Logic**: Hiển thị chat widget button khi có OA ID, fallback về traditional link khi không có
+✅ **Responsive Design**: Widget responsive cho mobile và desktop
+✅ **State Management**: Quản lý state mở/đóng widget trong Header và Footer
+
+### Files Modified
+
+- `backend/src/globals/CompanyInfo.ts` - Added `oaId` field to Zalo configuration
+- `vrcfrontend/src/services/headerInfoService.ts` - Enhanced SocialLinks interface
+- `vrcfrontend/src/components/ZaloChatWidget.tsx` - **NEW** Chat widget component
+- `vrcfrontend/src/styles/zalo-chat-widget.css` - **NEW** Widget styling
+- `vrcfrontend/src/components/Header.tsx` - Integrated chat widget
+- `vrcfrontend/src/components/Footer.tsx` - Integrated chat widget
+
+### Usage Guide
+
+1. **Admin Setup**: In Payload CMS admin, go to Company Info > Social Media > Zalo > Enter OA ID
+2. **Frontend Display**: Widget appears as chat bubble icon in header/footer when OA ID is configured
+3. **User Experience**: Click icon opens chat overlay, click backdrop or X button to close
+
+### Technical Implementation
+
+- **SDK Integration**: Dynamically loads Zalo Social SDK from `https://sp.zalo.me/plugins/sdk.js`
+- **Widget Initialization**: Uses `ZaloSocialSDK.init()` and `ZaloSocialSDK.openChatWidget()`
+- **Error Handling**: Graceful fallback to traditional phone number link if OA ID not available
+- **Performance**: SDK loaded only when widget is opened to optimize page load

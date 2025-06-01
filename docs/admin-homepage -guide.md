@@ -948,3 +948,65 @@ const logoUrl = getLogoUrl(); // Unified helper function
 - 🌐 **CORS Ready**: Full cross-origin support cho production deployment
 
 ---
+
+## 💬 **ZALO CHAT WIDGET INTEGRATION** - ✅ **MỚI HOÀN THÀNH**
+
+### **Tính năng:**
+- ✅ **Zalo Official Account (OA) Chat Widget**: Tích hợp widget chat Zalo OA
+- ✅ **Conditional Display**: Hiển thị chat widget hoặc traditional phone link
+- ✅ **Responsive Design**: Hoạt động tốt trên mobile và desktop
+- ✅ **Header & Footer Integration**: Widget xuất hiện ở cả header và footer
+- ✅ **Modern UI**: Chat overlay với animations và modern styling
+
+### **🔧 Cách cấu hình trong Admin:**
+
+**Truy cập:** Admin Panel → Globals → Company Info → Social Media → Zalo
+
+**Cấu hình Zalo Chat Widget:**
+1. **Phone Number**: Số điện thoại Zalo (cho traditional link)
+2. **OA ID**: ⭐ **ID của Zalo Official Account** (cho chat widget)
+3. **Enabled**: Bật/tắt hiển thị
+
+### **📱 Cách lấy Zalo OA ID:**
+1. Truy cập [Zalo Official Account](https://oa.zalo.me/)
+2. Đăng nhập và chọn OA của bạn
+3. Vào Settings → Account Info
+4. Copy **OA ID** (định dạng: số hoặc chuỗi)
+
+### **🎯 Logic hoạt động:**
+
+```typescript
+// Nếu có OA ID: Hiển thị chat widget button
+if (socialLinks.zalo?.oaId) {
+  // → Click mở chat overlay với Zalo Social SDK
+  <ZaloChatWidget oaId={oaId} />
+}
+
+// Nếu chỉ có phone number: Traditional link
+else if (socialLinks.zalo?.url) {
+  // → Click mở zalo.me/[phone] trong tab mới
+  <a href="https://zalo.me/84xxxxxxxxx" />
+}
+```
+
+### **🎨 User Experience:**
+- **Desktop**: Chat widget mở trong overlay 400x600px ở góc phải
+- **Mobile**: Chat widget fullscreen responsive
+- **Loading**: Spinner animation trong khi load SDK
+- **Close**: Click backdrop hoặc nút X để đóng
+- **Fallback**: Nếu SDK không load được, fallback về traditional link
+
+### **⚙️ Technical Implementation:**
+- **SDK Loading**: Dynamic load Zalo Social SDK khi cần
+- **Performance**: SDK chỉ load khi user click chat button
+- **Error Handling**: Graceful fallback nếu SDK error
+- **State Management**: Separate state cho Header và Footer widgets
+
+### **📂 Files đã thay đổi:**
+- `backend/src/globals/CompanyInfo.ts` - Thêm `oaId` field
+- `vrcfrontend/src/components/ZaloChatWidget.tsx` - **NEW** Component
+- `vrcfrontend/src/styles/zalo-chat-widget.css` - **NEW** Styling
+- `vrcfrontend/src/components/Header.tsx` - Tích hợp widget
+- `vrcfrontend/src/components/Footer.tsx` - Tích hợp widget
+
+---
