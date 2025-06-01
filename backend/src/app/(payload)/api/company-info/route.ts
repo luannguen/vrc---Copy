@@ -4,9 +4,9 @@ import config from '@payload-config'
 import {
   createCORSResponse,
   handleOptionsRequest,
-  handleApiError,
-  checkAuth
+  handleApiError
 } from '../_shared/cors'
+import { validateApiKey, createApiKeyErrorResponse } from '../_shared/apiKey'
 
 // Pre-flight request handler for CORS
 export function OPTIONS(req: NextRequest) {
@@ -16,6 +16,12 @@ export function OPTIONS(req: NextRequest) {
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
+    // Validate API key to prevent spam
+    if (!validateApiKey(req)) {
+      const errorResponse = createApiKeyErrorResponse()
+      return createCORSResponse(errorResponse, 401)
+    }
+
     // Initialize Payload
     const payload = await getPayload({
       config,
@@ -27,20 +33,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       depth: 2, // Populate relations like logo
     })
 
-    // Check if authentication is required
-    if (companyInfo?.requireAuth) {
-      const isAuthenticated = await checkAuth(req, true)
-      
-      if (!isAuthenticated) {
-        return createCORSResponse(
-          {
-            success: false,
-            message: 'Xác thực thất bại. Vui lòng đăng nhập để truy cập thông tin.',
-          },
-          401
-        )
-      }
-    }    // Return success response
+    // Company info is public data, but requires API key to prevent spam
+    // The requireAuth field is kept for admin control but not enforced in API
+
+    // Return success response
     return createCORSResponse(companyInfo, 200)
   } catch (error) {
     console.error('Error fetching company information:', error)

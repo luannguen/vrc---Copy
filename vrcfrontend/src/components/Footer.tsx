@@ -2,6 +2,7 @@ import { Facebook, Twitter, Linkedin, Youtube, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AppLink from '@/components/ui/app-link';
 import { useCompanyInfo } from '@/hooks/useApi';
+import { getLogoUrl } from '@/lib/api';
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -12,19 +13,21 @@ const Footer = () => {
   const companyDescription = companyInfo?.companyDescription || 'Cung cấp giải pháp điện lạnh toàn diện cho mọi doanh nghiệp và công trình.';
   const contactInfo = companyInfo?.contactSection;
   const socialLinks = companyInfo?.socialMediaLinks || {};
-  const logoUrl = companyInfo?.logo?.url || '/lovable-uploads/0bd3c048-8e37-4775-a6bc-0b54ec07edbe.png';
+  
+  // Sử dụng getLogoUrl() đơn giản như Logo component
+  const logoUrl = getLogoUrl();
 
   return (
     <footer className="bg-primary text-white">
       <div className="container-custom py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Column 1 */}
-          <div>
-            <div className="mb-4">
+          <div>            <div className="mb-4">
               <img 
                 src={logoUrl} 
                 alt={companyName} 
                 className="h-16"
+                crossOrigin="anonymous"
               />
             </div>
             <p className="text-gray-300 mb-6">

@@ -53,7 +53,7 @@ export default buildConfig({  admin: {
     // Fix for Payload CMS hydration mismatch issue #11066
     // https://github.com/payloadcms/payload/issues/11066
     suppressHydrationWarning: true,livePreview: {
-      url: ({ req }: { req: PayloadRequest }) => {
+      url: ({ req: _req }: { req: PayloadRequest }) => {
         // Dynamically determine the URL based on environment
         if (process.env.NODE_ENV === 'production') {
           return process.env.FRONTEND_URL || getServerSideURL()
@@ -120,11 +120,11 @@ export default buildConfig({  admin: {
           process.env.FRONTEND_URL || 'http://localhost:5173', // Frontend Vite URL
           'http://localhost:8080', 'http://localhost:8081',    // Custom frontend ports
           '*',                                                 // Allow all origins for development
-        ].filter(Boolean) as string[],
-    headers: [
+        ].filter(Boolean) as string[],    headers: [
       'authorization',
       'content-type',
       'x-custom-header',
+      'x-api-key',        // Add API key header
       'cache-control',
       'x-requested-with',
       'accept',

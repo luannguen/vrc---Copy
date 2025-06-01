@@ -7,6 +7,7 @@ import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_KEY = import.meta.env.VITE_PUBLIC_API_KEY || 'vrc-api-2024-secure';
 const API_TIMEOUT = 30000; // 30 seconds
 
 // Create axios instance with default configuration
@@ -22,6 +23,9 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
+    // Add API key for all requests
+    config.headers['x-api-key'] = API_KEY;
+    
     // Add authentication token if available
     const token = localStorage.getItem('auth_token');
     if (token) {
@@ -63,14 +67,14 @@ apiClient.interceptors.response.use(
 );
 
 // Generic API response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
   error?: string;
 }
 
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   docs: T[];
   totalDocs: number;
   totalPages: number;
@@ -89,33 +93,32 @@ export class ApiService {
   constructor() {
     this.client = apiClient;
   }
-
   // Generic GET method
-  async get<T = any>(url: string, params?: Record<string, any>): Promise<T> {
+  async get<T = unknown>(url: string, params?: Record<string, unknown>): Promise<T> {
     const response = await this.client.get<T>(url, { params });
     return response.data;
   }
 
   // Generic POST method
-  async post<T = any>(url: string, data?: any): Promise<T> {
+  async post<T = unknown>(url: string, data?: unknown): Promise<T> {
     const response = await this.client.post<T>(url, data);
     return response.data;
   }
 
   // Generic PUT method
-  async put<T = any>(url: string, data?: any): Promise<T> {
+  async put<T = unknown>(url: string, data?: unknown): Promise<T> {
     const response = await this.client.put<T>(url, data);
     return response.data;
   }
 
   // Generic PATCH method
-  async patch<T = any>(url: string, data?: any): Promise<T> {
+  async patch<T = unknown>(url: string, data?: unknown): Promise<T> {
     const response = await this.client.patch<T>(url, data);
     return response.data;
   }
 
   // Generic DELETE method
-  async delete<T = any>(url: string): Promise<T> {
+  async delete<T = unknown>(url: string): Promise<T> {
     const response = await this.client.delete<T>(url);
     return response.data;
   }
@@ -131,3 +134,14 @@ export const apiService = new ApiService();
 
 // Export the axios instance for direct use if needed
 export { apiClient };
+
+// Media URL helper function
+export const getMediaUrl = (filename: string): string => {
+  const baseUrl = API_BASE_URL.replace('/api', ''); // Remove /api from base URL
+  return `${baseUrl}/media/${filename}`;
+};
+
+// Logo URL helper
+export const getLogoUrl = (): string => {
+  return getMediaUrl('logo.svg');
+};
