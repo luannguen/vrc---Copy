@@ -1,135 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarIcon, ChevronRight, User, Search, Eye, MessageCircle, MapPin, Tag } from 'lucide-react';
+import { CalendarIcon, ChevronRight, User, Search, Eye, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { SearchIcon } from '@/components/ui/search-icon';
-
-// Interface phù hợp với API response structure thực tế
-interface PostData {
-  id: string;
-  title: string;
-  slug: string;
-  content: {
-    root: {
-      children?: unknown[];
-      [key: string]: unknown;
-    };
-  };
-  heroImage?: {
-    url?: string;
-    thumbnailURL?: string;
-    alt?: string;
-    sizes?: {
-      thumbnail?: { url?: string; width?: number; height?: number };
-      small?: { url?: string; width?: number; height?: number };
-      medium?: { url?: string; width?: number; height?: number };
-      large?: { url?: string; width?: number; height?: number };
-      xlarge?: { url?: string; width?: number; height?: number };
-      og?: { url?: string; width?: number; height?: number };
-    };
-  };
-  publishedAt: string;
-  authors?: string[];
-  populatedAuthors?: { name: string; id: string }[];
-  _status: string;
-  meta?: {
-    title?: string;
-    description?: string;
-    keywords?: string;
-  };
-}
-
-interface ApiResponse {
-  success: boolean;
-  message?: string;
-  data: PostData[];
-  totalDocs: number;
-  totalPages: number;
-  page: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
+import { useNewsCategories } from '@/hooks/useNewsCategories';
+import { useNewsPosts, PostData } from '@/hooks/useNewsPosts';
 
 const News: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [posts, setPosts] = useState<PostData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [pagination, setPagination] = useState<{
-    totalDocs: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  }>({
-    totalDocs: 0,
-    totalPages: 0,
-    hasNextPage: false,
-    hasPrevPage: false
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
+  // Use custom hooks
+  const { categories, totalAllPosts, loading: categoriesLoading } = useNewsCategories();
+  const { posts, loading: postsLoading, pagination, filterByCategory, goToPage, currentPage } = useNewsPosts({
+    selectedCategory
   });
 
-  // Sample categories data
-  const categories = [
-    { name: "Tin công ty", count: 12 },
-    { name: "Triển lãm", count: 8 },
-    { name: "Hội thảo", count: 15 },
-    { name: "Nghiên cứu", count: 6 },
-    { name: "Công nghệ mới", count: 24 },
-    { name: "Giải thưởng", count: 5 }
-  ];
-
-  // Sample tags from content
+  // Sample tags for display
   const sampleTags = [
     "Điện lạnh", "Triển lãm", "Hội thảo", "Công nghệ", "Tiết kiệm năng lượng",
     "Bảo trì", "Inverter", "Hợp tác quốc tế", "Nghiên cứu", "Phát triển bền vững"
   ];
-  // Fetch posts using the real API
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        console.log('🚀 Fetching posts from API - Page:', currentPage);
-        const url = `http://localhost:3000/api/posts?page=${currentPage}&limit=9&where[_status][equals]=published`;
-        console.log('📡 API URL:', url);
-        
-        const response = await fetch(url);
-        console.log('📡 API Response Status:', response.status);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data: ApiResponse = await response.json();
-        console.log('📡 API Response Data:', data);
-          if (data.success) {
-          console.log('✅ Posts loaded successfully:', data.data.length, 'posts');
-          console.log('🖼️ First post image data:', data.data[0]?.heroImage);
-          setPosts(data.data);
-          setPagination({
-            totalDocs: data.totalDocs,
-            totalPages: data.totalPages,
-            hasNextPage: data.hasNextPage,
-            hasPrevPage: data.hasPrevPage
-          });
-        } else {
-          throw new Error('API returned success: false');
-        }
-      } catch (err) {
-        console.error('❌ Error fetching posts:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch posts');
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchPosts();
-  }, [currentPage]);
+  // Handle category selection
+  const handleCategorySelect = (categoryId: string | null) => {
+    setSelectedCategory(categoryId);
+    filterByCategory(categoryId);
+  };
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -140,6 +39,7 @@ const News: React.FC = () => {
       year: 'numeric' 
     });
   };
+
   // Get excerpt from Lexical content or meta description
   const getExcerpt = (post: PostData, maxLength: number = 150): string => {
     // Try meta description first
@@ -178,53 +78,33 @@ const News: React.FC = () => {
     }
   };
 
-  // Helper function to construct full image URL
-  const getImageUrl = (imageUrl: string | undefined, size: 'thumbnail' | 'small' | 'medium' | 'large' = 'medium'): string => {
-    if (!imageUrl) {
-      return `/api/placeholder/800/450`;
-    }
+  // Simplified image URL function
+  const getImageUrl = (heroImage: PostData['heroImage'], preferredSize: 'thumbnail' | 'small' | 'medium' | 'large' | 'og' = 'medium'): string => {
+    const fallbackUrl = 'http://localhost:3000/api/media/file/banner-1748513055712.jpg';
     
-    // If URL already includes protocol, return as is
-    if (imageUrl.startsWith('http')) {
-      return imageUrl;
-    }
-    
-    // Construct full URL with backend base URL
-    const baseUrl = 'http://localhost:3000';
-    return `${baseUrl}${imageUrl}`;
-  };  // Helper function to get optimized image URL with size preference
-  const getOptimizedImageUrl = (heroImage: PostData['heroImage'], preferredSize: 'thumbnail' | 'small' | 'medium' | 'large' = 'medium'): string => {
     if (!heroImage) {
-      console.log('🖼️ No heroImage provided, using placeholder');
-      return '/api/placeholder/800/450';
+      return fallbackUrl;
     }
 
-    console.log('🖼️ Processing heroImage:', heroImage);
-
-    // Try to get the preferred size first
-    if (heroImage.sizes && heroImage.sizes[preferredSize]?.url) {
-      const sizedUrl = getImageUrl(heroImage.sizes[preferredSize].url);
-      console.log(`🖼️ Using ${preferredSize} size:`, sizedUrl);
-      return sizedUrl;
+    // Try preferred size first
+    if (heroImage.sizes?.[preferredSize]?.url) {
+      const sizedUrl = heroImage.sizes[preferredSize].url;
+      return sizedUrl.startsWith('http') ? sizedUrl : `http://localhost:3000${sizedUrl}`;
     }
 
-    // Fallback to other available sizes
-    if (heroImage.sizes) {
-      const availableSizes = ['large', 'medium', 'small', 'thumbnail'];
-      for (const size of availableSizes) {
-        if (heroImage.sizes[size]?.url) {
-          const fallbackUrl = getImageUrl(heroImage.sizes[size].url);
-          console.log(`🖼️ Using fallback ${size} size:`, fallbackUrl);
-          return fallbackUrl;
-        }
-      }
+    // Try main URL
+    if (heroImage.url) {
+      const mainUrl = heroImage.url;
+      return mainUrl.startsWith('http') ? mainUrl : `http://localhost:3000${mainUrl}`;
     }
 
-    // Fallback to main URL or thumbnail
-    const fallbackUrl = heroImage.url || heroImage.thumbnailURL;
-    const finalUrl = getImageUrl(fallbackUrl);
-    console.log('🖼️ Using main URL fallback:', finalUrl);
-    return finalUrl;
+    // Try thumbnail URL
+    if (heroImage.thumbnailURL) {
+      const thumbUrl = heroImage.thumbnailURL;
+      return thumbUrl.startsWith('http') ? thumbUrl : `http://localhost:3000${thumbUrl}`;
+    }
+
+    return fallbackUrl;
   };
 
   // Get featured post (first post) and regular posts
@@ -234,11 +114,10 @@ const News: React.FC = () => {
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search functionality if needed
     console.log('Search term:', searchTerm);
   };
 
-  if (loading) {
+  if (categoriesLoading || postsLoading) {
     return (
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
@@ -265,36 +144,31 @@ const News: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">Lỗi tải dữ liệu</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button 
-              onClick={() => window.location.reload()}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Thử lại
-            </Button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="flex-grow">
       {/* Page Header */}
       <div className="bg-gradient-to-b from-blue-50 to-transparent py-8 md:py-12">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-blue-900">
-            Tin tức & Sự kiện
+            {selectedCategory ? 
+              categories.find(cat => cat.id === selectedCategory)?.title || 'Tin tức & Sự kiện' 
+              : 'Tin tức & Sự kiện'
+            }
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-3xl">
-            Cập nhật những thông tin mới nhất về ngành điện lạnh, công nghệ mới và các hoạt động của chúng tôi
+            {selectedCategory ? 
+              `Các bài viết thuộc danh mục: ${categories.find(cat => cat.id === selectedCategory)?.title}`
+              : 'Cập nhật những thông tin mới nhất về ngành điện lạnh, công nghệ mới và các hoạt động của chúng tôi'
+            }
           </p>
+          {selectedCategory && (
+            <button 
+              onClick={() => handleCategorySelect(null)}
+              className="mt-3 text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+            >
+              ← Quay lại tất cả tin tức
+            </button>
+          )}
         </div>
       </div>
 
@@ -305,14 +179,15 @@ const News: React.FC = () => {
           <div className="lg:col-span-2">
             {/* Featured News */}
             {featuredPost && (
-              <div className="mb-10">                <div className="aspect-video rounded-lg overflow-hidden mb-4">
+              <div className="mb-10">
+                <div className="aspect-video rounded-lg overflow-hidden mb-4">
                   <img 
-                    src={getOptimizedImageUrl(featuredPost.heroImage, 'large')} 
+                    src={getImageUrl(featuredPost.heroImage, 'large')} 
                     alt={featuredPost.heroImage?.alt || featuredPost.title}
-                    className="w-full h-full object-cover transition-transform hover:scale-105" 
+                    className="w-full h-full object-cover transition-transform hover:scale-105"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = '/api/placeholder/800/450';
+                      target.src = 'http://localhost:3000/api/media/file/banner-1748513055712.jpg';
                       console.log('🖼️ Image load error for featured post:', featuredPost.title);
                     }}
                   />
@@ -324,7 +199,7 @@ const News: React.FC = () => {
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
                   <Link 
-                    to={`/news-detail/${featuredPost.slug}`} 
+                    to={`/news/${featuredPost.slug}`} 
                     className="hover:text-blue-600 transition-colors"
                   >
                     {featuredPost.title}
@@ -370,14 +245,15 @@ const News: React.FC = () => {
             {/* News Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {regularPosts.map((post) => (
-                <div key={post.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border">                  <Link to={`/news/${post.slug}`} className="block aspect-[4/3] overflow-hidden">
+                <div key={post.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow border">
+                  <Link to={`/news/${post.slug}`} className="block aspect-[4/3] overflow-hidden">
                     <img 
-                      src={getOptimizedImageUrl(post.heroImage, 'medium')} 
+                      src={getImageUrl(post.heroImage, 'medium')} 
                       alt={post.heroImage?.alt || post.title}
-                      className="w-full h-full object-cover transition-transform hover:scale-105" 
+                      className="w-full h-full object-cover transition-transform hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/api/placeholder/400/300';
+                        target.src = 'http://localhost:3000/api/media/file/banner-1748513055712.jpg';
                         console.log('🖼️ Image load error for post:', post.title);
                       }}
                     />
@@ -433,7 +309,7 @@ const News: React.FC = () => {
                 <div className="flex gap-1">
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() => goToPage(Math.max(currentPage - 1, 1))}
                     disabled={!pagination.hasPrevPage}
                     className="px-3 py-1"
                   >
@@ -443,7 +319,7 @@ const News: React.FC = () => {
                     <Button
                       key={i + 1}
                       variant={currentPage === i + 1 ? "default" : "outline"}
-                      onClick={() => setCurrentPage(i + 1)}
+                      onClick={() => goToPage(i + 1)}
                       className="px-3 py-1"
                     >
                       {i + 1}
@@ -451,7 +327,7 @@ const News: React.FC = () => {
                   ))}
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, pagination.totalPages))}
+                    onClick={() => goToPage(Math.min(currentPage + 1, pagination.totalPages))}
                     disabled={!pagination.hasNextPage}
                     className="px-3 py-1"
                   >
@@ -480,25 +356,52 @@ const News: React.FC = () => {
                 </Button>
               </form>
             </div>
-            
+
             {/* Categories */}
             <div className="bg-white p-4 rounded-lg shadow-sm mb-6 border">
               <h3 className="font-semibold text-lg mb-3">Danh mục</h3>
-              <ul className="space-y-2">
-                {categories.map((category, index) => (
-                  <li key={index}>
-                    <Link 
-                      to={`/news/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`} 
-                      className="flex justify-between items-center py-2 hover:text-blue-600 transition-colors"
+              {categoriesLoading ? (
+                <div className="space-y-2">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="animate-pulse flex justify-between items-center py-2">
+                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-300 rounded w-8"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {/* All categories option */}
+                  <li>
+                    <button 
+                      onClick={() => handleCategorySelect(null)}
+                      className={`w-full flex justify-between items-center py-2 hover:text-blue-600 transition-colors text-left ${
+                        selectedCategory === null ? 'text-blue-600 font-medium' : ''
+                      }`}
                     >
-                      <span>{category.name}</span>
+                      <span>Tất cả</span>
                       <Badge variant="secondary" className="text-xs">
-                        {category.count}
+                        {totalAllPosts || 0}
                       </Badge>
-                    </Link>
+                    </button>
                   </li>
-                ))}
-              </ul>
+                  {categories.map((category) => (
+                    <li key={category.id}>
+                      <button 
+                        onClick={() => handleCategorySelect(category.id)}
+                        className={`w-full flex justify-between items-center py-2 hover:text-blue-600 transition-colors text-left ${
+                          selectedCategory === category.id ? 'text-blue-600 font-medium' : ''
+                        }`}
+                      >
+                        <span>{category.title}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {category.count}
+                        </Badge>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             
             {/* Recent Posts */}
@@ -506,20 +409,21 @@ const News: React.FC = () => {
               <h3 className="font-semibold text-lg mb-3">Bài viết gần đây</h3>
               <div className="space-y-4">
                 {posts.slice(0, 5).map(post => (
-                  <div key={post.id} className="flex gap-3">                    <Link to={`/news/${post.slug}`} className="block w-20 h-20 flex-shrink-0">
+                  <div key={post.id} className="flex gap-3">
+                    <Link to={`/news/${post.slug}`} className="block w-20 h-20 flex-shrink-0">
                       <img 
-                        src={getOptimizedImageUrl(post.heroImage, 'thumbnail')} 
+                        src={getImageUrl(post.heroImage, 'thumbnail')} 
                         alt={post.heroImage?.alt || post.title}
                         className="w-full h-full object-cover rounded"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = '/api/placeholder/80/80';
+                          target.src = 'http://localhost:3000/api/media/file/banner-1748513055712-300x450.jpg';
                         }}
                       />
                     </Link>
                     <div>
                       <Link 
-                        to={`/news-detail/${post.slug}`} 
+                        to={`/news/${post.slug}`} 
                         className="font-medium text-sm hover:text-blue-600 transition-colors line-clamp-2"
                       >
                         {post.title}

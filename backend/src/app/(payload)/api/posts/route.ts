@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -109,12 +110,88 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
         console.error(`Error fetching post with slug ${slug}:`, error)
         return handleApiError(error, `Không tìm thấy bài viết với slug: ${slug}`, 404)
       }
+    }    // Otherwise fetch a list of posts with advanced filtering
+    const query: Record<string, unknown> = {}    // Define types for better type safety
+    interface WhereClause {
+      equals?: string
+      in?: string[]
+      contains?: string
+      like?: string
+      not_equals?: string
+      greater_than?: string
+      less_than?: string
     }
-      // Otherwise fetch a list of posts with advanced filtering
-    const query: any = {}
-      // Handle status filter - allow filtering by any status if specified, default to published
+
+    interface WhereQuery {
+      [field: string]: WhereClause
+    }
+
+    // Parse complex query parameters from URL (where[field][operator]=value format)
+    const parseWhereParams = (searchParams: URLSearchParams): WhereQuery => {
+      const whereQuery: WhereQuery = {}
+
+      for (const [key, value] of searchParams.entries()) {
+        // Handle where[field][operator]=value format
+        const whereMatch = key.match(/^where\[([^\]]+)\]\[([^\]]+)\]$/)
+        if (whereMatch && whereMatch[1] && whereMatch[2]) {
+          const field = whereMatch[1]
+          const operator = whereMatch[2]
+
+          if (!whereQuery[field]) {
+            whereQuery[field] = {}
+          }
+
+          // Handle different operators
+          switch (operator) {
+            case 'equals':
+              whereQuery[field].equals = value
+              break
+            case 'in':
+              // Handle array values for 'in' operator
+              if (!whereQuery[field].in) {
+                whereQuery[field].in = []
+              }
+              whereQuery[field].in!.push(value)
+              break
+            case 'contains':
+              whereQuery[field].contains = value
+              break
+            case 'like':
+              whereQuery[field].like = value
+              break
+            case 'not_equals':
+              whereQuery[field].not_equals = value
+              break
+            case 'greater_than':
+              whereQuery[field].greater_than = value
+              break
+            case 'less_than':
+              whereQuery[field].less_than = value
+              break
+            default:
+              // Unknown operator, skip
+              break
+          }
+        }
+
+        // Handle simple where[field]=value format
+        const simpleWhereMatch = key.match(/^where\[([^\]]+)\]$/)
+        if (simpleWhereMatch && simpleWhereMatch[1]) {
+          const field = simpleWhereMatch[1]
+          whereQuery[field] = { equals: value }
+        }
+      }
+
+      return whereQuery
+    }
+
+    // Parse query parameters from URL
+    const whereQuery = parseWhereParams(url.searchParams)
+    Object.assign(query, whereQuery)
+
+    // Handle status filter - allow filtering by any status if specified, default to published
     const statusParam = url.searchParams.get('status') || 'published'
-    if (statusParam !== 'all') {
+    if (statusParam !== 'all' && !query._status) {
       query._status = {
         equals: statusParam
       }
@@ -137,8 +214,8 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
       ]
     }
 
-    // Add category filter
-    if (category) {
+    // Add category filter (legacy support)
+    if (category && !query.categories) {
       query.categories = {
         contains: category
       }
@@ -149,15 +226,17 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
     const toDate = url.searchParams.get('toDate')
 
     if (fromDate || toDate) {
-      query.createdAt = {}
+      const createdAtFilter: Record<string, string> = {}
 
       if (fromDate) {
-        query.createdAt.greater_than_equal = new Date(fromDate).toISOString()
+        createdAtFilter.greater_than_equal = new Date(fromDate).toISOString()
       }
 
       if (toDate) {
-        query.createdAt.less_than_equal = new Date(toDate).toISOString()
+        createdAtFilter.less_than_equal = new Date(toDate).toISOString()
       }
+
+      query.createdAt = createdAtFilter
     }
 
     console.log('Posts query:', JSON.stringify(query, null, 2))
@@ -165,7 +244,7 @@ export const GET = withCORS(async (req: NextRequest): Promise<NextResponse> => {
     // Default sort by createdAt in descending order, unless specified otherwise
     const posts = await payload.find({
       collection: 'posts',
-      where: query,
+      where: query as any, // Type assertion needed for Payload CMS where clause
       page,
       limit,
       depth: 1,

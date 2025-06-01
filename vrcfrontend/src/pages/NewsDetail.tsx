@@ -59,7 +59,7 @@ interface LexicalNode {
   text?: string;
   format?: number;
   url?: string;
-  tag?: number;
+  tag?: number | string; // Allow both number and string for heading tags
   listType?: string;
   direction?: string;
   indent?: number;
@@ -204,9 +204,24 @@ const NewsDetail: React.FC = () => {
             <p key={index} className="mb-6 leading-[1.8] text-gray-800 text-lg tracking-wide">
               {node.children?.map((child, childIndex) => renderNode(child, childIndex))}
             </p>
-          );
-          case 'heading': {
-          const HeadingTag = `h${Math.min(node.tag || 2, 6)}` as keyof JSX.IntrinsicElements;
+          );        case 'heading': {
+          // Extract heading level - handle both string tags like "h3" and numeric levels
+          let headingLevel = 2; // default to h2
+          
+          if (typeof node.tag === 'string' && node.tag.startsWith('h')) {
+            // Extract number from "h3" -> 3
+            const levelMatch = node.tag.match(/h(\d+)/);
+            if (levelMatch) {
+              headingLevel = parseInt(levelMatch[1], 10);
+            }
+          } else if (typeof node.tag === 'number' && !isNaN(node.tag)) {
+            headingLevel = node.tag;
+          }
+          
+          // Ensure level is between 1-6
+          headingLevel = Math.max(1, Math.min(headingLevel, 6));
+          
+          const HeadingTag = `h${headingLevel}` as keyof JSX.IntrinsicElements;
           const headingClasses = {
             h1: 'text-4xl font-bold mb-8 text-gray-900 leading-tight border-b-2 border-blue-100 pb-4',
             h2: 'text-3xl font-bold mb-6 text-gray-900 leading-tight mt-12 first:mt-0',
