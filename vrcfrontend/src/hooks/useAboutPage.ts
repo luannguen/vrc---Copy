@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react';
 
+// Media interface từ Payload CMS
+interface MediaItem {
+  id: string;
+  url: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  filename: string;
+  mimeType: string;
+}
+
 interface RichTextContent {
   root: {
     type: string;
@@ -22,7 +33,7 @@ interface Leader {
   name: string;
   position: string;
   bio: RichTextContent;
-  image?: any;
+  image?: MediaItem;
 }
 
 interface Achievement {
@@ -36,7 +47,7 @@ interface AboutPageData {
   heroSection: {
     title: string;
     subtitle: string;
-    backgroundImage?: any;
+    backgroundImage?: MediaItem;
   };
   companyHistory: {
     title: string;
@@ -62,16 +73,17 @@ interface AboutPageData {
 const useAboutPage = () => {
   const [data, setData] = useState<AboutPageData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
+  const [error, setError] = useState<string | null>(null);  useEffect(() => {
     const fetchAboutData = async () => {
       try {
         setLoading(true);
         setError(null);
         
+        // VITE_API_URL đã bao gồm /api trong .env
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+        
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL || 'http://localhost:3000'}/api/about-page`,
+          `${API_BASE_URL}/about-page`,
           {
             method: 'GET',
             headers: {
