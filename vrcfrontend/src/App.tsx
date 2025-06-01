@@ -22,6 +22,7 @@ import Technologies from "./pages/Technologies";
 import EnergyEfficiency from "./pages/technologies/EnergyEfficiency";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
+import { TagPage } from "./pages/TagPage";
 import Contact from "./pages/Contact";
 import Events from "./pages/Events";
 import NotFound from "./pages/NotFound";
@@ -95,7 +96,9 @@ const App = () => (
           <Route path="technologies/energy-efficiency" element={<EnergyEfficiency />} />
           <Route path="technology" element={<Navigate to="/technologies" replace />} />
           <Route path="news" element={<News />} />
+          <Route path="news/tag/:tagSlug" element={<TagPage />} />
           <Route path="news/:slug" element={<NewsDetail />} />
+          <Route path="tags/:tag" element={<TagPage />} />
           <Route path="events" element={<Events />} />
           <Route path="publications" element={<Publications />} />
           <Route path="publications/inverter-technology" element={<InverterTechnology />} />

@@ -1,8 +1,84 @@
 # VRC PAYLOAD CMS - FIXME & TROUBLESHOOTING GUIDE
 
-**Last Updated: June 1, 2025**
+**Last Updated: June 2, 2025**
 
-**Recent Fixes Applied:**
+## 🆕 **RECENT FIXES - JUNE 2, 2025**
+
+### ✅ **Fix "process is not defined" Error - Tags Loading**
+
+**Vấn đề:**
+- Trang `/news` hiển thị lỗi `process is not defined` khi tải tags
+- TagsList component không thể tải danh sách tags
+- TagPage component gặp lỗi tương tự khi truy cập
+
+**Nguyên nhân:**
+1. **Sử dụng sai Environment Variables**: Dùng `process.env.REACT_APP_API_URL` trong Vite project
+2. **Thiếu .env file**: Không có file environment variables cho frontend
+3. **API URL Pattern**: Sử dụng Create React App pattern thay vì Vite pattern
+
+**Tệp bị ảnh hưởng:**
+- `vrcfrontend/src/components/TagsList.tsx` - Line 23
+- `vrcfrontend/src/pages/TagPage.tsx` - Lines 53, 166
+
+**Giải pháp đã áp dụng:**
+
+**1. Fix TagsList Component**
+```typescript
+// OLD - Causing "process is not defined"
+const response = await fetch(`${process.env.REACT_APP_API_URL}/api/tags`);
+
+// NEW - Using Vite environment variables  
+const response = await fetch(`${import.meta.env.VITE_API_URL}/tags`);
+```
+
+**2. Fix TagPage Component**
+```typescript
+// OLD - Multiple process.env references
+const response = await fetch(`${process.env.REACT_APP_API_URL}/api/posts/by-tag?tag=${encodeURIComponent(tagSlug)}`);
+src={`${process.env.REACT_APP_API_URL}${post.heroImage.url}`}
+
+// NEW - Using Vite environment variables
+const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/by-tag?tag=${encodeURIComponent(tagSlug)}`);
+src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000'}${post.heroImage.url}`}
+```
+
+**3. Created .env file**
+```properties
+VITE_API_URL=http://localhost:3001
+```
+
+**Kết quả:**
+- ✅ Tags hiển thị bình thường trên trang `/news`
+- ✅ Không còn lỗi "process is not defined"
+- ✅ TagPage component hoạt động ổn định
+- ✅ Frontend development server chạy thành công
+
+### ✅ **Fix Backend Syntax Error - assign-tags-to-posts**
+
+**Vấn đề:**
+- Lỗi syntax trong `backend/src/app/(payload)/api/assign-tags-to-posts/route.ts`
+- Thiếu dấu đóng ngoặc sau if statement
+
+**Giải pháp:**
+```typescript
+// OLD - Missing closing brace
+});
+}    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+// NEW - Fixed formatting
+});
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+```
+
+**Kết quả:**
+- ✅ Backend API hoạt động bình thường
+- ✅ Assign tags endpoint không lỗi syntax
+
+---
+
+**Previous Fixes Applied:**
 
 - ✅ **Zalo Chat Widget Fix - Contact Page**: Fixed Zalo chat icon not showing chat bubble in "Kết nối với chúng tôi" section by correcting ZaloChatWidget rendering condition
 - ✅ **About Page Media URL Fix**: Fixed hardcoded placeholder causing 500 errors by implementing proper API data usage and URL processing
@@ -423,7 +499,7 @@ Footer (hoạt động tốt):
     oaId={socialMedia.zalo.oaId}
     isOpen={isZaloChatOpen}
     onClose={() => setIsZaloChatOpen(false)}
-  />
+/>
 )}
 
 // AFTER - ✅ Widget luôn render nhưng chỉ hiển thị khi isOpen = true

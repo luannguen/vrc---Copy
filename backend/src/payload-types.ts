@@ -278,6 +278,10 @@ export interface Post {
    * Chọn danh mục cho bài viết
    */
   categories?: (string | NewsCategory)[] | null;
+  /**
+   * Chọn các thẻ cho bài viết (để phân loại và tìm kiếm)
+   */
+  tags?: (string | Category)[] | null;
   meta?: {
     title?: string | null;
     /**
@@ -404,6 +408,36 @@ export interface NewsCategory {
   description?: string | null;
   slug?: string | null;
   slugLock?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Quản lý tất cả các danh mục và thẻ trong hệ thống.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  /**
+   * Nhập tên của danh mục hoặc thẻ
+   */
+  title: string;
+  /**
+   * Chọn loại danh mục hoặc thẻ phù hợp với mục đích sử dụng.
+   */
+  type: 'category' | 'tag' | 'news_category' | 'service_category' | 'event_category' | 'project_category';
+  slug?: string | null;
+  slugLock?: boolean | null;
+  parent?: (string | null) | Category;
+  breadcrumbs?:
+    | {
+        doc?: (string | null) | Category;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -566,36 +600,6 @@ export interface ArchiveBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
-}
-/**
- * Quản lý tất cả các danh mục và thẻ trong hệ thống.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: string;
-  /**
-   * Nhập tên của danh mục hoặc thẻ
-   */
-  title: string;
-  /**
-   * Chọn loại danh mục hoặc thẻ phù hợp với mục đích sử dụng.
-   */
-  type: 'category' | 'tag' | 'news_category' | 'service_category' | 'event_category' | 'project_category';
-  slug?: string | null;
-  slugLock?: boolean | null;
-  parent?: (string | null) | Category;
-  breadcrumbs?:
-    | {
-        doc?: (string | null) | Category;
-        url?: string | null;
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2261,6 +2265,7 @@ export interface PostsSelect<T extends boolean = true> {
   content?: T;
   relatedPosts?: T;
   categories?: T;
+  tags?: T;
   meta?:
     | T
     | {

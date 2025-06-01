@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNewsCategories } from '@/hooks/useNewsCategories';
 import { useNewsPosts, PostData } from '@/hooks/useNewsPosts';
+import { TagsList } from '@/components/TagsList';
 
 const News: React.FC = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -17,12 +18,11 @@ const News: React.FC = () => {
   const { posts, loading: postsLoading, pagination, filterByCategory, goToPage, currentPage } = useNewsPosts({
     selectedCategory
   });
-
   // Sample tags for display
-  const sampleTags = [
-    "Điện lạnh", "Triển lãm", "Hội thảo", "Công nghệ", "Tiết kiệm năng lượng",
-    "Bảo trì", "Inverter", "Hợp tác quốc tế", "Nghiên cứu", "Phát triển bền vững"
-  ];
+  // const sampleTags = [
+  //   "Điện lạnh", "Triển lãm", "Hội thảo", "Công nghệ", "Tiết kiệm năng lượng",
+  //   "Bảo trì", "Inverter", "Hợp tác quốc tế", "Nghiên cứu", "Phát triển bền vững"
+  // ];
 
   // Handle category selection
   const handleCategorySelect = (categoryId: string | null) => {
@@ -437,22 +437,8 @@ const News: React.FC = () => {
                 ))}
               </div>
             </div>
-            
-            {/* Tags */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <h3 className="font-semibold text-lg mb-3">Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {sampleTags.map((tag, index) => (
-                  <Link 
-                    key={index}
-                    to={`/news/tag/${tag.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="bg-gray-100 hover:bg-blue-100 hover:text-blue-700 px-3 py-1 rounded-full text-sm transition-colors"
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </div>
-            </div>
+              {/* Tags */}
+            <TagsList />
           </div>
         </div>
       </div>

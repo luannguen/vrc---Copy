@@ -48,7 +48,7 @@ export const Posts: CollectionConfig<'posts'> = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'categories', 'status', 'updatedAt'],
-    group: 'Tin tức & Bài viết', 
+    group: 'Tin tức & Bài viết',
     description: 'Quản lý tin tức, bài viết và nội dung liên quan',
     livePreview: {
       url: ({ data, req }) => {
@@ -132,6 +132,21 @@ export const Posts: CollectionConfig<'posts'> = {
               },
               hasMany: true,
               relationTo: 'news-categories',
+            },
+            {
+              name: 'tags',
+              type: 'relationship',
+              admin: {
+                position: 'sidebar',
+                description: 'Chọn các thẻ cho bài viết (để phân loại và tìm kiếm)',
+              },
+              hasMany: true,
+              relationTo: 'categories',
+              filterOptions: {
+                type: {
+                  equals: 'tag',
+                },
+              },
             },
           ],
           label: 'Meta',
