@@ -5,10 +5,12 @@ import Logo from './header/Logo';
 import MainNavigation from './header/MainNavigation';
 import LanguageSwitcher from './header/LanguageSwitcher';
 import SearchComponent from './header/SearchComponent';
+import ZaloChatWidget from './ZaloChatWidget';
 import { useHeaderInfo } from '@/hooks/useApi';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isZaloChatOpen, setIsZaloChatOpen] = useState(false);
   const { t } = useTranslation();
   const { data: headerInfo, isLoading, error } = useHeaderInfo();
   
@@ -87,20 +89,38 @@ const Header = () => {
               {/* Zalo */}
               {(() => {
                 const zaloData = getSocialMedia(socialLinks.zalo);
+                const hasOAId = typeof socialLinks.zalo === 'object' && socialLinks.zalo?.oaId;
+                
                 return zaloData.enabled && zaloData.url && (
-                  <a 
-                    href={formatZaloUrl(zaloData.url)} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center hover:opacity-80 transition-opacity"
-                    aria-label="Zalo"
-                  >
-                    <img 
-                      src="/assets/svg/zalo.svg" 
-                      alt="Zalo" 
-                      className="w-5 h-5" 
-                    />
-                  </a>
+                  hasOAId ? (
+                    // If has OA ID, show chat widget
+                    <button
+                      onClick={() => setIsZaloChatOpen(true)}
+                      className="flex items-center hover:opacity-80 transition-opacity"
+                      aria-label="Chat Zalo"
+                    >
+                      <img 
+                        src="/assets/svg/zalo.svg" 
+                        alt="Zalo" 
+                        className="w-5 h-5" 
+                      />
+                    </button>
+                  ) : (
+                    // If no OA ID, use traditional link
+                    <a 
+                      href={formatZaloUrl(zaloData.url)} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center hover:opacity-80 transition-opacity"
+                      aria-label="Zalo"
+                    >
+                      <img 
+                        src="/assets/svg/zalo.svg" 
+                        alt="Zalo" 
+                        className="w-5 h-5" 
+                      />
+                    </a>
+                  )
                 );
               })()}
 
@@ -267,6 +287,16 @@ const Header = () => {
           </div>
         )}
       </header>
+      
+      {/* Zalo Chat Widget */}
+      {typeof socialLinks.zalo === 'object' && socialLinks.zalo?.oaId && (
+        <ZaloChatWidget
+          oaId={socialLinks.zalo.oaId}
+          isOpen={isZaloChatOpen}
+          onClose={() => setIsZaloChatOpen(false)}
+          welcomeMessage="Xin chào! Chúng tôi có thể hỗ trợ gì cho bạn?"
+        />
+      )}
     </>
   );
 };

@@ -18,9 +18,9 @@ export interface SocialLinks {
   facebook?: {
     url?: string;
     enabled?: boolean;
-  } | string;
-  zalo?: {
+  } | string;  zalo?: {
     url?: string;
+    oaId?: string;
     enabled?: boolean;
   } | string;
   linkedin?: {

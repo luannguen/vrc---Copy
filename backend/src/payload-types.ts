@@ -3243,6 +3243,10 @@ export interface CompanyInfo {
        * Nhập số điện thoại Zalo (ví dụ: 0987654321 hoặc 84987654321). Hệ thống sẽ tự động tạo link zalo.me
        */
       url?: string | null;
+      /**
+       * Nhập Zalo OA ID để kích hoạt chat widget (ví dụ: 1234567890). Lấy từ trang quản lý Zalo OA.
+       */
+      oaId?: string | null;
       enabled?: boolean | null;
     };
     twitter?: {
@@ -3463,6 +3467,7 @@ export interface CompanyInfoSelect<T extends boolean = true> {
           | T
           | {
               url?: T;
+              oaId?: T;
               enabled?: T;
             };
         twitter?:

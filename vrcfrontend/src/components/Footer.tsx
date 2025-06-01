@@ -1,12 +1,15 @@
 import { Facebook, Twitter, Linkedin, Youtube, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import AppLink from '@/components/ui/app-link';
 import { useCompanyInfo } from '@/hooks/useApi';
 import { getLogoUrl } from '@/lib/api';
+import ZaloChatWidget from './ZaloChatWidget';
 
 const Footer = () => {
   const { t } = useTranslation();
   const { data: companyInfo, isLoading, error } = useCompanyInfo();
+  const [isZaloChatOpen, setIsZaloChatOpen] = useState(false);
   
   
   // Use API data or fallback to defaults
@@ -120,10 +123,24 @@ const Footer = () => {
                 );
               })()}              {(() => {
                 const zalo = getSocialMedia(socialMedia?.zalo);
+                const hasOAId = typeof socialMedia?.zalo === 'object' && socialMedia.zalo?.oaId;
+                
                 return zalo.enabled && zalo.url && (
-                  <a href={formatZaloUrl(zalo.url)} className="text-gray-300 hover:text-white transition-colors" aria-label="Zalo" target="_blank" rel="noopener noreferrer">
-                    <img src="/assets/svg/zalo.svg" alt="Zalo" className="w-5 h-5 inline-block invert" />
-                  </a>
+                  hasOAId ? (
+                    // If has OA ID, show chat widget
+                    <button
+                      onClick={() => setIsZaloChatOpen(true)}
+                      className="text-gray-300 hover:text-white transition-colors"
+                      aria-label="Chat Zalo"
+                    >
+                      <img src="/assets/svg/zalo.svg" alt="Zalo" className="w-5 h-5 inline-block invert" />
+                    </button>
+                  ) : (
+                    // If no OA ID, use traditional link
+                    <a href={formatZaloUrl(zalo.url)} className="text-gray-300 hover:text-white transition-colors" aria-label="Zalo" target="_blank" rel="noopener noreferrer">
+                      <img src="/assets/svg/zalo.svg" alt="Zalo" className="w-5 h-5 inline-block invert" />
+                    </a>
+                  )
                 );
               })()}
               {(() => {
@@ -204,9 +221,18 @@ const Footer = () => {
             <AppLink routeKey="TERMS" className="footer-link">Terms of Service</AppLink>
             <AppLink routeKey="COOKIES" className="footer-link">Cookie Policy</AppLink>
             <AppLink routeKey="SITEMAP" className="footer-link">Sitemap</AppLink>
-          </div>
-        </div>
+          </div>        </div>
       </div>
+      
+      {/* Zalo Chat Widget */}
+      {typeof socialMedia?.zalo === 'object' && socialMedia.zalo?.oaId && (
+        <ZaloChatWidget
+          oaId={socialMedia.zalo.oaId}
+          isOpen={isZaloChatOpen}
+          onClose={() => setIsZaloChatOpen(false)}
+          welcomeMessage="Xin chào! Chúng tôi có thể hỗ trợ gì cho bạn?"
+        />
+      )}
     </footer>
   );
 };

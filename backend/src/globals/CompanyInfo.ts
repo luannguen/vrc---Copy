@@ -118,6 +118,14 @@ export const CompanyInfo: GlobalConfig = {
               }
             },
             {
+              name: 'oaId',
+              label: 'Zalo Official Account ID',
+              type: 'text',
+              admin: {
+                description: 'Nhập Zalo OA ID để kích hoạt chat widget (ví dụ: 1234567890). Lấy từ trang quản lý Zalo OA.'
+              }
+            },
+            {
               name: 'enabled',
               label: 'Hiển thị trên trang chủ',
               type: 'checkbox',
