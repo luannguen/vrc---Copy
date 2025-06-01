@@ -19,6 +19,7 @@
 - ✅ **localAvatar.ts TypeScript Errors**: Fixed undefined username and color array access issues
 - ✅ **CSS Iframe Detection**: Implemented fallback styles for iframe contexts before hydration completes
 - ✅ **Tools Admin Integration**: Implemented complete CRUD API for Tools collection with routing conflict resolution
+- ✅ **Lexical Rich Text Format Fix - About Page**: Fixed parsing error with Rich Text in seed API and admin interface
 
 ## CORS LOGO LOADING FIX
 
@@ -141,3 +142,53 @@ curl -I -H "Origin: http://localhost:5173" http://localhost:3000/media/logo.svg
 - **Widget Initialization**: Uses `ZaloSocialSDK.init()` and `ZaloSocialSDK.openChatWidget()`
 - **Error Handling**: Graceful fallback to traditional phone number link if OA ID not available
 - **Performance**: SDK loaded only when widget is opened to optimize page load
+
+## LEXICAL RICH TEXT FORMAT FIX - ABOUT PAGE
+
+### Vấn đề
+Admin panel hiển thị lỗi `parseEditorState: type "undefined" + not found` khi cố gắng phân tích nội dung Rich Text từ API seed About page trong Lexical editor.
+
+### Nguyên nhân
+1. **Cấu trúc Rich Text không đúng**: Định dạng Rich Text trong seed API About page không khớp với cấu trúc chuẩn của Lexical
+2. **Thuộc tính `format` không hợp lệ**: Sử dụng `format: undefined` thay vì giá trị hợp lệ (`''` hoặc một trong các giá trị căn chỉnh)
+3. **Thiếu Type Assertion**: Không có type assertion để đảm bảo tính tương thích với các giá trị enum hợp lệ
+
+### Giải pháp đã áp dụng
+
+**1. Sửa hàm `createRichText` trong seed API**
+
+File: `backend/src/app/api/seed-about-page/route.ts`
+
+```typescript
+// Helper function to create proper Rich Text format
+const createRichText = (text: string) => {
+  return {
+    root: {
+      type: 'root',
+      children: [
+        {
+          type: 'paragraph',
+          version: 1,
+          children: [
+            {
+              type: 'text',
+              text: text,
+              version: 1,
+            },
+          ],
+        },
+      ],
+      direction: null,
+      format: '' as "" | "left" | "start" | "center" | "right" | "end" | "justify" | undefined,
+      indent: 0,
+      version: 1,
+    }
+  };
+};
+```
+
+### Kết quả
+- ✅ Không còn lỗi TypeScript trong codebase
+- ✅ Lexical editor có thể phân tích cấu trúc Rich Text từ API
+- ✅ Admin panel có thể chỉnh sửa nội dung About page
+- ✅ API seed-about-page hoạt động chính xác

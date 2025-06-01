@@ -29,6 +29,7 @@ import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { CompanyInfo } from './globals/CompanyInfo'
 import { HomepageSettings } from './globals/HomepageSettings'
+import { AboutPageSettings } from './globals/AboutPageSettings'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -130,7 +131,7 @@ export default buildConfig({  admin: {
       'accept',
     ]
   },
-  globals: [Header, Footer, CompanyInfo, HomepageSettings],
+  globals: [Header, Footer, CompanyInfo, HomepageSettings, AboutPageSettings],
   plugins: [
     ...plugins,
     // storage-adapter-placeholder

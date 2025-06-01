@@ -135,12 +135,14 @@ export interface Config {
     footer: Footer;
     'company-info': CompanyInfo;
     'homepage-settings': HomepageSetting;
+    'about-page-settings': AboutPageSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'company-info': CompanyInfoSelect<false> | CompanyInfoSelect<true>;
     'homepage-settings': HomepageSettingsSelect<false> | HomepageSettingsSelect<true>;
+    'about-page-settings': AboutPageSettingsSelect<false> | AboutPageSettingsSelect<true>;
   };
   locale: null;
   user: User & {
@@ -3390,6 +3392,175 @@ export interface HomepageSetting {
   createdAt?: string | null;
 }
 /**
+ * Quản lý nội dung trang giới thiệu công ty
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page-settings".
+ */
+export interface AboutPageSetting {
+  id: string;
+  heroSection: {
+    /**
+     * Tiêu đề lớn hiển thị trên banner
+     */
+    title: string;
+    /**
+     * Mô tả ngắn dưới tiêu đề chính
+     */
+    subtitle?: string | null;
+    /**
+     * Hình ảnh nền cho banner
+     */
+    backgroundImage?: (string | null) | Media;
+  };
+  companyHistory: {
+    title: string;
+    /**
+     * Nội dung chi tiết về lịch sử phát triển
+     */
+    description?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Năm công ty được thành lập
+     */
+    establishedYear?: number | null;
+    /**
+     * Tổng số năm kinh nghiệm hoạt động
+     */
+    experienceYears?: number | null;
+  };
+  vision: {
+    title: string;
+    description?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Tên icon (ví dụ: target, vision)
+     */
+    icon?: string | null;
+  };
+  mission: {
+    title: string;
+    description?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Tên icon (ví dụ: mission, goal)
+     */
+    icon?: string | null;
+  };
+  /**
+   * Các giá trị cốt lõi của công ty
+   */
+  coreValues?:
+    | {
+        title: string;
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        /**
+         * Tên icon cho giá trị này
+         */
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Danh sách các thành viên ban lãnh đạo
+   */
+  leadership?:
+    | {
+        name: string;
+        position: string;
+        image?: (string | null) | Media;
+        /**
+         * Thông tin chi tiết về thành viên
+         */
+        bio?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Các thành tích nổi bật của công ty
+   */
+  achievements?:
+    | {
+        title: string;
+        description: string;
+        /**
+         * Tên icon cho thành tích này
+         */
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -3594,6 +3765,69 @@ export interface HomepageSettingsSelect<T extends boolean = true> {
         metaDescription?: T;
         metaKeywords?: T;
         ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page-settings_select".
+ */
+export interface AboutPageSettingsSelect<T extends boolean = true> {
+  heroSection?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        backgroundImage?: T;
+      };
+  companyHistory?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        establishedYear?: T;
+        experienceYears?: T;
+      };
+  vision?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+      };
+  mission?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+      };
+  coreValues?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+        id?: T;
+      };
+  leadership?:
+    | T
+    | {
+        name?: T;
+        position?: T;
+        image?: T;
+        bio?: T;
+        id?: T;
+      };
+  achievements?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;
