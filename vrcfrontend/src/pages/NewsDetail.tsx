@@ -89,9 +89,8 @@ const NewsDetail: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // Try to fetch by slug first
-        let response = await fetch(`http://localhost:3000/api/posts?where[slug][equals]=${slug}&limit=1`);
+          // Try to fetch by slug first
+        let response = await fetch(`http://localhost:3000/api/posts?slug=${slug}&limit=1`);
         
         if (!response.ok) {
           // If slug doesn't work, try ID
