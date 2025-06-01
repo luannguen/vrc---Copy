@@ -13,14 +13,15 @@ const Header = () => {
   const { data: headerInfo, isLoading, error } = useHeaderInfo();
   
   // Debug log
-  console.log('Header headerInfo:', headerInfo);
-  console.log('Header socialMediaLinks:', headerInfo?.socialMediaLinks);
+
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // Use API data or fallback to defaults
   const contactPhone = headerInfo?.contactSection?.phone || '+84 (28) 1234 5678';
   const socialLinks = headerInfo?.socialMedia || headerInfo?.socialMediaLinks || {};
+  
+
   
   // Helper function to ensure URL has proper protocol
   const ensureHttps = (url: string) => {
@@ -29,6 +30,26 @@ const Header = () => {
       return url;
     }
     return `https://${url}`;
+  };
+
+  // Helper function to format Zalo URL from phone number
+  const formatZaloUrl = (phoneNumber: string) => {
+    if (!phoneNumber) return '';
+    
+    // Remove all non-digit characters
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    
+    // If it starts with 84 (Vietnam country code), use as is
+    // If it starts with 0, replace with 84
+    // Otherwise, add 84 prefix
+    let formattedPhone = cleanPhone;
+    if (cleanPhone.startsWith('0')) {
+      formattedPhone = '84' + cleanPhone.substring(1);
+    } else if (!cleanPhone.startsWith('84')) {
+      formattedPhone = '84' + cleanPhone;
+    }
+    
+    return `https://zalo.me/${formattedPhone}`;
   };
 
   // Helper function to get social media URL and enabled status
@@ -61,13 +82,14 @@ const Header = () => {
             </a>
 
             {/* Social Media Links - All supported platforms */}
-            <div className="flex items-center space-x-2">
+            {socialLinks && Object.keys(socialLinks).length > 0 && (
+              <div className="flex items-center space-x-2">
               {/* Zalo */}
               {(() => {
                 const zaloData = getSocialMedia(socialLinks.zalo);
                 return zaloData.enabled && zaloData.url && (
                   <a 
-                    href={ensureHttps(zaloData.url)} 
+                    href={formatZaloUrl(zaloData.url)} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center hover:opacity-80 transition-opacity"
@@ -190,6 +212,7 @@ const Header = () => {
                 );
               })()}
             </div>
+            )}
 
             {/* Loading indicator */}
             {isLoading && (

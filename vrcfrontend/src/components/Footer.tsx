@@ -8,9 +8,6 @@ const Footer = () => {
   const { t } = useTranslation();
   const { data: companyInfo, isLoading, error } = useCompanyInfo();
   
-  // Debug log
-  console.log('Footer socialMedia data:', companyInfo?.socialMedia);
-  console.log('Footer socialMediaLinks data:', companyInfo?.socialMediaLinks);
   
   // Use API data or fallback to defaults
   const companyName = companyInfo?.companyName || 'VRC - Tổng công ty Kỹ thuật lạnh Việt Nam';
@@ -20,7 +17,6 @@ const Footer = () => {
   
   // Sử dụng getLogoUrl() đơn giản như Logo component
   const logoUrl = getLogoUrl();
-
   // Helper function to ensure URL has proper protocol
   const ensureHttps = (url: string) => {
     if (!url) return '';
@@ -28,6 +24,26 @@ const Footer = () => {
       return url;
     }
     return `https://${url}`;
+  };
+
+  // Helper function to format Zalo URL from phone number
+  const formatZaloUrl = (phoneNumber: string) => {
+    if (!phoneNumber) return '';
+    
+    // Remove all non-digit characters
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    
+    // If it starts with 84 (Vietnam country code), use as is
+    // If it starts with 0, replace with 84
+    // Otherwise, add 84 prefix
+    let formattedPhone = cleanPhone;
+    if (cleanPhone.startsWith('0')) {
+      formattedPhone = '84' + cleanPhone.substring(1);
+    } else if (!cleanPhone.startsWith('84')) {
+      formattedPhone = '84' + cleanPhone;
+    }
+    
+    return `https://zalo.me/${formattedPhone}`;
   };
 
   // Helper function to get social media URL and enabled status
@@ -59,9 +75,6 @@ const Footer = () => {
               />
             </div>            <p className="text-gray-300 mb-6">
               {companyDescription}
-            </p>
-            <p className="text-gray-300 mb-6">
-              Debugging social media - Facebook: {JSON.stringify(socialMedia?.facebook)}
             </p>
             <div className="flex flex-wrap gap-3">
               {(() => {
@@ -108,8 +121,8 @@ const Footer = () => {
               })()}              {(() => {
                 const zalo = getSocialMedia(socialMedia?.zalo);
                 return zalo.enabled && zalo.url && (
-                  <a href={ensureHttps(zalo.url)} className="text-gray-300 hover:text-white transition-colors" aria-label="Zalo" target="_blank" rel="noopener noreferrer">
-                    <img src="/assets/svg/zalo.svg" alt="Zalo" className="w-5 h-5 inline-block" style={{filter: 'invert(1)'}} />
+                  <a href={formatZaloUrl(zalo.url)} className="text-gray-300 hover:text-white transition-colors" aria-label="Zalo" target="_blank" rel="noopener noreferrer">
+                    <img src="/assets/svg/zalo.svg" alt="Zalo" className="w-5 h-5 inline-block invert" />
                   </a>
                 );
               })()}

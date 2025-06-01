@@ -3240,7 +3240,7 @@ export interface CompanyInfo {
     };
     zalo?: {
       /**
-       * Đường dẫn đến trang Zalo của công ty (zalo.me/your_id)
+       * Nhập số điện thoại Zalo (ví dụ: 0987654321 hoặc 84987654321). Hệ thống sẽ tự động tạo link zalo.me
        */
       url?: string | null;
       enabled?: boolean | null;

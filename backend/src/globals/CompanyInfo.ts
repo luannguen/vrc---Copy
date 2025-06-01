@@ -111,10 +111,10 @@ export const CompanyInfo: GlobalConfig = {
           fields: [
             {
               name: 'url',
-              label: 'Zalo URL',
+              label: 'Số điện thoại Zalo',
               type: 'text',
               admin: {
-                description: 'Đường dẫn đến trang Zalo của công ty (zalo.me/your_id)'
+                description: 'Nhập số điện thoại Zalo (ví dụ: 0987654321 hoặc 84987654321). Hệ thống sẽ tự động tạo link zalo.me'
               }
             },
             {
