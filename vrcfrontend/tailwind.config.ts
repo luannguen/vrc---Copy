@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+import lineClamp from "@tailwindcss/line-clamp";
 
 export default {
 	darkMode: ["class"],
@@ -90,6 +92,8 @@ export default {
 				'ripple': 'ripple 1s ease-out'
 			}
 		}
-	},
-	plugins: [require("tailwindcss-animate")],
+	},	plugins: [
+		tailwindcssAnimate,
+		lineClamp
+	],
 } satisfies Config;

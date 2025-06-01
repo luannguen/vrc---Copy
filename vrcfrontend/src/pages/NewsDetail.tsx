@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+// Define API base URL from environment variable
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
+
 // Interface phù hợp với API response structure thực tế
 interface PostDetailData {
   id: string;
@@ -42,7 +45,18 @@ interface PostDetailData {
   publishedAt: string;
   createdAt: string;
   updatedAt: string;
-  _status: string;
+  _status: string;  relatedPosts?: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    meta?: {
+      image?: string | {
+        url: string;
+        alt?: string;
+      };
+      description?: string;
+    };
+  }>;
   meta?: {
     title?: string;
     description?: string;
@@ -85,28 +99,28 @@ const NewsDetail: React.FC = () => {
       return;
     }
 
-    const fetchPost = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    const fetchPost = async () => {        try {
+          setLoading(true);
+          setError(null);
           // Try to fetch by slug first
-        let response = await fetch(`http://localhost:3000/api/posts?slug=${slug}&limit=1`);
-        
-        if (!response.ok) {
-          // If slug doesn't work, try ID
-          response = await fetch(`http://localhost:3000/api/posts/${slug}`);
-        }
+          let response = await fetch(`${import.meta.env.VITE_API_URL}/posts?slug=${slug}&limit=1`);
+          
+          if (!response.ok) {
+            // If slug doesn't work, try ID
+            response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
+          }
         
         if (!response.ok) {
           throw new Error('Bài viết không tồn tại');
         }
         
         const data: ApiResponse = await response.json();
-        
-        if (data.success) {
+          if (data.success) {
           // Handle both single post and array response
           const postData = Array.isArray(data.data) ? data.data[0] : data.data;
           if (postData) {
+            console.log('📰 Post data loaded:', postData);
+            console.log('🔗 Related posts:', postData.relatedPosts);
             setPost(postData);
           } else {
             throw new Error('Không tìm thấy bài viết');
@@ -122,8 +136,35 @@ const NewsDetail: React.FC = () => {
       }
     };
 
-    fetchPost();
-  }, [slug]);
+    fetchPost();  }, [slug]);  // Helper function to get image URL from ID or object  
+  const getRelatedImageUrl = async (imageIdOrObject: string | { url: string } | null): Promise<string | null> => {
+    if (!imageIdOrObject) return null;
+    
+    // If it's already an object with url
+    if (typeof imageIdOrObject === 'object' && imageIdOrObject.url) {
+      return imageIdOrObject.url.startsWith('http') 
+        ? imageIdOrObject.url 
+        : `${API_BASE_URL}${imageIdOrObject.url}`;
+    }
+    
+    // If it's an ID string, fetch the media data
+    if (typeof imageIdOrObject === 'string') {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/media/${imageIdOrObject}`);
+        if (response.ok) {
+          const mediaData = await response.json();
+          return mediaData.thumbnailURL 
+            ? `${API_BASE_URL}${mediaData.thumbnailURL}`
+            : `${API_BASE_URL}${mediaData.url}`;
+        }
+      } catch (error) {
+        console.error('Error fetching media:', error);
+      }
+    }
+    
+    return null;
+  };
+  
   // Format date helper
   const formatDate = (dateString: string) => {
     try {
@@ -151,9 +192,8 @@ const NewsDetail: React.FC = () => {
       console.log('🖼️ Using full URL:', imageUrl);
       return imageUrl;
     }
-    
-    // Construct full URL with backend base URL
-    const baseUrl = 'http://localhost:3000';
+      // Construct full URL with backend base URL
+    const baseUrl = API_BASE_URL;
     const fullUrl = `${baseUrl}${imageUrl}`;
     console.log('🖼️ Constructed URL:', fullUrl);
     return fullUrl;
@@ -449,8 +489,66 @@ const NewsDetail: React.FC = () => {
             
             {/* Decorative elements */}
             <div className="absolute -top-4 -left-4 w-24 h-24 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full opacity-20 -z-10"></div>
-            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-20 -z-10"></div>
-          </article>
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-20 -z-10"></div>          </article>          {/* Related Posts Section */}
+          {post.relatedPosts && post.relatedPosts.length > 0 && (
+            <section className="mt-16 pt-12 border-t border-gray-200/50">
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50">
+                <div className="flex items-center mb-8">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900">Bài viết liên quan</h2>
+                  </div>
+                  <div className="flex-1 ml-6 h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">                  {post.relatedPosts.map((relatedPost) => {
+                    console.log('🔗 Rendering related post:', relatedPost);
+                    console.log('🖼️ Related post image:', relatedPost.meta?.image);
+                    
+                    return (
+                      <article
+                        key={relatedPost.id}
+                        onClick={() => navigate(`/news/${relatedPost.slug}`)}
+                        className="group cursor-pointer bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
+                      >                      {/* Related Post Image */}                      <RelatedPostImage 
+                        image={relatedPost.meta?.image} 
+                        title={relatedPost.title}
+                        getImageUrl={getRelatedImageUrl}
+                      />
+                      
+                      {/* Related Post Content */}
+                      <div className="p-6">
+                        <h3 className="font-bold text-lg text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 leading-tight">
+                          {relatedPost.title}
+                        </h3>
+                        
+                        {relatedPost.meta?.description && (
+                          <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+                            {relatedPost.meta.description}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-blue-600 font-medium text-sm group-hover:text-blue-700 transition-colors duration-300">
+                            Đọc thêm
+                          </span>
+                          <div className="w-6 h-6 rounded-full bg-blue-100 group-hover:bg-blue-600 transition-colors duration-300 flex items-center justify-center">
+                            <svg className="w-3 h-3 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>                        </div>
+                      </div>
+                    </article>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Footer Actions */}
           <footer className="mt-16 pt-8">
@@ -509,6 +607,73 @@ const NewsDetail: React.FC = () => {
             </div>
           </footer>
         </div>
+      </div>
+    </div>  );
+};
+
+// Related Post Image Component with async loading
+const RelatedPostImage: React.FC<{
+  image: string | { url: string } | undefined;
+  title: string;
+  getImageUrl: (imageIdOrObject: string | { url: string } | null) => Promise<string | null>;
+}> = ({ image, title, getImageUrl }) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      if (!image) {
+        setLoading(false);
+        return;
+      }
+
+      const url = await getImageUrl(image);
+      setImageUrl(url);
+      setLoading(false);
+    };
+
+    loadImage();
+  }, [image, getImageUrl]);
+
+  return (
+    <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+      {loading ? (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+          <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+        </div>
+      ) : imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            target.parentElement!.innerHTML = `
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+                <svg class="w-16 h-16 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14"></path>
+                </svg>
+              </div>
+            `;
+          }}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+          <svg className="w-16 h-16 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14" />
+          </svg>
+        </div>
+      )}
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      
+      {/* Read more indicator */}
+      <div className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
       </div>
     </div>
   );
