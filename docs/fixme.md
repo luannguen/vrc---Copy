@@ -21,6 +21,7 @@
 - ✅ **CSS Iframe Detection**: Implemented fallback styles for iframe contexts before hydration completes
 - ✅ **Tools Admin Integration**: Implemented complete CRUD API for Tools collection with routing conflict resolution
 - ✅ **Lexical Rich Text Format Fix - About Page**: Fixed parsing error with Rich Text in seed API and admin interface
+- ✅ **FormSubmissions Admin Group Integration**: Integrated built-in FormSubmissions into "Liên hệ & Phản hồi" group with ContactSubmissions for better admin organization
 
 ## ABOUT PAGE MEDIA URL FIX
 
@@ -282,3 +283,102 @@ const createRichText = (text: string) => {
 - ✅ Lexical editor có thể phân tích cấu trúc Rich Text từ API
 - ✅ Admin panel có thể chỉnh sửa nội dung About page
 - ✅ API seed-about-page hoạt động chính xác
+
+## FORM SUBMISSIONS DUAL COLLECTION ISSUE - JUNE 1, 2025
+
+### Vấn đề
+
+Contact form submissions đang được lưu vào 2 collections khác nhau:
+1. **`form-submissions`** (built-in từ formBuilderPlugin) - Payload CMS native collection
+2. **`contact-submissions`** (custom collection) - Collection riêng với Vietnamese interface
+
+Admin users muốn thấy tất cả contact submissions trong `contact-submissions` collection nhưng dữ liệu đang được phân tán.
+
+### Nguyên nhân
+
+1. **Dual API Architecture**: `/api/contact-form` ban đầu chỉ lưu vào `form-submissions`
+2. **Plugin Integration**: FormSubmissions được tạo tự động bởi formBuilderPlugin
+3. **Admin Interface**: ContactSubmissions có UI và fields tốt hơn cho Vietnamese context
+4. **Data Separation**: Dữ liệu bị tách ra 2 nơi khác nhau
+
+### Giải pháp tạm thời (CÁCH 1) - ĐÃ ÁP DỤNG
+
+**File:** `backend/src/app/api/contact-form/route.ts`
+
+Cập nhật API để lưu dữ liệu vào CẢ HAI collections:
+
+```typescript
+// Create form submission (original - for formBuilderPlugin)
+const formSubmission = await payload.create({
+  collection: 'form-submissions',
+  data: {
+    form: formToUse,
+    submissionData,
+  },
+});
+
+// ALSO create contact submission (for admin convenience)
+const contactSubmission = await payload.create({
+  collection: 'contact-submissions',
+  data: {
+    name,
+    email,
+    phone: phone || '',
+    subject: subject || 'general',
+    message,
+    status: 'new',
+  }
+});
+```
+
+### Ưu điểm của giải pháp hiện tại
+
+1. **✅ Immediate Solution**: Admin có thể thấy dữ liệu ngay trong `contact-submissions`
+2. **✅ Backward Compatibility**: FormSubmissions vẫn hoạt động bình thường
+3. **✅ Vietnamese Interface**: ContactSubmissions có labels và options tiếng Việt
+4. **✅ No Breaking Changes**: Existing workflows không bị ảnh hưởng
+
+### Vấn đề cần xem xét
+
+1. **❌ Data Duplication**: Cùng một submission được lưu 2 lần
+2. **❌ Sync Issues**: Nếu chỉnh sửa một collection, collection kia không được update
+3. **❌ Storage Overhead**: Database size tăng do duplicate data
+4. **❌ Maintenance**: Phải maintain 2 collections cùng lúc
+
+### Các giải pháp tối ưu hơn (TODO)
+
+**CÁCH 2: Migration Script + Single Collection**
+```bash
+# Migrate all form-submissions to contact-submissions
+# Then update API to only use contact-submissions
+# Remove form-submissions from admin interface
+```
+
+**CÁCH 3: Custom Admin View**
+```typescript
+// Create custom admin component that aggregates both collections
+// Display unified view without data duplication
+// Smart mapping between FormSubmissions and ContactSubmissions
+```
+
+**CÁCH 4: FormBuilder Plugin Override**
+```typescript
+// Override formBuilderPlugin to use custom ContactSubmissions
+// Maintain single source of truth
+// Leverage plugin features with custom collection
+```
+
+### Quyết định
+
+- **Hiện tại**: Sử dụng CÁCH 1 (dual collection) cho immediate needs
+- **Tương lai**: Evaluate CÁCH 3 (custom admin view) để tránh data duplication
+- **Priority**: Medium (hoạt động được nhưng cần tối ưu hóa)
+
+### Related Files
+
+- `backend/src/app/api/contact-form/route.ts` - API endpoint with dual save
+- `backend/src/collections/ContactSubmissions.ts` - Custom collection
+- `backend/src/plugins/index.ts` - FormBuilder plugin config
+- `docs/form-submissions-integration-guide.md` - Integration documentation
+
+---

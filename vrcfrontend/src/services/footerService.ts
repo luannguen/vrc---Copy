@@ -71,7 +71,6 @@ class FooterService {
       return this.getFallbackFooterData();
     }
   }
-
   /**
    * Process raw API response to footer data
    */
@@ -79,12 +78,15 @@ class FooterService {
     // Fix logo URL - convert from API format to correct URL
     let logoUrl = data.logo?.url || '';
     
+    // Get base URL from environment
+    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
+    
     // Convert /api/media/file/ to correct format
     if (logoUrl.startsWith('/api/media/file/')) {
       const filename = logoUrl.replace('/api/media/file/', '');
-      logoUrl = `http://localhost:3000/media/${filename}`;
+      logoUrl = `${baseUrl}/media/${filename}`;
     } else if (logoUrl.startsWith('/media/')) {
-      logoUrl = `http://localhost:3000${logoUrl}`;
+      logoUrl = `${baseUrl}${logoUrl}`;
     }
 
     return {

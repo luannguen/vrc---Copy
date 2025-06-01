@@ -235,18 +235,44 @@ export const CompanyInfo: GlobalConfig = {
           label: 'Google Maps Embed URL',
           type: 'text',
           admin: {
-            description: 'URL iframe của Google Maps (src từ thẻ iframe)'
+            description: 'URL iframe của Google Maps để nhúng bản đồ (lấy từ Google Maps > Share > Embed a map)'
           }
         },
         {
           name: 'latitude',
-          label: 'Vĩ độ',
-          type: 'text',
+          label: 'Vĩ độ (Latitude)',
+          type: 'number',
+          admin: {
+            description: 'Tọa độ vĩ độ của địa điểm (ví dụ: 10.771594)'
+          }
         },
         {
           name: 'longitude',
-          label: 'Kinh độ',
-          type: 'text',
+          label: 'Kinh độ (Longitude)',
+          type: 'number',
+          admin: {
+            description: 'Tọa độ kinh độ của địa điểm (ví dụ: 106.699168)'
+          }
+        },
+        {
+          name: 'mapZoom',
+          label: 'Mức zoom bản đồ',
+          type: 'number',
+          defaultValue: 15,
+          min: 1,
+          max: 20,
+          admin: {
+            description: 'Mức zoom của bản đồ (1-20, 15 là mặc định)'
+          }
+        },
+        {
+          name: 'showMapControls',
+          label: 'Hiển thị điều khiển bản đồ',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: {
+            description: 'Cho phép zoom, pan và các điều khiển khác trên bản đồ'
+          }
         }
       ]
     },    {

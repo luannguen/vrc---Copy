@@ -624,6 +624,8 @@ export interface FormBlock {
   blockType: 'formBlock';
 }
 /**
+ * Quản lý templates và cấu hình các form
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "forms".
  */
@@ -1825,6 +1827,8 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Các phản hồi từ form liên hệ và các form khác
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
@@ -3274,11 +3278,25 @@ export interface CompanyInfo {
   };
   maps?: {
     /**
-     * URL iframe của Google Maps (src từ thẻ iframe)
+     * URL iframe của Google Maps để nhúng bản đồ (lấy từ Google Maps > Share > Embed a map)
      */
     googleMapsEmbed?: string | null;
-    latitude?: string | null;
-    longitude?: string | null;
+    /**
+     * Tọa độ vĩ độ của địa điểm (ví dụ: 10.771594)
+     */
+    latitude?: number | null;
+    /**
+     * Tọa độ kinh độ của địa điểm (ví dụ: 106.699168)
+     */
+    longitude?: number | null;
+    /**
+     * Mức zoom của bản đồ (1-20, 15 là mặc định)
+     */
+    mapZoom?: number | null;
+    /**
+     * Cho phép zoom, pan và các điều khiển khác trên bản đồ
+     */
+    showMapControls?: boolean | null;
   };
   additionalInfo?: {
     root: {
@@ -3749,6 +3767,8 @@ export interface CompanyInfoSelect<T extends boolean = true> {
         googleMapsEmbed?: T;
         latitude?: T;
         longitude?: T;
+        mapZoom?: T;
+        showMapControls?: T;
       };
   additionalInfo?: T;
   logo?: T;

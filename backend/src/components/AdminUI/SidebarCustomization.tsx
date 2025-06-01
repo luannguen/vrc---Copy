@@ -18,27 +18,27 @@ const SidebarCustomization: React.FC = () => {
   useEffect(() => {
     // Không thực thi bất cứ logic DOM nào nếu chưa mount
     if (!isMounted) return;
-    
+
     // Function to add group icons and enhance visibility
     const enhanceSidebar = () => {
       const sidebarElement = document.querySelector('.payload-sidebar');
       if (!sidebarElement) return;
-      
+
       // Add custom class for styling
       sidebarElement.classList.add('vrc-enhanced-sidebar');
-      
+
       // Add title tooltips to long collection names that might be truncated
       const collectionLinks = document.querySelectorAll('.nav__link[href*="/admin/collections/"]');
       collectionLinks.forEach(link => {
         const label = link.querySelector('.nav__label');
         if (label && label.textContent) {
           (link as HTMLElement).title = label.textContent.trim();
-          
+
           // Add icons for specific collections
           const href = (link as HTMLAnchorElement).getAttribute('href') || '';
           const iconContainer = document.createElement('span');
           iconContainer.className = 'collection-icon';
-          
+
           if (href.includes('/product-categories')) {
             // Product categories icon
             iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3zM12 3v18M3 12h18"/></svg>`;
@@ -57,24 +57,23 @@ const SidebarCustomization: React.FC = () => {
           }
         }
       });
-      
+
       // Add group counters (number of collections in each group)
       const groups = document.querySelectorAll('.nav-group');
       groups.forEach(group => {
         const collectionList = group.querySelector('.nav-group__content');
         if (!collectionList) return;
-        
+
         const collections = collectionList.querySelectorAll('.nav__link');
         const countBadge = document.createElement('span');
         countBadge.className = 'group-counter';
         countBadge.textContent = String(collections.length);
-        
+
         const groupTitle = group.querySelector('.nav-group__toggle-label');
         if (groupTitle && !groupTitle.querySelector('.group-counter')) {
           groupTitle.appendChild(countBadge);
         }
-        
-        // Add icons for product-related groups
+          // Add icons for specific groups
         const groupTitleText = groupTitle?.textContent?.trim() || '';
         if (groupTitleText === 'Sản phẩm' && !groupTitle?.querySelector('.group-icon')) {
           const groupIcon = document.createElement('span');
@@ -82,17 +81,24 @@ const SidebarCustomization: React.FC = () => {
           groupIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><rect x="6" y="10" width="12" height="12"/><path d="M12 6v14"/></svg>`;
           groupTitle?.insertBefore(groupIcon, groupTitle.firstChild);
         }
+
+        if (groupTitleText === 'Liên hệ & Phản hồi' && !groupTitle?.querySelector('.group-icon')) {
+          const groupIcon = document.createElement('span');
+          groupIcon.className = 'group-icon';
+          groupIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`;
+          groupTitle?.insertBefore(groupIcon, groupTitle.firstChild);
+        }
       });
     };
-    
+
     // Run initially - tăng timeout để đảm bảo DOM đã hoàn toàn sẵn sàng
     const initialTimeout = setTimeout(enhanceSidebar, 1000);
-    
+
     // Set up mutation observer to handle dynamic updates
     const observer = new MutationObserver((_mutations) => {
       enhanceSidebar();
     });
-    
+
     // Start observing the sidebar
     const sidebar = document.querySelector('.payload-sidebar');
     if (sidebar) {
@@ -101,7 +107,7 @@ const SidebarCustomization: React.FC = () => {
         subtree: true
       });
     }
-    
+
     // Add counter styles - chỉ thêm style khi đã mount
     const styleElement = document.createElement('style');
     styleElement.textContent = `
@@ -119,12 +125,12 @@ const SidebarCustomization: React.FC = () => {
         font-size: 12px;
         font-weight: 500;
       }
-      
+
       .nav-group:has(.nav__link--active) .nav-group__toggle .group-counter {
         background-color: var(--theme-success-500);
         color: white;
       }
-      
+
       /* Collection icons */
       .collection-icon {
         display: inline-flex;
@@ -133,7 +139,7 @@ const SidebarCustomization: React.FC = () => {
         color: var(--theme-text);
         opacity: 0.7;
       }
-      
+
       /* Group icons */
       .group-icon {
         display: inline-flex;
@@ -141,32 +147,32 @@ const SidebarCustomization: React.FC = () => {
         margin-right: 8px;
         color: var(--theme-text);
       }
-      
+
       /* Improve link hover states */
       .nav__link:hover {
         background-color: var(--theme-elevation-100);
         border-radius: 4px;
       }
-      
+
       .nav__link:hover .collection-icon {
         opacity: 1;
         color: var(--theme-success-500);
       }
-      
+
       /* Highlight active link */
       .nav__link--active {
         background-color: var(--theme-success-100) !important;
         border-radius: 4px;
         font-weight: 600;
       }
-      
+
       .nav__link--active .collection-icon {
         opacity: 1;
         color: var(--theme-success-500);
       }
     `;
     document.head.appendChild(styleElement);
-    
+
     // Return cleanup function tập trung tại một điểm
     return () => {
       clearTimeout(initialTimeout);
@@ -185,7 +191,7 @@ export default SidebarCustomization;
 // Nếu vẫn gặp lỗi hydration, hãy uncomment đoạn này và comment dòng export default ở trên
 /*
 import dynamic from 'next/dynamic';
-export default dynamic(() => Promise.resolve(SidebarCustomization), { 
-  ssr: false 
+export default dynamic(() => Promise.resolve(SidebarCustomization), {
+  ssr: false
 });
 */

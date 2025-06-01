@@ -101,6 +101,24 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Also create a record in contact-submissions for admin convenience
+    try {
+      await payload.create({
+        collection: 'contact-submissions',
+        data: {
+          name,
+          email,
+          phone: phone || '',
+          subject: subject || 'general',
+          message,
+          status: 'new',
+        },
+      });
+    } catch (error) {
+      console.warn('Could not create contact submission record:', error);
+      // Don't fail the entire request if this fails
+    }
+
     // Get confirmation message from the form template
     let confirmationMessage = 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.';
 

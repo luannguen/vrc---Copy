@@ -10,7 +10,7 @@ import useAdminGroupState from '../../hooks/useAdminGroupState';
 const AdminStyleCustomization: React.FC = () => {
   // Use the custom hook to manage group states
   useAdminGroupState();
-  
+
   useEffect(() => {
     // Create style element
     const styleElement = document.createElement('style');
@@ -76,11 +76,15 @@ const AdminStyleCustomization: React.FC = () => {
       /* Media Group */
       .nav-group:has([href*="/admin/collections/media"]) .nav-group__toggle::before {
         content: "📸";
-      }
-
-      /* Users Group */
+      }      /* Users Group */
       .nav-group:has([href*="/admin/collections/users"]) .nav-group__toggle::before {
         content: "👤";
+      }
+
+      /* Contact & Feedback Group */
+      .nav-group:has([href*="/admin/collections/contact-submissions"]) .nav-group__toggle::before,
+      .nav-group:has([href*="/admin/collections/form-submissions"]) .nav-group__toggle::before {
+        content: "📬";
       }
 
       /* Active group highlighting */
@@ -102,10 +106,10 @@ const AdminStyleCustomization: React.FC = () => {
         padding-bottom: 4px;
       }
     `;
-    
+
     // Append style to head
     document.head.appendChild(styleElement);
-    
+
     // Cleanup when component unmounts
     return () => {
       document.head.removeChild(styleElement);

@@ -72,6 +72,12 @@ export interface CompanyInfo {
     embedUrl?: string;
     latitude?: number;
     longitude?: number;
+  };  maps?: {
+    googleMapsEmbed?: string;
+    latitude?: number;
+    longitude?: number;
+    mapZoom?: number;
+    showMapControls?: boolean;
   };
   // Add other company info fields
 }

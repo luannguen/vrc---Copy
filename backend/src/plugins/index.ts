@@ -60,6 +60,10 @@ export const plugins: Plugin[] = [
       payment: false,
     },
     formOverrides: {
+      admin: {
+        group: 'Tin tức & Bài viết',
+        description: 'Quản lý templates và cấu hình các form',
+      },
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
           if ('name' in field && field.name === 'confirmationMessage') {
@@ -78,6 +82,14 @@ export const plugins: Plugin[] = [
           }
           return field
         })
+      },
+    },
+    formSubmissionOverrides: {
+      admin: {
+        group: 'Liên hệ & Phản hồi',
+        description: 'Các phản hồi từ form liên hệ và các form khác',
+        useAsTitle: 'form',
+        defaultColumns: ['form', 'createdAt'],
       },
     },
   }),

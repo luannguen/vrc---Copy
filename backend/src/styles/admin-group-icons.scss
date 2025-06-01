@@ -76,6 +76,12 @@
   content: "👤";
 }
 
+/* Contact & Feedback Group */
+.nav-group:has([href*="/admin/collections/contact-submissions"]) .nav-group__toggle::before,
+.nav-group:has([href*="/admin/collections/form-submissions"]) .nav-group__toggle::before {
+  content: "📬";
+}
+
 /* Active group highlighting */
 .nav-group:has(.nav__link--active) .nav-group__toggle {
   color: var(--theme-success-500);

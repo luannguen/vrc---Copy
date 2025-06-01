@@ -11,20 +11,23 @@ export default defineConfig(({ mode }) => {
   // Sử dụng mock function thay vì import trực tiếp
   const componentTagger = mockComponentTagger;
   
+  // Safely get API URL from environment
+  const apiUrl = process.env.VITE_API_URL || 'http://localhost:3000/api';
+  const apiBaseUrl = apiUrl.replace('/api', '');
+  
   return {
     base: "/", // Use absolute paths from root
     test: {
       globals: true,
       environment: 'jsdom',
       setupFiles: './src/test-setup.js',
-    },
-    server: {
+    },    server: {
       host: "::",
       port: 8081, // Đổi sang port 8081 để phù hợp với cấu hình Cypress
       proxy: {
-        // Cấu hình proxy cho các API request
+        // Cấu hình proxy cho các API request sử dụng biến môi trường
         '/api': {
-          target: 'http://localhost:3001',
+          target: apiBaseUrl,
           changeOrigin: true,
           secure: false,
           rewrite: (p) => p.replace(/^\/api/, '')
