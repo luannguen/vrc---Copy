@@ -77,6 +77,7 @@ export interface BannerData {
   link: string;
   sortOrder: number;
   isActive: boolean;
+  [key: string]: unknown;
 }
 
 export interface ProductData {
@@ -89,6 +90,7 @@ export interface ProductData {
   };
   slug: string;
   featured: boolean;
+  [key: string]: unknown;
 }
 
 export interface PostData {
@@ -104,6 +106,7 @@ export interface PostData {
   author?: {
     name: string;
   };
+  [key: string]: unknown;
 }
 
 export interface HomepageSettings {
@@ -119,21 +122,128 @@ export interface HomepageSettings {
   latestPosts?: PostData[];
   selectedPostsData?: PostData[];
   formSubmissionsStats?: FormSubmissionsStats;
+  [key: string]: unknown;
 }
 
 export interface HomepageSettingsResponse {
   success: boolean;
-  data: HomepageSettings;
+  data: ApiHomepageSettingsResponse;
   message?: string;
   error?: string;
 }
 
-class HomepageSettingsService {  /**
+// Types for API Response
+interface ApiImage {
+  url: string;
+  alt?: string;
+  filename?: string;
+  mimeType?: string;
+  filesize?: number;
+  width?: number;
+  height?: number;
+}
+
+interface ApiBannerData {
+  id: string;
+  title: string;
+  subtitle: string;
+  image?: ApiImage;
+  link?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+interface ApiPostData {
+  id: string;
+  title: string;
+  meta?: {
+    description?: string;
+  };
+  publishedAt: string;
+  slug: string;
+  heroImage?: ApiImage;
+}
+
+interface ApiProductData {
+  id: string;
+  name: string;
+  excerpt?: string;
+  mainImage?: ApiImage & {
+    thumbnailURL?: string;
+  };
+  slug: string;
+  featured?: boolean;
+}
+
+interface ApiHomepageSettingsResponse {
+  activeBanners?: ApiBannerData[];
+  latestPosts?: ApiPostData[];
+  featuredProductsData?: ApiProductData[];
+  heroSection?: {
+    enableCarousel?: boolean;
+    autoSlideInterval?: number;
+  };
+  featuredSection?: {
+    isEnabled?: boolean;
+    title?: string;
+    description?: string;
+  };
+  publicationsSection?: {
+    isEnabled?: boolean;
+    numberOfPosts?: number;
+    title?: string;
+  };
+  resourcesSection?: {
+    isEnabled?: boolean;
+    leftPanel?: {
+      title?: string;
+      linkUrl?: string;
+    };
+    rightPanel?: {
+      title?: string;
+      linkUrl?: string;
+    };
+  };
+  contactSection?: {
+    isEnabled?: boolean;
+  };
+  seoSettings?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    ogImage?: ApiImage;
+  };
+  formSubmissionsStats?: {
+    total?: number;
+    thisMonth?: number;
+    pending?: number;
+    lastSubmission?: {
+      id: string;
+      createdAt: string;
+      submissionData?: Array<{ field: string; value: string }>;
+    };
+  };
+  [key: string]: unknown;
+}
+
+class HomepageSettingsService {
+  /**
+   * Convert our HomepageSettings to urlProcessor compatible format
+   */
+  private toUrlProcessorFormat(settings: HomepageSettings): Parameters<typeof processHomepageSettings>[0] {
+    return settings as Parameters<typeof processHomepageSettings>[0];
+  }
+
+  /**
+   * Convert from urlProcessor format back to our HomepageSettings
+   */
+  private fromUrlProcessorFormat(settings: ReturnType<typeof processHomepageSettings>): HomepageSettings {
+    return settings as HomepageSettings;
+  }  /**
    * Transform API response to match our interface
    */
-  private transformApiResponse(apiData: any): HomepageSettings {
+  private transformApiResponse(apiData: ApiHomepageSettingsResponse): HomepageSettings {
     // Transform activeBanners to match BannerData interface
-    const activeBanners: BannerData[] = (apiData.activeBanners || []).map((banner: any) => ({
+    const activeBanners: BannerData[] = (apiData.activeBanners || []).map((banner: ApiBannerData) => ({
       id: banner.id,
       title: banner.title,
       subtitle: banner.subtitle,
@@ -141,18 +251,21 @@ class HomepageSettingsService {  /**
       link: banner.link || '#',
       sortOrder: banner.sortOrder || 0,
       isActive: banner.isActive ?? true
-    }));
-
-    // Transform latest posts to match PostData interface  
-    const latestPosts: PostData[] = (apiData.latestPosts || []).map((post: any) => ({
+    }));    // Transform latest posts to match PostData interface  
+    const latestPosts: PostData[] = (apiData.latestPosts || []).map((post: ApiPostData) => ({
       id: post.id,
       title: post.title,
       excerpt: post.meta?.description || '',
       publishedAt: post.publishedAt,
       slug: post.slug,
-      featuredImage: post.heroImage
-    }));    // Transform featured products to match ProductData interface
-    const featuredProductsData: ProductData[] = (apiData.featuredProductsData || []).map((product: any) => ({
+      featuredImage: post.heroImage ? {
+        url: post.heroImage.url,
+        alt: post.heroImage.alt || post.title
+      } : undefined
+    }));
+
+    // Transform featured products to match ProductData interface
+    const featuredProductsData: ProductData[] = (apiData.featuredProductsData || []).map((product: ApiProductData) => ({
       id: product.id,
       title: product.name,
       description: product.excerpt || '',
@@ -204,13 +317,16 @@ class HomepageSettingsService {  /**
       },      seo: {
         metaTitle: apiData.seoSettings?.metaTitle || '',
         metaDescription: apiData.seoSettings?.metaDescription || '',
-        ogImage: apiData.seoSettings?.ogImage || null
+        ogImage: apiData.seoSettings?.ogImage ? {
+          url: apiData.seoSettings.ogImage.url,
+          alt: apiData.seoSettings.ogImage.alt || ''
+        } : undefined
       },
       formSubmissionsStats: {
         total: apiData.formSubmissionsStats?.total || 0,
         thisMonth: apiData.formSubmissionsStats?.thisMonth || 0,
         pending: apiData.formSubmissionsStats?.pending || 0,
-        lastSubmission: apiData.formSubmissionsStats?.lastSubmission || null
+        lastSubmission: apiData.formSubmissionsStats?.lastSubmission || undefined
       }
     };
   }  /**
@@ -223,19 +339,24 @@ class HomepageSettingsService {  /**
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch homepage settings');
-      }
-
-      // Transform API response to match our interface
+      }      // Transform API response to match our interface
       const transformedData = this.transformApiResponse(response.data);
       
       // Process URLs to fix media paths
-      return processHomepageSettings(transformedData);
+      const urlProcessorData = this.toUrlProcessorFormat(transformedData);
+      const processedData = processHomepageSettings(urlProcessorData);
+      
+      // Handle null case (though it shouldn't happen with valid data)
+      if (!processedData) {
+        throw new Error('Failed to process homepage settings data');
+      }
+      
+      return this.fromUrlProcessorFormat(processedData);
     } catch (error) {
       console.error('Error fetching homepage settings:', error);
       throw error;
     }
   }
-
   /**
    * Update homepage settings (Admin only)
    */
@@ -245,9 +366,16 @@ class HomepageSettingsService {  /**
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to update homepage settings');
+      }      // Transform and process the updated data
+      const transformedData = this.transformApiResponse(response.data);
+      const urlProcessorData = this.toUrlProcessorFormat(transformedData);
+      const processedData = processHomepageSettings(urlProcessorData);
+      
+      if (!processedData) {
+        throw new Error('Failed to process updated homepage settings data');
       }
-
-      return response.data;
+      
+      return this.fromUrlProcessorFormat(processedData);
     } catch (error) {
       console.error('Error updating homepage settings:', error);
       throw error;
