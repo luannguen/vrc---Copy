@@ -86,8 +86,8 @@ const About = () => {
               </div>
             </div>            <div className="relative">
               <img 
-                src="/api/placeholder/500/400"
-                alt="VRC Company History" 
+                src={data.heroSection?.backgroundImage?.url || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=400&fit=crop&crop=center"}
+                alt={data.heroSection?.backgroundImage?.alt || "VRC Company History"} 
                 className="rounded-lg shadow-lg w-full h-auto"
               />
             </div>

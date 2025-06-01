@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { fixMediaUrl } from '../utils/urlProcessor';
 
 // Media interface từ Payload CMS
 interface MediaItem {
@@ -94,9 +95,24 @@ const useAboutPage = () => {
 
         if (!response.ok) {
           throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }        const aboutData = await response.json();
+        
+        // Process media URLs to fix potential port issues
+        if (aboutData.heroSection?.backgroundImage?.url) {
+          aboutData.heroSection.backgroundImage.url = fixMediaUrl(aboutData.heroSection.backgroundImage.url);
         }
-
-        const aboutData = await response.json();
+        
+        // Fix leadership image URLs
+        if (aboutData.leadership) {
+          aboutData.leadership = aboutData.leadership.map((leader: Leader) => ({
+            ...leader,
+            image: leader.image ? {
+              ...leader.image,
+              url: fixMediaUrl(leader.image.url)
+            } : leader.image
+          }));
+        }
+        
         setData(aboutData);
       } catch (err) {
         console.error('Error fetching about page data:', err);

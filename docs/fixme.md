@@ -4,6 +4,7 @@
 
 **Recent Fixes Applied:**
 
+- ✅ **About Page Media URL Fix**: Fixed hardcoded placeholder causing 500 errors by implementing proper API data usage and URL processing
 - ✅ **CORS Logo Loading Fix**: Resolved logo display issues in Header and Footer components by adding CORS headers for static media files
 - ✅ **Component API Standardization**: Unified Logo and Footer components to use the same API calling pattern with useCompanyInfo() hook
 - ✅ **PayloadCMS Admin Panel Save Fix - Tools Collection**: Fixed form data parsing in custom API handlers to handle `_payload` field wrapper
