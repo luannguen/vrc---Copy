@@ -164,6 +164,7 @@ export const AboutPageSettings: GlobalConfig = {
       label: 'Ban lãnh đạo',
       type: 'array',
       fields: [
+        // Thông tin cơ bản
         {
           name: 'name',
           label: 'Họ và tên',
@@ -184,10 +185,125 @@ export const AboutPageSettings: GlobalConfig = {
         },
         {
           name: 'bio',
-          label: 'Tiểu sử',
+          label: 'Tiểu sử ngắn',
           type: 'richText',
           admin: {
-            description: 'Thông tin chi tiết về thành viên',
+            description: 'Mô tả ngắn gọn hiển thị trên card',
+          },
+        },
+        // Thông tin mở rộng cho popup
+        {
+          name: 'experience',
+          label: 'Số năm kinh nghiệm',
+          type: 'text',
+          admin: {
+            description: 'VD: 15 năm, 10+ năm',
+          },
+        },
+        {
+          name: 'education',
+          label: 'Học vấn',
+          type: 'textarea',
+          admin: {
+            description: 'Thông tin về trình độ học vấn',
+          },
+        },
+        {
+          name: 'expertise',
+          label: 'Chuyên môn',
+          type: 'array',
+          fields: [
+            {
+              name: 'skill',
+              label: 'Kỹ năng',
+              type: 'text',
+              required: true,
+            },
+          ],
+          admin: {
+            description: 'Danh sách các lĩnh vực chuyên môn',
+          },
+        },
+        {
+          name: 'achievements',
+          label: 'Thành tích cá nhân',
+          type: 'array',
+          fields: [
+            {
+              name: 'achievement',
+              label: 'Thành tích',
+              type: 'text',
+              required: true,
+            },
+          ],
+          admin: {
+            description: 'Các thành tích, giải thưởng cá nhân',
+          },
+        },
+        {
+          name: 'quote',
+          label: 'Câu nói đặc trưng',
+          type: 'textarea',
+          admin: {
+            description: 'Câu quote hoặc triết lý làm việc',
+          },
+        },
+        {
+          name: 'email',
+          label: 'Email liên hệ',
+          type: 'email',
+          admin: {
+            description: 'Email liên hệ công việc',
+          },
+        },
+        {
+          name: 'linkedin',
+          label: 'LinkedIn URL',
+          type: 'text',
+          admin: {
+            description: 'Đường dẫn LinkedIn profile',
+          },
+        },
+        {
+          name: 'phone',
+          label: 'Số điện thoại',
+          type: 'text',
+          admin: {
+            description: 'Số điện thoại liên hệ',
+          },
+        },
+        {
+          name: 'detailedBio',
+          label: 'Tiểu sử chi tiết',
+          type: 'richText',
+          admin: {
+            description: 'Tiểu sử đầy đủ hiển thị trong popup',
+          },
+        },
+        {
+          name: 'projects',
+          label: 'Dự án tiêu biểu',
+          type: 'array',
+          fields: [
+            {
+              name: 'name',
+              label: 'Tên dự án',
+              type: 'text',
+              required: true,
+            },
+            {
+              name: 'description',
+              label: 'Mô tả',
+              type: 'textarea',
+            },
+            {
+              name: 'year',
+              label: 'Năm thực hiện',
+              type: 'text',
+            },
+          ],
+          admin: {
+            description: 'Các dự án tiêu biểu đã tham gia',
           },
         },
       ],

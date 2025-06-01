@@ -1,8 +1,58 @@
+import { useState } from 'react';
 import useAboutPage from '../hooks/useAboutPage';
+import LeadershipProfileModal from '../components/LeadershipProfileModal';
 import { Eye, Target, Award, Medal, Users, Lightbulb, Heart, FileCheck } from 'lucide-react';
+
+// Define Leadership type (same as in the hook but extended for modal)
+interface RichTextContent {
+  root?: {
+    children?: Array<{
+      children?: Array<{
+        text?: string;
+      }>;
+    }>;
+  };
+}
+
+interface LeadershipProfile {
+  id: string;
+  name: string;
+  position: string;
+  bio: RichTextContent;
+  image?: {
+    url?: string;
+    alt?: string;
+  };
+  detailedBio?: RichTextContent;
+  experience?: string;
+  education?: string;
+  expertise?: Array<{ skill: string }>;
+  achievements?: Array<{ achievement: string }>;
+  quote?: string;
+  email?: string;
+  phone?: string;
+  linkedin?: string;
+  projects?: Array<{
+    name: string;
+    description?: string;
+    year?: string;
+  }>;
+}
 
 const About = () => {
   const { data, loading, error, richTextToPlainText } = useAboutPage();
+  const [selectedProfile, setSelectedProfile] = useState<LeadershipProfile | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleProfileClick = (profile: LeadershipProfile) => {
+    setSelectedProfile(profile);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProfile(null);
+  };
 
   // Loading state
   if (loading) {
@@ -153,7 +203,11 @@ const About = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-primary mb-10 text-center">Đội ngũ lãnh đạo</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {data.leadership?.map((leader, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md">
+              <div 
+                key={index} 
+                className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                onClick={() => handleProfileClick(leader as LeadershipProfile)}
+              >
                 <img 
                   src={leader.image?.url || `https://i.pravatar.cc/300?img=${index + 1}`}
                   alt={leader.image?.alt || leader.name} 
@@ -165,12 +219,15 @@ const About = () => {
                   {leader.bio && (
                     <p className="text-sm mt-2">{richTextToPlainText(leader.bio)}</p>
                   )}
+                  <div className="mt-3 text-sm text-blue-600 font-medium">
+                    Nhấp để xem thêm →
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>      {/* Thành tựu */}
+      </section>{/* Thành tựu */}
       <section className="py-12 md:py-16">
         <div className="container-custom">
           <h2 className="text-2xl md:text-3xl font-bold text-primary mb-10 text-center">Thành tựu nổi bật</h2>
@@ -189,8 +246,7 @@ const About = () => {
                   </li>
                 ))}
               </ul>
-            </div>
-            <div>
+            </div>            <div>
               <ul className="space-y-6">
                 {data.achievements?.slice(Math.ceil(data.achievements.length / 2)).map((achievement, index) => (
                   <li key={index} className="flex gap-4">
@@ -208,6 +264,13 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      {/* Leadership Profile Modal */}
+      <LeadershipProfileModal
+        profile={selectedProfile}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </main>
   );
 };

@@ -3523,7 +3523,7 @@ export interface AboutPageSetting {
         position: string;
         image?: (string | null) | Media;
         /**
-         * Thông tin chi tiết về thành viên
+         * Mô tả ngắn gọn hiển thị trên card
          */
         bio?: {
           root: {
@@ -3540,6 +3540,77 @@ export interface AboutPageSetting {
           };
           [k: string]: unknown;
         } | null;
+        /**
+         * VD: 15 năm, 10+ năm
+         */
+        experience?: string | null;
+        /**
+         * Thông tin về trình độ học vấn
+         */
+        education?: string | null;
+        /**
+         * Danh sách các lĩnh vực chuyên môn
+         */
+        expertise?:
+          | {
+              skill: string;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Các thành tích, giải thưởng cá nhân
+         */
+        achievements?:
+          | {
+              achievement: string;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Câu quote hoặc triết lý làm việc
+         */
+        quote?: string | null;
+        /**
+         * Email liên hệ công việc
+         */
+        email?: string | null;
+        /**
+         * Đường dẫn LinkedIn profile
+         */
+        linkedin?: string | null;
+        /**
+         * Số điện thoại liên hệ
+         */
+        phone?: string | null;
+        /**
+         * Tiểu sử đầy đủ hiển thị trong popup
+         */
+        detailedBio?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        /**
+         * Các dự án tiêu biểu đã tham gia
+         */
+        projects?:
+          | {
+              name: string;
+              description?: string | null;
+              year?: string | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -3819,6 +3890,33 @@ export interface AboutPageSettingsSelect<T extends boolean = true> {
         position?: T;
         image?: T;
         bio?: T;
+        experience?: T;
+        education?: T;
+        expertise?:
+          | T
+          | {
+              skill?: T;
+              id?: T;
+            };
+        achievements?:
+          | T
+          | {
+              achievement?: T;
+              id?: T;
+            };
+        quote?: T;
+        email?: T;
+        linkedin?: T;
+        phone?: T;
+        detailedBio?: T;
+        projects?:
+          | T
+          | {
+              name?: T;
+              description?: T;
+              year?: T;
+              id?: T;
+            };
         id?: T;
       };
   achievements?:

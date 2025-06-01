@@ -759,3 +759,259 @@ POST /api/seed-about-page
 5. ❌ **Don't re-run existing seeds** - data corruption risk
 
 ---
+
+# 🔮 **TÍNH NĂNG MỚI: LEADERSHIP PROFILE POPUP**
+
+## **📋 YÊU CẦU**
+- **Trang Giới thiệu**: Click vào hình lãnh đạo → Popup hiển thị profile chi tiết
+- **Profile mở rộng**: Thêm thông tin như kinh nghiệm, học vấn, thành tích, liên hệ
+- **UI/UX**: Modal popup responsive, có thể đóng bằng ESC hoặc click outside
+
+---
+
+## **📊 PHÂN TÍCH DỮ LIỆU HIỆN TẠI**
+
+### **Cấu trúc Leadership hiện tại**
+```typescript
+leadership: Array<{
+  name: string,        // ✅ Đã có
+  position: string,    // ✅ Đã có  
+  image?: Media,       // ✅ Đã có
+  bio?: richText       // ✅ Đã có (ngắn gọn)
+}>
+```
+
+### **Cấu trúc Leadership mở rộng cần thiết**
+```typescript
+leadership: Array<{
+  // Thông tin cơ bản (đã có)
+  name: string,
+  position: string,
+  image?: Media,
+  bio?: richText,
+  
+  // Thông tin mở rộng cho popup (CẦN THÊM)
+  experience?: string,           // Số năm kinh nghiệm
+  education?: string,            // Học vấn
+  expertise?: string[],          // Chuyên môn/Kỹ năng
+  achievements?: string[],       // Thành tích cá nhân
+  quote?: string,               // Câu nói đặc trưng
+  email?: string,               // Email liên hệ
+  linkedin?: string,            // LinkedIn profile
+  phone?: string,               // Số điện thoại
+  detailedBio?: richText,       // Tiểu sử chi tiết
+  projects?: Array<{            // Dự án tiêu biểu
+    name: string,
+    description: string,
+    year?: string
+  }>
+}>
+```
+
+---
+
+## **🎯 KẾ HOẠCH TRIỂN KHAI**
+
+### **Phase 1: Cập nhật Backend Data Schema (2h)**
+
+#### **Step 1.1: Cập nhật Global Schema**
+File: `backend/src/globals/AboutPageSettings.ts`
+```typescript
+// Mở rộng leadership field
+leadership: {
+  type: 'array',
+  fields: [
+    // Giữ nguyên fields cũ
+    { name: 'name', type: 'text', required: true },
+    { name: 'position', type: 'text', required: true },
+    { name: 'image', type: 'upload', relationTo: 'media' },
+    { name: 'bio', type: 'richText' },
+    
+    // Thêm fields mới cho popup
+    { name: 'experience', type: 'text', label: 'Số năm kinh nghiệm' },
+    { name: 'education', type: 'textarea', label: 'Học vấn' },
+    { name: 'expertise', type: 'array', label: 'Chuyên môn', 
+      fields: [{ name: 'skill', type: 'text' }] },
+    { name: 'achievements', type: 'array', label: 'Thành tích',
+      fields: [{ name: 'achievement', type: 'text' }] },
+    { name: 'quote', type: 'textarea', label: 'Câu nói đặc trưng' },
+    { name: 'email', type: 'email', label: 'Email liên hệ' },
+    { name: 'linkedin', type: 'text', label: 'LinkedIn URL' },
+    { name: 'phone', type: 'text', label: 'Số điện thoại' },
+    { name: 'detailedBio', type: 'richText', label: 'Tiểu sử chi tiết' },
+    { name: 'projects', type: 'array', label: 'Dự án tiêu biểu',
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        { name: 'description', type: 'textarea' },
+        { name: 'year', type: 'text' }
+      ] }
+  ]
+}
+```
+
+#### **Step 1.2: Cập nhật Seed Data**
+File: `backend/src/app/api/seed-about-page/route.ts`
+```typescript
+leadership: [
+  {
+    name: "Nguyễn Văn A",
+    position: "CEO & Founder",
+    image: "team1.jpg",
+    bio: "Lãnh đạo giàu kinh nghiệm trong lĩnh vực công nghệ.",
+    
+    // Dữ liệu mở rộng
+    experience: "15 năm",
+    education: "Thạc sĩ Quản trị Kinh doanh - Đại học Bách Khoa",
+    expertise: ["Quản lý dự án", "Công nghệ thông tin", "Phát triển kinh doanh"],
+    achievements: [
+      "Giải thưởng CEO xuất sắc 2023",
+      "Chứng chỉ PMP quốc tế",
+      "Dẫn dắt 100+ dự án thành công"
+    ],
+    quote: "Thành công không phải là đích đến mà là hành trình không ngừng học hỏi.",
+    email: "ceo@vrc.com",
+    linkedin: "https://linkedin.com/in/nguyen-van-a",
+    phone: "+84 901 234 567",
+    detailedBio: "<!-- Rich text với 2-3 đoạn chi tiết -->",
+    projects: [
+      {
+        name: "VRC ERP System",
+        description: "Hệ thống quản lý tổng thể cho doanh nghiệp",
+        year: "2023"
+      },
+      // ... 2-3 projects khác
+    ]
+  },
+  // ... 3-5 leaders khác với dữ liệu tương tự
+]
+```
+
+### **Phase 2: Cập nhật Frontend Components (3h)**
+
+#### **Step 2.1: Tạo LeadershipModal Component**
+File: `vrcfrontend/src/components/LeadershipModal.tsx`
+```typescript
+interface LeadershipModalProps {
+  leader: LeadershipData;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// Features:
+// - Responsive modal design
+// - Close on ESC/backdrop click  
+// - Sections: Photo, Basic Info, Experience, Education, Projects, Contact
+// - Rich text rendering cho detailedBio
+// - Social media links
+```
+
+#### **Step 2.2: Cập nhật About.tsx**
+```typescript
+// Thêm state cho modal
+const [selectedLeader, setSelectedLeader] = useState<LeadershipData | null>(null);
+
+// Cập nhật leadership card với onClick handler
+<div 
+  key={index} 
+  className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+  onClick={() => setSelectedLeader(leader)}
+>
+  {/* Existing card content */}
+</div>
+
+// Thêm modal component
+<LeadershipModal 
+  leader={selectedLeader}
+  isOpen={!!selectedLeader}
+  onClose={() => setSelectedLeader(null)}
+/>
+```
+
+#### **Step 2.3: Responsive Modal Styling**
+```css
+/* Tailwind classes cho modal */
+- Backdrop: fixed inset-0 bg-black/50 z-50
+- Modal: max-w-4xl mx-auto my-8 bg-white rounded-lg
+- Mobile: full-width với proper spacing
+- Animations: fade-in/slide-up với framer-motion
+```
+
+### **Phase 3: Testing & Polish (1h)**
+
+#### **Step 3.1: Test Cases**
+```bash
+# 1. Test data seeding
+curl -X POST http://localhost:3000/api/seed-about-page
+
+# 2. Verify API response contains expanded data
+curl http://localhost:3000/api/about-page | grep -E "(expertise|projects|education)"
+
+# 3. Frontend testing
+# - Click on leader cards
+# - Modal opens with complete profile
+# - Close modal with ESC/backdrop
+# - Responsive on mobile/desktop
+```
+
+#### **Step 3.2: Error Handling**
+- Missing extended data graceful fallback
+- Image loading errors
+- Modal keyboard navigation (A11y)
+
+---
+
+## **🔧 THỰC THI TECHNICAL NOTES**
+
+### **Data Migration Strategy**
+```typescript
+// Backward compatibility - existing data vẫn hoạt động
+// Extended fields sẽ được populate từ seed
+// Frontend render với optional chaining
+leader.expertise?.map() || []
+leader.projects?.length > 0 && (...)
+```
+
+### **Component Architecture**
+```
+About.tsx
+├── LeadershipSection
+│   ├── LeadershipCard (onClick → modal)
+│   └── LeadershipModal
+│       ├── ProfileHeader (ảnh, tên, chức vụ)
+│       ├── ExperienceSection  
+│       ├── EducationSection
+│       ├── ProjectsSection
+│       └── ContactSection
+```
+
+### **Performance Considerations**
+- Modal lazy load với React.lazy()
+- Image optimization với next/image
+- Modal animation với framer-motion
+- Click outside detection hiệu quả
+
+---
+
+## **⚠️ LƯU Ý QUAN TRỌNG**
+
+1. **Backup Data**: Export existing about-page data trước khi seed mới
+2. **API Key**: Đảm bảo x-api-key header cho all requests  
+3. **Schema Migration**: Server restart sau khi update Global schema
+4. **Testing**: Test trên mobile devices - modal UX quan trọng
+5. **Content**: Chuẩn bị content chất lượng cho expanded profiles
+
+---
+
+## **📅 TIMELINE**
+
+| Phase | Thời gian | Công việc | Status |
+|-------|-----------|-----------|---------|
+| 1.1 | 1h | Update Global Schema & restart server | 🔄 PENDING |
+| 1.2 | 1h | Update seed data với expanded fields | 🔄 PENDING |  
+| 2.1 | 2h | Create LeadershipModal component | 🔄 PENDING |
+| 2.2 | 1h | Update About.tsx với modal integration | 🔄 PENDING |
+| 3 | 1h | Testing, responsive, polish | 🔄 PENDING |
+
+**Tổng thời gian ước tính: 6 giờ**
+
+---
