@@ -108,4 +108,3 @@ class ApiService {
 curl -I -H "Origin: http://localhost:5173" http://localhost:3000/media/logo.svg
 # Expected: access-control-allow-origin: * in response headers
 ```
-

@@ -81,48 +81,139 @@ export const CompanyInfo: GlobalConfig = {
           type: 'text',
         },
       ]
-    },
-    {
+    },    {
       name: 'socialMedia',
       label: 'Mạng xã hội',
       type: 'group',
-      fields: [        {
+      fields: [
+        {
           name: 'facebook',
           label: 'Facebook',
-          type: 'text',
+          type: 'group',
+          fields: [
+            {
+              name: 'url',
+              label: 'Facebook URL',
+              type: 'text',
+            },
+            {
+              name: 'enabled',
+              label: 'Hiển thị trên trang chủ',
+              type: 'checkbox',
+              defaultValue: true,
+            },
+          ],
         },
         {
           name: 'zalo',
           label: 'Zalo',
-          type: 'text',
-          admin: {
-            description: 'Đường dẫn đến trang Zalo của công ty (zalo.me/your_id)'
-          }
+          type: 'group',
+          fields: [
+            {
+              name: 'url',
+              label: 'Zalo URL',
+              type: 'text',
+              admin: {
+                description: 'Đường dẫn đến trang Zalo của công ty (zalo.me/your_id)'
+              }
+            },
+            {
+              name: 'enabled',
+              label: 'Hiển thị trên trang chủ',
+              type: 'checkbox',
+              defaultValue: true,
+            },
+          ],
         },
         {
           name: 'twitter',
-          label: 'Twitter',
-          type: 'text',
+          label: 'Twitter/X',
+          type: 'group',
+          fields: [
+            {
+              name: 'url',
+              label: 'Twitter/X URL',
+              type: 'text',
+            },
+            {
+              name: 'enabled',
+              label: 'Hiển thị trên trang chủ',
+              type: 'checkbox',
+              defaultValue: true,
+            },
+          ],
         },
         {
           name: 'instagram',
           label: 'Instagram',
-          type: 'text',
+          type: 'group',
+          fields: [
+            {
+              name: 'url',
+              label: 'Instagram URL',
+              type: 'text',
+            },
+            {
+              name: 'enabled',
+              label: 'Hiển thị trên trang chủ',
+              type: 'checkbox',
+              defaultValue: true,
+            },
+          ],
         },
         {
           name: 'linkedin',
           label: 'LinkedIn',
-          type: 'text',
+          type: 'group',
+          fields: [
+            {
+              name: 'url',
+              label: 'LinkedIn URL',
+              type: 'text',
+            },
+            {
+              name: 'enabled',
+              label: 'Hiển thị trên trang chủ',
+              type: 'checkbox',
+              defaultValue: true,
+            },
+          ],
         },
         {
           name: 'youtube',
-          label: 'Youtube',
-          type: 'text',
+          label: 'YouTube',
+          type: 'group',
+          fields: [
+            {
+              name: 'url',
+              label: 'YouTube URL',
+              type: 'text',
+            },
+            {
+              name: 'enabled',
+              label: 'Hiển thị trên trang chủ',
+              type: 'checkbox',
+              defaultValue: true,
+            },
+          ],
         },
         {
           name: 'telegram',
           label: 'Telegram',
-          type: 'text',
+          type: 'group',
+          fields: [
+            {
+              name: 'url',
+              label: 'Telegram URL',
+              type: 'text',
+            },
+            {
+              name: 'enabled',
+              label: 'Hiển thị trên trang chủ',
+              type: 'checkbox',
+              defaultValue: true,
+            },
+          ],
         }
       ]
     },
@@ -168,7 +259,7 @@ export const CompanyInfo: GlobalConfig = {
       if (referrer.includes('/admin')) {
         return true;
       }
-      
+
       // For API access, we can't check requireAuth field here
       // because it would cause an infinite loop
       // The actual authentication check will be done in the API endpoint

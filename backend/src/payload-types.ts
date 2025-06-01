@@ -3234,16 +3234,37 @@ export interface CompanyInfo {
     fax?: string | null;
   };
   socialMedia?: {
-    facebook?: string | null;
-    /**
-     * Đường dẫn đến trang Zalo của công ty (zalo.me/your_id)
-     */
-    zalo?: string | null;
-    twitter?: string | null;
-    instagram?: string | null;
-    linkedin?: string | null;
-    youtube?: string | null;
-    telegram?: string | null;
+    facebook?: {
+      url?: string | null;
+      enabled?: boolean | null;
+    };
+    zalo?: {
+      /**
+       * Đường dẫn đến trang Zalo của công ty (zalo.me/your_id)
+       */
+      url?: string | null;
+      enabled?: boolean | null;
+    };
+    twitter?: {
+      url?: string | null;
+      enabled?: boolean | null;
+    };
+    instagram?: {
+      url?: string | null;
+      enabled?: boolean | null;
+    };
+    linkedin?: {
+      url?: string | null;
+      enabled?: boolean | null;
+    };
+    youtube?: {
+      url?: string | null;
+      enabled?: boolean | null;
+    };
+    telegram?: {
+      url?: string | null;
+      enabled?: boolean | null;
+    };
   };
   maps?: {
     /**
@@ -3432,13 +3453,48 @@ export interface CompanyInfoSelect<T extends boolean = true> {
   socialMedia?:
     | T
     | {
-        facebook?: T;
-        zalo?: T;
-        twitter?: T;
-        instagram?: T;
-        linkedin?: T;
-        youtube?: T;
-        telegram?: T;
+        facebook?:
+          | T
+          | {
+              url?: T;
+              enabled?: T;
+            };
+        zalo?:
+          | T
+          | {
+              url?: T;
+              enabled?: T;
+            };
+        twitter?:
+          | T
+          | {
+              url?: T;
+              enabled?: T;
+            };
+        instagram?:
+          | T
+          | {
+              url?: T;
+              enabled?: T;
+            };
+        linkedin?:
+          | T
+          | {
+              url?: T;
+              enabled?: T;
+            };
+        youtube?:
+          | T
+          | {
+              url?: T;
+              enabled?: T;
+            };
+        telegram?:
+          | T
+          | {
+              url?: T;
+              enabled?: T;
+            };
       };
   maps?:
     | T

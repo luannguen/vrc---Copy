@@ -4,7 +4,6 @@
  */
 
 import { apiService } from '../lib/api';
-import { processHeaderInfo, processCompanyInfo } from '../utils/urlProcessor';
 
 // Header Info Types
 export interface ContactInfo {
@@ -16,11 +15,34 @@ export interface ContactInfo {
 }
 
 export interface SocialLinks {
-  facebook?: string;
-  zalo?: string;
-  linkedin?: string;
-  youtube?: string;
-  twitter?: string;
+  facebook?: {
+    url?: string;
+    enabled?: boolean;
+  } | string;
+  zalo?: {
+    url?: string;
+    enabled?: boolean;
+  } | string;
+  linkedin?: {
+    url?: string;
+    enabled?: boolean;
+  } | string;
+  youtube?: {
+    url?: string;
+    enabled?: boolean;
+  } | string;
+  twitter?: {
+    url?: string;
+    enabled?: boolean;
+  } | string;
+  instagram?: {
+    url?: string;
+    enabled?: boolean;
+  } | string;
+  telegram?: {
+    url?: string;
+    enabled?: boolean;
+  } | string;
 }
 
 export interface HeaderInfo {
@@ -32,6 +54,7 @@ export interface HeaderInfo {
   };
   contactSection: ContactInfo;
   socialMediaLinks: SocialLinks;
+  socialMedia?: SocialLinks; // Add the new socialMedia field for backend compatibility
   // Add other header-related fields as needed
 }
 
@@ -44,6 +67,7 @@ export interface CompanyInfo {
   };
   contactSection: ContactInfo;
   socialMediaLinks: SocialLinks;
+  socialMedia?: SocialLinks; // Add the new socialMedia field for backend compatibility
   mapSection?: {
     embedUrl?: string;
     latitude?: number;
@@ -53,16 +77,19 @@ export interface CompanyInfo {
 }
 
 // Header Info API Service
-export class HeaderInfoService {
-  /**
+export class HeaderInfoService {  /**
    * Get header information for the website header
-   */  async getHeaderInfo(): Promise<HeaderInfo> {
+   */  
+  async getHeaderInfo(): Promise<HeaderInfo> {
     try {
       const response = await apiService.get<HeaderInfo>('/header-info');
       
+      // Debug log
+      console.log('HeaderInfo API Response:', response);
+      
       // API trả về trực tiếp dữ liệu, không có wrapper { success, data }
       if (response && typeof response === 'object') {
-        return processHeaderInfo(response);
+        return response;
       }
       
       throw new Error('Invalid header info response format');
@@ -72,16 +99,16 @@ export class HeaderInfoService {
       return this.getFallbackHeaderInfo();
     }
   }
-
   /**
    * Get company information for footer and other components
-   */  async getCompanyInfo(): Promise<CompanyInfo> {
+   */
+  async getCompanyInfo(): Promise<CompanyInfo> {
     try {
       const response = await apiService.get<CompanyInfo>('/company-info');
       
       // API trả về trực tiếp dữ liệu, không có wrapper { success, data }
       if (response && typeof response === 'object') {
-        return processCompanyInfo(response);
+        return response;
       }
       
       throw new Error('Invalid company info response format');
