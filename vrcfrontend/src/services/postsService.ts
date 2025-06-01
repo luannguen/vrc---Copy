@@ -6,6 +6,7 @@ export interface Post {
   content: string;
   excerpt?: string;
   featuredImage?: string;
+  image?: string; // For backward compatibility
   author?: string;
   publishDate: string;
   tags?: string[];
@@ -14,6 +15,12 @@ export interface Post {
   published?: boolean;
   createdAt: string;
   updatedAt: string;
+  // Additional properties for backward compatibility
+  location?: string;
+  organizer?: string;
+  comments?: number;
+  views?: number;
+  type?: string;
 }
 
 export interface PostsResponse {

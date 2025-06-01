@@ -4,6 +4,7 @@
 
 **Recent Fixes Applied:**
 
+- ✅ **Zalo Chat Widget Fix - Contact Page**: Fixed Zalo chat icon not showing chat bubble in "Kết nối với chúng tôi" section by correcting ZaloChatWidget rendering condition
 - ✅ **About Page Media URL Fix**: Fixed hardcoded placeholder causing 500 errors by implementing proper API data usage and URL processing
 - ✅ **CORS Logo Loading Fix**: Resolved logo display issues in Header and Footer components by adding CORS headers for static media files
 - ✅ **Component API Standardization**: Unified Logo and Footer components to use the same API calling pattern with useCompanyInfo() hook
@@ -380,5 +381,66 @@ const contactSubmission = await payload.create({
 - `backend/src/collections/ContactSubmissions.ts` - Custom collection
 - `backend/src/plugins/index.ts` - FormBuilder plugin config
 - `docs/form-submissions-integration-guide.md` - Integration documentation
+
+---
+
+## ZALO CHAT WIDGET FIX - CONTACT PAGE
+
+### Vấn đề
+
+Icon Zalo trong phần "Kết nối với chúng tôi" ở trang Contact không hiển thị được bong bóng chat khi click, trong khi icon Zalo ở Footer hoạt động bình thường.
+
+### Nguyên nhân
+
+**1. Condition render ZaloChatWidget khác nhau:**
+
+Contact page (có vấn đề):
+```tsx
+{isZaloChatOpen && socialMedia?.zalo && typeof socialMedia.zalo === 'object' && socialMedia.zalo.oaId && (
+  <ZaloChatWidget ... />
+)}
+```
+
+Footer (hoạt động tốt):
+```tsx
+{typeof socialMedia?.zalo === 'object' && socialMedia.zalo?.oaId && (
+  <ZaloChatWidget ... />
+)}
+```
+
+**2. Logic render sai:** ZaloChatWidget chỉ được render vào DOM khi `isZaloChatOpen` là `true`. Điều này có nghĩa là khi click vào icon Zalo lần đầu, component chưa tồn tại trong DOM nên không thể hiển thị.
+
+**3. Component lifecycle:** Widget cần được render trước rồi mới có thể control visibility thông qua prop `isOpen`.
+
+### Giải pháp đã áp dụng
+
+**File:** `vrcfrontend/src/pages/Contact.tsx`
+
+```tsx
+// BEFORE - ❌ Widget chỉ render khi isZaloChatOpen = true
+{isZaloChatOpen && socialMedia?.zalo && typeof socialMedia.zalo === 'object' && socialMedia.zalo.oaId && (
+  <ZaloChatWidget
+    oaId={socialMedia.zalo.oaId}
+    isOpen={isZaloChatOpen}
+    onClose={() => setIsZaloChatOpen(false)}
+  />
+)}
+
+// AFTER - ✅ Widget luôn render nhưng chỉ hiển thị khi isOpen = true
+{typeof socialMedia?.zalo === 'object' && socialMedia.zalo?.oaId && (
+  <ZaloChatWidget
+    oaId={socialMedia.zalo.oaId}
+    isOpen={isZaloChatOpen}
+    onClose={() => setIsZaloChatOpen(false)}
+  />
+)}
+```
+
+### Kết quả
+
+- ✅ Zalo chat widget hoạt động bình thường ở cả Footer và Contact page
+- ✅ Bong bóng chat hiển thị khi click vào icon Zalo
+- ✅ Logic render thống nhất giữa các components
+- ✅ Component lifecycle được xử lý đúng cách
 
 ---
