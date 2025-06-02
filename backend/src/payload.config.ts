@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 import { Categories } from './collections/Categories'
 import { EventCategories } from './collections/EventCategories'
 import { Events } from './collections/Events'
+import { EventRegistrations } from './collections/EventRegistrations'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
@@ -104,6 +105,7 @@ export default buildConfig({  admin: {
     Projects,
     EventCategories,
     Events,
+    EventRegistrations,
     Services,
     Technologies,
     Tools,

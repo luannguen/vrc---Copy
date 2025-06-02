@@ -7,7 +7,7 @@ export const seedCompanyInfo = async (payload: Payload) => {
   try {
     // Initialize progress bar
     progressManager.initProgressBar(1, 'Creating company info');
-    
+
     // Check if company info already exists
     const existingGlobal = await payload.findGlobal({
       slug: 'company-info',
@@ -27,7 +27,7 @@ export const seedCompanyInfo = async (payload: Payload) => {
         collection: 'media',
         limit: 1,
       });
-      
+
       if (media?.docs && media.docs.length > 0 && media.docs[0]?.id) {
         defaultMediaId = media.docs[0].id;
       }
@@ -50,20 +50,40 @@ export const seedCompanyInfo = async (payload: Payload) => {
           hotline: '1900 1234',
           workingHours: 'Thứ Hai - Thứ Sáu: 8:00 - 17:30 | Thứ Bảy: 8:00 - 12:00',
           fax: '+84 28 1234 5679',
-        },
-        socialMedia: {
-          facebook: 'https://facebook.com/vrcrefrigeration',
-          zalo: 'https://zalo.me/vrcrefrigeration',
-          youtube: 'https://youtube.com/vrcrefrigeration',
-          linkedin: 'https://linkedin.com/company/vrcrefrigeration',
-          twitter: '',
-          instagram: '',
-          telegram: ''
-        },
-        maps: {
+        },        socialMedia: {
+          facebook: {
+            url: 'https://facebook.com/vrcrefrigeration',
+            enabled: true
+          },
+          zalo: {
+            url: '0987654321',
+            oaId: '',
+            enabled: true
+          },
+          youtube: {
+            url: 'https://youtube.com/vrcrefrigeration',
+            enabled: true
+          },
+          linkedin: {
+            url: 'https://linkedin.com/company/vrcrefrigeration',
+            enabled: true
+          },
+          twitter: {
+            url: '',
+            enabled: false
+          },
+          instagram: {
+            url: '',
+            enabled: false
+          },
+          telegram: {
+            url: '',
+            enabled: false
+          }
+        },        maps: {
           googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197667!2d106.69856857486687!3d10.77994445927126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4670702e31%3A0xe5dfce8a215bd9ab!2zMTIzIMSQLiBMw6ogTOG7o2ksIELhur9uIE5naMOpLCBRdeG6rW4gMSwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1682316476091!5m2!1svi!2s',
-          latitude: '10.779945',
-          longitude: '106.698569'
+          latitude: 10.779945,
+          longitude: 106.698569
         },
         additionalInfo: {
           root: {
@@ -89,11 +109,11 @@ export const seedCompanyInfo = async (payload: Payload) => {
         },        logo: defaultMediaId
       },
     });
-    
+
     // Increment progress bar
     progressManager.increment();
     progressManager.complete();
-    
+
     console.log('✅ Successfully seeded company info');
   } catch (error) {
     console.error('Error seeding company info:', error);

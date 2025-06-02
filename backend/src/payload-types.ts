@@ -82,6 +82,7 @@ export interface Config {
     projects: Project;
     'event-categories': EventCategory;
     events: Event;
+    'event-registrations': EventRegistration;
     services: Service;
     technologies: Technology;
     tools: Tool;
@@ -113,6 +114,7 @@ export interface Config {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'event-categories': EventCategoriesSelect<false> | EventCategoriesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
     tools: ToolsSelect<false> | ToolsSelect<true>;
@@ -1213,6 +1215,41 @@ export interface Event {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Đăng ký tham gia sự kiện
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations".
+ */
+export interface EventRegistration {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  organization?: string | null;
+  jobTitle?: string | null;
+  eventTitle: string;
+  /**
+   * ID của sự kiện (có thể là ID nội bộ hoặc ID bên ngoài)
+   */
+  eventId?: string | null;
+  participationType: 'in-person' | 'online' | 'hybrid';
+  dietaryRequirements?: ('none' | 'vegetarian' | 'vegan' | 'gluten-free' | 'other') | null;
+  dietaryNote?: string | null;
+  accessibilityNeeds?: string | null;
+  interests?: string | null;
+  experience?: ('beginner' | 'intermediate' | 'expert') | null;
+  heardAbout?: ('website' | 'social-media' | 'email' | 'word-of-mouth' | 'other') | null;
+  status?: ('pending' | 'confirmed' | 'attended' | 'absent' | 'cancelled') | null;
+  confirmationSent?: boolean | null;
+  reminderSent?: boolean | null;
+  /**
+   * Chỉ admin thấy được các ghi chú này
+   */
+  adminNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Quản lý dịch vụ và thông tin liên quan
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2038,6 +2075,10 @@ export interface PayloadLockedDocument {
         value: string | Event;
       } | null)
     | ({
+        relationTo: 'event-registrations';
+        value: string | EventRegistration;
+      } | null)
+    | ({
         relationTo: 'services';
         value: string | Service;
       } | null)
@@ -2657,6 +2698,32 @@ export interface EventsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations_select".
+ */
+export interface EventRegistrationsSelect<T extends boolean = true> {
+  fullName?: T;
+  email?: T;
+  phone?: T;
+  organization?: T;
+  jobTitle?: T;
+  eventTitle?: T;
+  eventId?: T;
+  participationType?: T;
+  dietaryRequirements?: T;
+  dietaryNote?: T;
+  accessibilityNeeds?: T;
+  interests?: T;
+  experience?: T;
+  heardAbout?: T;
+  status?: T;
+  confirmationSent?: T;
+  reminderSent?: T;
+  adminNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

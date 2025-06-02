@@ -18,12 +18,13 @@ import { handleDELETE } from '../handlers/delete';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
+    const { id } = await params;
     // Convert id from params to query parameter format expected by the handler
     const url = new URL(request.url);
-    url.searchParams.set('id', params.id);
+    url.searchParams.set('id', id);
 
     // Create a new request with the modified URL
     const modifiedRequest = new NextRequest(url, {
@@ -47,12 +48,13 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
+    const { id } = await params;
     // Convert id from params to query parameter format expected by the handler
     const url = new URL(request.url);
-    url.searchParams.set('id', params.id);
+    url.searchParams.set('id', id);
 
     // Create a new request with the modified URL
     const modifiedRequest = new NextRequest(url, {
@@ -76,12 +78,13 @@ export async function PUT(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
+    const { id } = await params;
     // Convert id from params to query parameter format expected by the handler
     const url = new URL(request.url);
-    url.searchParams.set('id', params.id);
+    url.searchParams.set('id', id);
 
     // Create a new request with the modified URL
     const modifiedRequest = new NextRequest(url, {
@@ -105,12 +108,13 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
   try {
+    const { id } = await params;
     // Convert id from params to query parameter format expected by the handler
     const url = new URL(request.url);
-    url.searchParams.set('id', params.id);
+    url.searchParams.set('id', id);
 
     // Create a new request with the modified URL
     const modifiedRequest = new NextRequest(url, {

@@ -1,0 +1,281 @@
+.event-registration-dashboard {
+  padding: 20px;
+  font-family: system-ui, sans-serif;
+}
+
+.event-registration-dashboard h2 {
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.event-registration-dashboard h3 {
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  padding: 40px;
+}
+
+.error button {
+  margin-top: 10px;
+  padding: 8px 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.stat-card.total {
+  background: #f8f9fa;
+}
+
+.stat-card.pending {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+}
+
+.stat-card.confirmed {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.stat-card.cancelled {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.stat-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.stat-card.pending h3 {
+  color: #856404;
+}
+
+.stat-card.confirmed h3 {
+  color: #155724;
+}
+
+.stat-card.cancelled h3 {
+  color: #721c24;
+}
+
+.stat-card .number {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-card.pending .number {
+  color: #856404;
+}
+
+.stat-card.confirmed .number {
+  color: #155724;
+}
+
+.stat-card.cancelled .number {
+  color: #721c24;
+}
+
+.participation-stats {
+  margin-bottom: 32px;
+}
+
+.participation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.participation-card {
+  padding: 16px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.participation-card.in-person {
+  background: #e3f2fd;
+}
+
+.participation-card.online {
+  background: #f3e5f5;
+}
+
+.participation-card.hybrid {
+  background: #e8f5e8;
+}
+
+.participation-card .number {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.participation-card.in-person .number {
+  color: #1976d2;
+}
+
+.participation-card.online .number {
+  color: #7b1fa2;
+}
+
+.participation-card.hybrid .number {
+  color: #388e3c;
+}
+
+.participation-card .label {
+  font-size: 12px;
+  color: #666;
+}
+
+.recent-registrations {
+  margin-bottom: 32px;
+}
+
+.registrations-list {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.registration-item {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.registration-item:not(:last-child) {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.registration-info .name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.registration-info .email,
+.registration-info .event {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.registration-meta {
+  text-align: right;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.status-badge.confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.registration-date {
+  font-size: 12px;
+  color: #666;
+}
+
+.registration-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn.confirm {
+  background: #28a745;
+  color: white;
+}
+
+.btn.email {
+  background: #007bff;
+  color: white;
+}
+
+.no-registrations {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.quick-actions {
+  margin-top: 32px;
+}
+
+.actions-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.action-btn.primary {
+  background: #007bff;
+  color: white;
+}
+
+.action-btn.success {
+  background: #28a745;
+  color: white;
+}
+
+.action-btn.secondary {
+  background: #6c757d;
+  color: white;
+}

@@ -573,7 +573,7 @@ export const seedEvents = async (payload: Payload): Promise<void> => {
           participants: eventData.maxParticipants,
           featured: eventData.featured,
           categories: validCategories,
-          tags: eventData.tags.map(tag => ({ tag })),
+          tags: [], // TODO: Need to create and map proper category IDs for tags
           status: 'upcoming' as const,
           publishStatus: 'published' as const,
           _status: 'published' as const,

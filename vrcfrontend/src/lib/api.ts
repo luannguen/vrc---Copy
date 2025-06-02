@@ -6,7 +6,11 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// For development: Use relative paths for proxy to work correctly
+// For production: Use full backend URL
+const API_BASE_URL = import.meta.env.NODE_ENV === 'development' 
+  ? '' 
+  : (import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api';
 const API_KEY = import.meta.env.VITE_PUBLIC_API_KEY || 'vrc-api-2024-secure';
 const API_TIMEOUT = 30000; // 30 seconds
 
@@ -137,7 +141,9 @@ export { apiClient };
 
 // Media URL helper function
 export const getMediaUrl = (filename: string): string => {
-  const baseUrl = API_BASE_URL.replace('/api', ''); // Remove /api from base URL
+  const baseUrl = import.meta.env.NODE_ENV === 'development' 
+    ? 'http://localhost:3000' 
+    : (import.meta.env.VITE_API_URL || 'http://localhost:3000');
   return `${baseUrl}/media/${filename}`;
 };
 

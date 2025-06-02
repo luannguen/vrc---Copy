@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useEvent } from "@/hooks/useEvents";
 import { EventsUtils } from "@/services/eventsApi";
 import { useTranslation } from "react-i18next";
+import EventRegistrationForm from "@/components/EventRegistrationForm";
 
 // Fallback data for when API is not available
 const fallbackEventData: Record<string, any> = {
@@ -504,19 +505,35 @@ const EventDetail = () => {
                   )}
                 </div>
 
-                <Separator className="my-6" />
-
-                {/* Action Buttons */}
+                <Separator className="my-6" />                {/* Action Buttons */}
                 <div className="space-y-3">
-                  <Button className="w-full" size="lg">
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => {
+                      document.getElementById('registration-form')?.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }}
+                  >
                     Đăng ký tham gia
                   </Button>
                   <Button variant="outline" className="w-full">
                     Tải tài liệu
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </CardContent>            </Card>            {/* Event Registration Form */}
+            <div id="registration-form">
+              <EventRegistrationForm 
+                eventId={event.id} 
+                eventTitle={event.title}
+                onSuccess={() => {
+                  // Optional: Handle successful registration
+                  console.log('Registration successful');
+                }}
+              />
+            </div>
 
             {/* Related Events */}
             <Card>
