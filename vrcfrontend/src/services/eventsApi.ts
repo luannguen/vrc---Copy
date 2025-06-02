@@ -130,8 +130,7 @@ export class EventsApi {
 }
 
 // Utility functions for API data transformation
-export class EventsUtils {
-  // Transform API event to frontend format
+export class EventsUtils {  // Transform API event to frontend format
   static transformEvent(apiEvent: Event): Event {
     return {
       ...apiEvent,
@@ -139,7 +138,7 @@ export class EventsUtils {
       startDate: apiEvent.startDate,
       endDate: apiEvent.endDate || apiEvent.startDate,
       // Extract summary from content if not provided
-      summary: apiEvent.summary || this.extractSummaryFromContent(apiEvent.content),
+      summary: apiEvent.summary || EventsUtils.extractSummaryFromContent(apiEvent.content),
       // Default values
       participants: apiEvent.participants || 0,
       tags: apiEvent.tags || [],
@@ -186,8 +185,9 @@ export class EventsUtils {
         return 'Bản nháp';
       default:
         return status;
-    }
-  }  // Get featured image URL with fallback
+    }  }
+
+  // Get featured image URL with fallback
   static getImageUrl(event: Event, size: 'thumbnail' | 'card' | 'tablet' | 'original' = 'card'): string {
     if (!event.featuredImage) {
       return '/assets/images/default-event.jpg'; // Default image

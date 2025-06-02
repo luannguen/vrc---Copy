@@ -1199,12 +1199,10 @@ export interface Event {
    */
   eventType?: ('exhibition' | 'workshop' | 'training' | 'conference' | 'other') | null;
   participants?: number | null;
-  tags?:
-    | {
-        tag: string;
-        id?: string | null;
-      }[]
-    | null;
+  /**
+   * Chọn các thẻ cho sự kiện (để phân loại và tìm kiếm)
+   */
+  tags?: (string | Category)[] | null;
   status: 'upcoming' | 'ongoing' | 'past';
   featured?: boolean | null;
   publishStatus: 'draft' | 'published';
@@ -2650,12 +2648,7 @@ export interface EventsSelect<T extends boolean = true> {
   categories?: T;
   eventType?: T;
   participants?: T;
-  tags?:
-    | T
-    | {
-        tag?: T;
-        id?: T;
-      };
+  tags?: T;
   status?: T;
   featured?: T;
   publishStatus?: T;

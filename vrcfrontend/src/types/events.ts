@@ -81,20 +81,16 @@ export interface EventsResponse {
 }
 
 export interface EventCategoriesResponse {
-  success: boolean;
-  message: string;
-  data: {
-    docs: EventCategory[];
-    totalDocs: number;
-    limit: number;
-    totalPages: number;
-    page: number;
-    pagingCounter: number;
-    hasPrevPage: boolean;
-    hasNextPage: boolean;
-    prevPage?: number;
-    nextPage?: number;
-  };
+  docs: EventCategory[];
+  totalDocs: number;
+  limit: number;
+  totalPages: number;
+  page: number;
+  pagingCounter: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  prevPage?: number;
+  nextPage?: number;
 }
 
 export interface EventsApiParams {
@@ -113,6 +109,15 @@ export interface EventCategoryCount {
   slug: string;
   count: number;
 }
+
+// Static category structure (fallback)
+export interface StaticCategoryCount {
+  name: string;
+  count: number;
+}
+
+// Union type for category display
+export type CategoryDisplay = EventCategoryCount | StaticCategoryCount;
 
 export interface EventCategoryCountResponse {
   success: boolean;

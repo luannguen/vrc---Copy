@@ -96,9 +96,8 @@ export function useEventCategories() {
         setError(null);
         
         const response: EventCategoriesResponse = await EventsApi.getEventCategories();
-        
-        // Remove duplicates and sort by order
-        const uniqueCategories = response.data.docs
+          // Remove duplicates and sort by order
+        const uniqueCategories = response.docs
           .filter((category, index, self) => 
             index === self.findIndex(c => c.name === category.name)
           )

@@ -82,7 +82,7 @@ export const Events: CollectionConfig = {
       name: 'categories',
       type: 'relationship',
       label: 'Danh mục sự kiện',
-      relationTo: 'event-categories' as any,
+      relationTo: 'event-categories',
       hasMany: true,
       required: true,
       admin: {
@@ -126,18 +126,21 @@ export const Events: CollectionConfig = {
       type: 'number',
       label: 'Số lượng người tham dự dự kiến',
       min: 0,
-    },
-    {
+    },    {
       name: 'tags',
-      type: 'array',
+      type: 'relationship',
       label: 'Thẻ',
-      fields: [
-        {
-          name: 'tag',
-          type: 'text',
-          required: true,
+      relationTo: 'categories',
+      hasMany: true,
+      filterOptions: {
+        type: {
+          equals: 'tag',
         },
-      ],
+      },
+      admin: {
+        position: 'sidebar',
+        description: 'Chọn các thẻ cho sự kiện (để phân loại và tìm kiếm)',
+      },
     },
     {
       name: 'status',

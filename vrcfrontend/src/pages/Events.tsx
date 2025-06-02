@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { SearchIcon } from "@/components/ui/search-icon";
 import { useEvents, useEventsFilters, useEventCategories, useFilteredEvents, useEventCategoryCounts } from "@/hooks/useEvents";
 import { EventsUtils } from "@/services/eventsApi";
+import { CategoryDisplay } from "@/types/events";
 
 // Dữ liệu mẫu cho sự kiện
 const eventItems = [
@@ -110,18 +111,49 @@ const categories = [
 const Events = () => {
   // API Integration: Use filtered events with category support
   const { filters, updateFilter, updatePage, resetFilters } = useEventsFilters();
+  
+  // Debug logging
+  console.log('Events filters:', filters);
+  
   const { events: apiEvents, loading, error, pagination } = useFilteredEvents(filters);
   const { categories: apiCategories, loading: categoriesLoading, error: categoriesError } = useEventCategories();
   const { categoryCounts, totalEvents, loading: countsLoading } = useEventCategoryCounts();
+
+  // Debug logging for data
+  console.log('API Events:', apiEvents);
+  console.log('Category Counts:', categoryCounts);
+  console.log('Total Events:', totalEvents);
 
   // Fallback to static data if API fails (for smooth transition)
   const hasApiData = apiEvents.length > 0 && !error;
   const hasApiCategories = apiCategories.length > 0 && !categoriesError;
   const hasCategoryCounts = categoryCounts.length > 0 && !countsLoading;
-  
-  // Use API data or fallback to static data
+    // Use API data or fallback to static data
   const events = hasApiData ? apiEvents : eventItems;
   const categoriesForDisplay = hasCategoryCounts ? categoryCounts : categories;
+    // Helper functions to safely access category properties
+  const getCategoryId = (category: CategoryDisplay): string => {
+    return 'id' in category ? category.id : category.name;
+  };
+  
+  const getCategoryDisplayName = (category: CategoryDisplay): string => {
+    return category.name;
+  };
+  
+  const isCategorySelected = (category: CategoryDisplay): boolean => {
+    const categoryId = getCategoryId(category);
+    return filters.category === categoryId;
+  };
+  
+  const getSelectedCategoryName = (): string | undefined => {
+    if (!filters.category) return undefined;
+    
+    const selectedCategory = categoriesForDisplay.find(cat => 
+      getCategoryId(cat) === filters.category
+    );
+    return selectedCategory ? getCategoryDisplayName(selectedCategory) : undefined;
+  };
+  
     // Get featured event (first event with featured=true or first event)
   const featuredEvent = hasApiData 
     ? apiEvents.find(event => event.featured) || apiEvents[0]
@@ -251,9 +283,8 @@ const Events = () => {
                     aria-label="Chọn danh mục"
                     value={filters.category || ''}
                     onChange={(e) => updateFilter('category', e.target.value || undefined)}
-                  >
-                    <option value="">Tất cả danh mục</option>                    {categoriesForDisplay.map((cat) => {
-                      const categoryId = 'id' in cat ? (cat as any).id : cat.name;
+                  >                    <option value="">Tất cả danh mục</option>                    {categoriesForDisplay.map((cat) => {
+                      const categoryId = getCategoryId(cat);
                       return (
                         <option key={categoryId} value={categoryId}>
                           {cat.name} ({cat.count})
@@ -287,12 +318,11 @@ const Events = () => {
                 </div>
               </div>
             </div>            {/* Danh sách sự kiện */}
-            <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-primary border-b border-gray-200 pb-2">
+            <div className="space-y-8">              <h2 className="text-2xl font-bold text-primary border-b border-gray-200 pb-2">
                 Sự kiện 
-                {filters.category && hasCategoryCounts && (
+                {filters.category && (
                   <span className="text-base font-normal text-gray-600">
-                    - {categoryCounts.find(cat => cat.id === filters.category)?.name}
+                    - {getSelectedCategoryName()}
                   </span>
                 )}
                 {filters.status && (
@@ -441,13 +471,12 @@ const Events = () => {
                         {totalEvents}
                       </span>
                     </button>
-                  </li>
-                  {/* Category filters */}
+                  </li>                  {/* Category filters */}
                   {categoriesForDisplay.map((category, index) => (
                     <li key={index}>
                       <button 
-                        onClick={() => updateFilter('category', category.name)}
-                        className={`w-full flex justify-between items-center py-2 hover:text-primary text-left ${filters.category === category.name ? 'text-primary font-medium' : ''}`}
+                        onClick={() => updateFilter('category', getCategoryId(category))}
+                        className={`w-full flex justify-between items-center py-2 hover:text-primary text-left ${isCategorySelected(category) ? 'text-primary font-medium' : ''}`}
                       >
                         <span>{category.name}</span>
                         <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs">

@@ -45,7 +45,11 @@ const fallbackEventData: Record<string, any> = {
     organizer: "Hiệp hội Điện lạnh Việt Nam",
     participants: 2500,
     categories: [{ id: "1", name: "Triển lãm" }],
-    tags: ["Triển lãm", "Điều hòa", "Công nghệ làm lạnh"],
+    tags: [
+      { id: "tag1", title: "Triển lãm", slug: "trien-lam" },
+      { id: "tag2", title: "Điều hòa", slug: "dieu-hoa" },
+      { id: "tag3", title: "Công nghệ làm lạnh", slug: "cong-nghe-lam-lanh" }
+    ],
     status: "upcoming"  },
   "2": {
     id: "2",
@@ -75,7 +79,11 @@ const fallbackEventData: Record<string, any> = {
     organizer: "VRC",
     participants: 350,
     categories: [{ id: "2", name: "Hội thảo" }],
-    tags: ["Tiết kiệm năng lượng", "Công nghệ mới", "Hệ thống lạnh"],
+    tags: [
+      { id: "tag4", title: "Tiết kiệm năng lượng", slug: "tiet-kiem-nang-luong" },
+      { id: "tag5", title: "Công nghệ mới", slug: "cong-nghe-moi" },
+      { id: "tag6", title: "Hệ thống lạnh", slug: "he-thong-lanh" }
+    ],
     status: "upcoming"  },
   "3": {
     id: "3",
@@ -107,7 +115,11 @@ const fallbackEventData: Record<string, any> = {
     organizer: "VRC Academy",
     participants: 180,
     categories: [{ id: "3", name: "Đào tạo" }],
-    tags: ["Đào tạo", "Bảo trì", "Kỹ thuật viên"],    status: "upcoming"
+    tags: [
+      { id: "tag7", title: "Đào tạo", slug: "dao-tao" },
+      { id: "tag8", title: "Bảo trì", slug: "bao-tri" },
+      { id: "tag9", title: "Kỹ thuật viên", slug: "ky-thuat-vien" }
+    ],    status: "upcoming"
   }
 };
 
@@ -281,16 +293,22 @@ const EventDetail = () => {
                   {/* Tags */}
                 {event.tags && event.tags.length > 0 && (
                   <div className="mt-8 pt-6 border-t">
-                    <h3 className="text-lg font-semibold mb-3">Từ khóa</h3>
-                    <div className="flex flex-wrap gap-2">
+                    <h3 className="text-lg font-semibold mb-3">Từ khóa</h3>                    <div className="flex flex-wrap gap-2">
                       {event.tags.map((tag, index) => {
-                        // Handle both string and object tags
-                        const tagText = typeof tag === 'string' ? tag : tag?.name || tag?.tag || String(tag);
+                        // Handle tags from relationship (object) or fallback data (string)
+                        const tagText = typeof tag === 'string' ? tag : tag?.title || tag?.name || tag?.tag || String(tag);                        const tagSlug = typeof tag === 'string' ? tag.toLowerCase().replace(/\s+/g, '-') : tag?.slug || tag.toLowerCase().replace(/\s+/g, '-');
+                        
                         return (
-                          <Badge key={index} variant="outline">
-                            <Tag className="mr-1 h-3 w-3" />
-                            {tagText}
-                          </Badge>
+                          <Link 
+                            key={index} 
+                            to={`/events?tag=${tagSlug}`}
+                            className="inline-flex items-center"
+                          >
+                            <Badge variant="outline" className="hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer">
+                              <Tag className="mr-1 h-3 w-3" />
+                              {tagText}
+                            </Badge>
+                          </Link>
                         );
                       })}
                     </div>
