@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { SearchIcon } from "@/components/ui/search-icon";
-import { useEvents, useEventsFilters, useEventCategories } from "@/hooks/useEvents";
+import { useEvents, useEventsFilters, useEventCategories, useFilteredEvents, useEventCategoryCounts } from "@/hooks/useEvents";
 import { EventsUtils } from "@/services/eventsApi";
 
 // Dữ liệu mẫu cho sự kiện
@@ -108,26 +108,26 @@ const categories = [
 ];
 
 const Events = () => {
-  // API Integration: Replace static data with API calls
+  // API Integration: Use filtered events with category support
   const { filters, updateFilter, updatePage, resetFilters } = useEventsFilters();
-  const { events: apiEvents, loading, error, pagination } = useEvents(filters);
+  const { events: apiEvents, loading, error, pagination } = useFilteredEvents(filters);
   const { categories: apiCategories, loading: categoriesLoading, error: categoriesError } = useEventCategories();
+  const { categoryCounts, totalEvents, loading: countsLoading } = useEventCategoryCounts();
 
   // Fallback to static data if API fails (for smooth transition)
   const hasApiData = apiEvents.length > 0 && !error;
   const hasApiCategories = apiCategories.length > 0 && !categoriesError;
+  const hasCategoryCounts = categoryCounts.length > 0 && !countsLoading;
   
   // Use API data or fallback to static data
   const events = hasApiData ? apiEvents : eventItems;
-  const categoriesForDisplay = hasApiCategories ? apiCategories.map(cat => ({ 
-    name: cat.name, 
-    count: 0 // TODO: Count events per category
-  })) : categories;
-  
-  // Get featured event (first event with featured=true or first event)
+  const categoriesForDisplay = hasCategoryCounts ? categoryCounts : categories;
+    // Get featured event (first event with featured=true or first event)
   const featuredEvent = hasApiData 
     ? apiEvents.find(event => event.featured) || apiEvents[0]
-    : eventItems[0];  // Helper functions to handle both API and static data formats
+    : eventItems[0];
+
+  // Helper functions to handle both API and static data formats
   const getEventImage = (event: any) => {
     if (hasApiData && event.featuredImage) {
       return EventsUtils.getImageUrl(event, 'card');
@@ -145,7 +145,6 @@ const Events = () => {
   const getEventEndDate = (event: any) => {
     return event.endDate || event.startDate;
   };
-
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -161,6 +160,25 @@ const Events = () => {
     } else {
       return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Đã kết thúc</Badge>;
     }
+  };
+
+  // Additional helper functions for event data
+  const getImageUrl = (event: any) => {
+    if (hasApiData && event.featuredImage) {
+      return EventsUtils.getImageUrl(event, 'card');
+    }
+    return event.image || '/assets/images/default-event.jpg';
+  };
+
+  const getCategoryName = (event: any) => {
+    if (hasApiData && event.categories && event.categories.length > 0) {
+      return event.categories[0].name;
+    }
+    return event.category || 'Sự kiện';
+  };
+
+  const getEventStatus = (event: any) => {
+    return event.status || 'upcoming';
   };
 
   return (
@@ -179,9 +197,10 @@ const Events = () => {
       <div className="container-custom py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content */}
-          <div className="lg:col-span-2">
-            {/* Sự kiện nổi bật */}
-            <div className="mb-10">              <div className="aspect-video rounded-lg overflow-hidden mb-4">
+          <div className="lg:col-span-2">            {/* Sự kiện nổi bật */}
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold text-primary mb-4">Sự kiện nổi bật</h2>
+              <div className="aspect-video rounded-lg overflow-hidden mb-4">
                 <img 
                   src={getEventImage(featuredEvent)} 
                   alt={featuredEvent?.title || 'Event image'}
@@ -221,23 +240,36 @@ const Events = () => {
                   <ChevronRight size={16} className="ml-1" />
                 </Link>
               </Button>
-            </div>
-
-            {/* Bộ lọc sự kiện */}
+            </div>            {/* Bộ lọc sự kiện */}
             <div className="mb-8 bg-white p-4 rounded-lg shadow-sm">
               <h3 className="text-lg font-medium mb-4">Lọc sự kiện</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm mb-1">Danh mục</label>                  <select className="w-full rounded border border-gray-300 p-2" aria-label="Chọn danh mục">
-                    <option value="">Tất cả danh mục</option>
-                    {categoriesForDisplay.map((cat, idx) => (
-                      <option key={idx} value={cat.name}>{cat.name}</option>
-                    ))}
+                  <label className="block text-sm mb-1">Danh mục</label>
+                  <select 
+                    className="w-full rounded border border-gray-300 p-2" 
+                    aria-label="Chọn danh mục"
+                    value={filters.category || ''}
+                    onChange={(e) => updateFilter('category', e.target.value || undefined)}
+                  >
+                    <option value="">Tất cả danh mục</option>                    {categoriesForDisplay.map((cat) => {
+                      const categoryId = 'id' in cat ? (cat as any).id : cat.name;
+                      return (
+                        <option key={categoryId} value={categoryId}>
+                          {cat.name} ({cat.count})
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm mb-1">Trạng thái</label>
-                  <select className="w-full rounded border border-gray-300 p-2">
+                  <select 
+                    className="w-full rounded border border-gray-300 p-2"
+                    aria-label="Chọn trạng thái"
+                    value={filters.status || ''}
+                    onChange={(e) => updateFilter('status', e.target.value || undefined)}
+                  >
                     <option value="">Tất cả trạng thái</option>
                     <option value="upcoming">Sắp diễn ra</option>
                     <option value="ongoing">Đang diễn ra</option>
@@ -245,41 +277,75 @@ const Events = () => {
                   </select>
                 </div>
                 <div className="self-end">
-                  <Button className="w-full">Áp dụng</Button>
+                  <Button 
+                    className="w-full mr-2"
+                    onClick={resetFilters}
+                    variant="outline"
+                  >
+                    Đặt lại
+                  </Button>
                 </div>
               </div>
-            </div>
-
-            {/* Danh sách sự kiện */}
+            </div>            {/* Danh sách sự kiện */}
             <div className="space-y-8">
               <h2 className="text-2xl font-bold text-primary border-b border-gray-200 pb-2">
-                Sự kiện sắp tới
+                Sự kiện 
+                {filters.category && hasCategoryCounts && (
+                  <span className="text-base font-normal text-gray-600">
+                    - {categoryCounts.find(cat => cat.id === filters.category)?.name}
+                  </span>
+                )}
+                {filters.status && (
+                  <span className="text-base font-normal text-gray-600">
+                    - {filters.status === 'upcoming' ? 'Sắp tới' : filters.status === 'ongoing' ? 'Đang diễn ra' : 'Đã kết thúc'}
+                  </span>
+                )}
               </h2>
               
-              <div className="space-y-6">
-                {eventItems.filter(event => event.status === "upcoming").map(event => (
-                  <div key={event.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row">
-                    <div className="md:w-1/3">
-                      <img 
-                        src={event.image} 
-                        alt={event.title}
-                        className="w-full h-full object-cover" 
-                      />
-                    </div>
-                    
-                    <div className="p-4 md:w-2/3 flex flex-col">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs">
-                          {event.category}
-                        </span>
-                        {getStatusBadge(event.status)}
+              {/* Loading state */}
+              {loading && (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="ml-2 text-gray-600">Đang tải sự kiện...</span>
+                </div>
+              )}
+
+              {/* Error state */}
+              {error && !loading && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
+                  <p>Có lỗi xảy ra khi tải sự kiện: {error}</p>
+                  <Button onClick={() => window.location.reload()} className="mt-2" variant="outline">
+                    Thử lại
+                  </Button>
+                </div>
+              )}
+
+              {/* Events list */}
+              {!loading && !error && events.length > 0 && (
+                <div className="space-y-6">
+                  {events.map(event => (
+                    <div key={event.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row">
+                      <div className="md:w-1/3">
+                        <img 
+                          src={getImageUrl(event)} 
+                          alt={event.title}
+                          className="w-full h-full object-cover" 
+                        />
                       </div>
                       
-                      <h3 className="text-lg font-bold text-primary mb-2 hover:text-accent">
-                        <Link to={`/event-details/${event.id}`}>
-                          {event.title}
-                        </Link>
-                      </h3>
+                      <div className="p-4 md:w-2/3 flex flex-col">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs">
+                            {getCategoryName(event)}
+                          </span>
+                          {getStatusBadge(getEventStatus(event))}
+                        </div>
+                        
+                        <h3 className="text-lg font-bold text-primary mb-2 hover:text-accent">
+                          <Link to={`/event-details/${event.id}`}>
+                            {event.title}
+                          </Link>
+                        </h3>
                       
                       <p className="text-muted-foreground text-sm mb-3 flex-grow">
                         {event.summary}
@@ -289,66 +355,54 @@ const Events = () => {
                         <div className="flex items-center">
                           <CalendarIcon size={14} className="mr-1 flex-shrink-0" />
                           <span className="truncate">{formatDate(event.startDate)}{event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</span>
-                        </div>
-                        <div className="flex items-center">
+                        </div>                        <div className="flex items-center">
                           <MapPin size={14} className="mr-1 flex-shrink-0" />
                           <span className="truncate">{event.location}</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-              
-              <Separator className="my-8" />
-              
-              <h2 className="text-2xl font-bold text-primary border-b border-gray-200 pb-2">
-                Sự kiện đã diễn ra
-              </h2>
-              
-              <div className="space-y-6">
-                {eventItems.filter(event => event.status === "past").map(event => (
-                  <div key={event.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row">
-                    <div className="md:w-1/3">
-                      <img 
-                        src={event.image} 
-                        alt={event.title}
-                        className="w-full h-full object-cover grayscale opacity-90" 
-                      />
-                    </div>
-                    
-                    <div className="p-4 md:w-2/3 flex flex-col">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs">
-                          {event.category}
-                        </span>
-                        {getStatusBadge(event.status)}
-                      </div>
-                      
-                      <h3 className="text-lg font-bold text-primary mb-2 hover:text-accent">
-                        <Link to={`/event-details/${event.id}`}>
-                          {event.title}
-                        </Link>
-                      </h3>
-                      
-                      <p className="text-muted-foreground text-sm mb-3 flex-grow">
-                        {event.summary}
-                      </p>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground mt-auto">
-                        <div className="flex items-center">
-                          <CalendarIcon size={14} className="mr-1 flex-shrink-0" />
-                          <span className="truncate">{formatDate(event.startDate)}{event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <MapPin size={14} className="mr-1 flex-shrink-0" />
-                          <span className="truncate">{event.location}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Empty state */}
+              {!loading && !error && events.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Không tìm thấy sự kiện nào phù hợp với bộ lọc hiện tại.</p>
+                  <Button onClick={resetFilters} className="mt-4" variant="outline">
+                    Xóa bộ lọc
+                  </Button>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {!loading && !error && events.length > 0 && pagination.pages > 1 && (
+                <div className="flex justify-center items-center space-x-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updatePage(pagination.page - 1)}
+                    disabled={!pagination.hasPrevPage}
+                  >
+                    Trước
+                  </Button>
+                  
+                  <span className="text-sm text-gray-600">
+                    Trang {pagination.page} / {pagination.pages} 
+                    ({pagination.total} sự kiện)
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updatePage(pagination.page + 1)}
+                    disabled={!pagination.hasNextPage}
+                  >
+                    Sau
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           
@@ -362,9 +416,8 @@ const Events = () => {
                   type="text" 
                   placeholder="Tìm kiếm sự kiện..." 
                   className="flex-grow border rounded-l-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <button className="bg-primary text-white px-4 py-2 rounded-r-md">
-                  <SearchIcon size={18} />
+                />                <button className="bg-primary text-white px-4 py-2 rounded-r-md" aria-label="Tìm kiếm">
+                  <SearchIcon className="w-[18px] h-[18px]" />
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { Event, EventsResponse, EventCategory, EventCategoriesResponse, EventsApiParams } from '@/types/events';
+import { Event, EventsResponse, EventCategory, EventCategoriesResponse, EventsApiParams, EventCategoryCountResponse, FilteredEventsResponse } from '@/types/events';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 
@@ -75,6 +75,55 @@ export class EventsApi {
       return await response.json();
     } catch (error) {
       console.error('Error fetching event categories:', error);
+      throw error;
+    }
+  }
+
+  // Get filtered events with category support
+  static async getFilteredEvents(params?: EventsApiParams): Promise<FilteredEventsResponse> {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.status) queryParams.append('status', params.status);
+      if (params?.featured !== undefined) queryParams.append('featured', params.featured.toString());
+      if (params?.eventType) queryParams.append('eventType', params.eventType);
+      if (params?.category) queryParams.append('category', params.category);
+
+      const url = `${API_BASE_URL}/events/filtered${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch filtered events: ${response.status} ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching filtered events:', error);
+      throw error;
+    }
+  }
+
+  // Get event counts by category
+  static async getEventCountsByCategory(): Promise<EventCategoryCountResponse> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/events/count-by-category`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch category counts: ${response.status} ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching category counts:', error);
       throw error;
     }
   }

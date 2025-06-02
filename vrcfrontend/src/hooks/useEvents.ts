@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Event, EventsResponse, EventCategory, EventCategoriesResponse, EventsApiParams } from '@/types/events';
+import { Event, EventsResponse, EventCategory, EventCategoriesResponse, EventsApiParams, EventCategoryCountResponse, FilteredEventsResponse, EventCategoryCount } from '@/types/events';
 import { EventsApi, EventsUtils } from '@/services/eventsApi';
 
 // Custom hook for fetching events
@@ -120,6 +120,90 @@ export function useEventCategories() {
     categories,
     loading,
     error,
+  };
+}
+
+// Custom hook for fetching filtered events with category support
+export function useFilteredEvents(params?: EventsApiParams) {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    pages: 1,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
+  const fetchFilteredEvents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response: FilteredEventsResponse = await EventsApi.getFilteredEvents(params);
+      
+      // Transform API events to frontend format
+      const transformedEvents = response.data.events.map(EventsUtils.transformEvent);
+      
+      setEvents(transformedEvents);
+      setPagination(response.data.pagination);
+    } catch (err) {
+      console.error('Error fetching filtered events:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch filtered events');
+    } finally {
+      setLoading(false);
+    }
+  }, [params]);
+
+  useEffect(() => {
+    fetchFilteredEvents();
+  }, [fetchFilteredEvents]);
+
+  return {
+    events,
+    loading,
+    error,
+    pagination,
+    refetch: fetchFilteredEvents,
+  };
+}
+
+// Custom hook for fetching event counts by category
+export function useEventCategoryCounts() {
+  const [categoryCounts, setCategoryCounts] = useState<EventCategoryCount[]>([]);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCategoryCounts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response: EventCategoryCountResponse = await EventsApi.getEventCountsByCategory();
+      
+      setCategoryCounts(response.data);
+      setTotalEvents(response.totalEvents);
+    } catch (err) {
+      console.error('Error fetching category counts:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch category counts');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategoryCounts();
+  }, [fetchCategoryCounts]);
+
+  return {
+    categoryCounts,
+    totalEvents,
+    loading,
+    error,
+    refetch: fetchCategoryCounts,
   };
 }
 

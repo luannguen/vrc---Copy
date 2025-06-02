@@ -103,4 +103,34 @@ export interface EventsApiParams {
   status?: string;
   featured?: boolean;
   eventType?: string;
+  category?: string; // Added for category filtering
+}
+
+// New interfaces for category filtering
+export interface EventCategoryCount {
+  id: string;
+  name: string;
+  slug: string;
+  count: number;
+}
+
+export interface EventCategoryCountResponse {
+  success: boolean;
+  data: EventCategoryCount[];
+  totalEvents: number;
+}
+
+export interface FilteredEventsResponse {
+  success: boolean;
+  data: {
+    events: Event[];
+    pagination: {
+      total: number;
+      page: number;
+      pages: number;
+      limit: number;
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+    };
+  };
 }
