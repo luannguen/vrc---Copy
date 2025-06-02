@@ -1,5 +1,5 @@
 import { CalendarIcon, ChevronRight, Clock, Eye, MapPin, Tag, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -109,6 +109,9 @@ const categories = [
 ];
 
 const Events = () => {
+  // Get tag parameter from URL
+  const { tag } = useParams<{ tag: string }>();
+  
   // API Integration: Use filtered events with category support
   const { filters, updateFilter, updatePage, resetFilters } = useEventsFilters();
   
@@ -127,10 +130,29 @@ const Events = () => {
   // Fallback to static data if API fails (for smooth transition)
   const hasApiData = apiEvents.length > 0 && !error;
   const hasApiCategories = apiCategories.length > 0 && !categoriesError;
-  const hasCategoryCounts = categoryCounts.length > 0 && !countsLoading;
-    // Use API data or fallback to static data
+  const hasCategoryCounts = categoryCounts.length > 0 && !countsLoading;    // Use API data or fallback to static data
   const events = hasApiData ? apiEvents : eventItems;
   const categoriesForDisplay = hasCategoryCounts ? categoryCounts : categories;
+  
+  // Filter events by tag if tag parameter is present
+  const filteredEvents = tag 
+    ? events.filter(event => {
+        if (hasApiData && event.tags) {
+          // Handle API data - tags might be objects or strings
+          return event.tags.some((eventTag: any) => {
+            const tagText = typeof eventTag === 'string' ? eventTag : eventTag?.title || eventTag?.name || eventTag?.tag;
+            const tagSlug = tagText?.toLowerCase().replace(/\s+/g, '-');
+            return tagSlug === tag;
+          });
+        } else if (event.tags) {
+          // Handle static data - tags are strings
+          return event.tags.some((eventTag: string) => 
+            eventTag.toLowerCase().replace(/\s+/g, '-') === tag
+          );
+        }
+        return false;
+      })
+    : events;
     // Helper functions to safely access category properties
   const getCategoryId = (category: CategoryDisplay): string => {
     return 'id' in category ? category.id : category.name;
@@ -214,14 +236,28 @@ const Events = () => {
   };
 
   return (
-    <main className="flex-grow">
-      {/* Tiêu đề trang */}
+    <main className="flex-grow">      {/* Tiêu đề trang */}
       <div className="bg-gradient-to-b from-primary/10 to-transparent py-8 md:py-12">
         <div className="container-custom">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary">Sự kiện</h1>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary">
+            {tag ? `Sự kiện: ${tag.replace(/-/g, ' ')}` : 'Sự kiện'}
+          </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl">
-            Các sự kiện, hội thảo và triển lãm liên quan đến lĩnh vực điện lạnh và điều hòa không khí
+            {tag 
+              ? `Các sự kiện liên quan đến "${tag.replace(/-/g, ' ')}"` 
+              : 'Các sự kiện, hội thảo và triển lãm liên quan đến lĩnh vực điện lạnh và điều hòa không khí'
+            }
           </p>
+          {tag && (
+            <div className="mt-4">
+              <Link 
+                to="/events" 
+                className="text-primary hover:text-primary/80 underline font-medium"
+              >
+                ← Quay lại tất cả sự kiện
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -353,7 +389,7 @@ const Events = () => {
               {/* Events list */}
               {!loading && !error && events.length > 0 && (
                 <div className="space-y-6">
-                  {events.map(event => (
+                  {filteredEvents.map(event => (
                     <div key={event.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row">
                       <div className="md:w-1/3">
                         <img 
@@ -381,11 +417,10 @@ const Events = () => {
                         {event.summary}
                       </p>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground mt-auto">
-                        <div className="flex items-center">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground mt-auto">                        <div className="flex items-center">
                           <CalendarIcon size={14} className="mr-1 flex-shrink-0" />
-                          <span className="truncate">{formatDate(event.startDate)}{event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</span>
-                        </div>                        <div className="flex items-center">
+                          <span className="truncate">{formatDate(event.startDate)}{getEventEndDate(event) !== event.startDate ? ` - ${formatDate(getEventEndDate(event))}` : ''}</span>
+                        </div><div className="flex items-center">
                           <MapPin size={14} className="mr-1 flex-shrink-0" />
                           <span className="truncate">{event.location}</span>
                         </div>

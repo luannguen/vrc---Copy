@@ -101,6 +101,7 @@ const App = () => (
           <Route path="news/:slug" element={<NewsDetail />} />
           <Route path="tags/:tag" element={<TagPage />} />
           <Route path="events" element={<Events />} />
+          <Route path="events/tag/:tag" element={<Events />} />
           <Route path="event-details/:id" element={<EventDetail />} />
           <Route path="publications" element={<Publications />} />
           <Route path="publications/inverter-technology" element={<InverterTechnology />} />

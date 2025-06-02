@@ -123,6 +123,131 @@ const fallbackEventData: Record<string, any> = {
   }
 };
 
+// Interface for Lexical node structure
+interface LexicalNode {
+  type: string;
+  children?: LexicalNode[];
+  text?: string;
+  format?: number;
+  url?: string;
+  tag?: number | string;
+  listType?: string;
+  direction?: string;
+  indent?: number;
+  version?: number;
+}
+
+// Render Lexical content with enhanced styling
+const renderLexicalContent = (content: any): JSX.Element[] => {
+  if (!content?.root?.children) return [];
+  
+  const renderNode = (node: LexicalNode, index: number): JSX.Element => {
+    switch (node.type) {
+      case 'paragraph':
+        return (
+          <p key={index} className="mb-6 leading-[1.8] text-gray-800 text-lg tracking-wide">
+            {node.children?.map((child, childIndex) => renderNode(child, childIndex))}
+          </p>
+        );
+      
+      case 'heading': {
+        // Extract heading level - handle both string tags like "h3" and numeric levels
+        let headingLevel = 2; // default to h2
+        
+        if (typeof node.tag === 'string' && node.tag.startsWith('h')) {
+          // Extract number from "h3" -> 3
+          const levelMatch = node.tag.match(/h(\d+)/);
+          if (levelMatch) {
+            headingLevel = parseInt(levelMatch[1], 10);
+          }
+        } else if (typeof node.tag === 'number' && !isNaN(node.tag)) {
+          headingLevel = node.tag;
+        }
+        
+        // Ensure level is between 1-6
+        headingLevel = Math.max(1, Math.min(headingLevel, 6));
+        
+        const HeadingTag = `h${headingLevel}` as keyof JSX.IntrinsicElements;
+        const headingClasses = {
+          h1: 'text-4xl font-bold mb-8 text-gray-900 leading-tight border-b-2 border-blue-100 pb-4',
+          h2: 'text-3xl font-bold mb-6 text-gray-900 leading-tight mt-12 first:mt-0',
+          h3: 'text-2xl font-semibold mb-5 text-gray-900 leading-tight mt-10 first:mt-0',
+          h4: 'text-xl font-semibold mb-4 text-gray-900 leading-tight mt-8 first:mt-0',
+          h5: 'text-lg font-semibold mb-3 text-gray-900 leading-tight mt-6 first:mt-0',
+          h6: 'text-base font-semibold mb-3 text-gray-900 leading-tight mt-4 first:mt-0'
+        };
+        
+        return (
+          <HeadingTag key={index} className={headingClasses[HeadingTag] || headingClasses.h2}>
+            {node.children?.map((child, childIndex) => renderNode(child, childIndex))}
+          </HeadingTag>
+        );
+      }
+      
+      case 'list': {
+        const ListTag = node.listType === 'number' ? 'ol' : 'ul';
+        const listClass = node.listType === 'number' 
+          ? 'list-decimal list-outside ml-6 mb-6 space-y-3 text-lg' 
+          : 'list-disc list-outside ml-6 mb-6 space-y-3 text-lg';
+        
+        return (
+          <ListTag key={index} className={listClass}>
+            {node.children?.map((child, childIndex) => renderNode(child, childIndex))}
+          </ListTag>
+        );
+      }
+      
+      case 'listitem':
+        return (
+          <li key={index} className="text-gray-800 leading-relaxed pl-2">
+            {node.children?.map((child, childIndex) => renderNode(child, childIndex))}
+          </li>
+        );
+      
+      case 'text': {
+        let textElement: React.ReactNode = node.text || '';
+        
+        if (node.format) {
+          if (node.format & 1) textElement = <strong key={index} className="font-semibold text-gray-900">{textElement}</strong>; // Bold
+          if (node.format & 2) textElement = <em key={index} className="italic text-gray-700">{textElement}</em>; // Italic
+          if (node.format & 8) textElement = <u key={index} className="underline decoration-blue-400 decoration-2">{textElement}</u>; // Underline
+        }
+        
+        return <span key={index}>{textElement}</span>;
+      }
+      
+      case 'link':
+        return (
+          <a 
+            key={index} 
+            href={node.url} 
+            className="text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 transition-colors duration-200 font-medium"
+            target={node.url?.startsWith('http') ? '_blank' : '_self'}
+            rel={node.url?.startsWith('http') ? 'noopener noreferrer' : undefined}
+          >
+            {node.children?.map((child, childIndex) => renderNode(child, childIndex))}
+          </a>
+        );
+      
+      case 'linebreak':
+        return <br key={index} />;
+      
+      default:
+        // Fallback for unknown node types
+        if (node.children) {
+          return (
+            <div key={index} className="mb-4">
+              {node.children.map((child, childIndex) => renderNode(child, childIndex))}
+            </div>
+          );
+        }
+        return <span key={index}>{node.text || ''}</span>;
+    }
+  };
+
+  return content.root.children.map((child, index) => renderNode(child, index));
+};
+
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -276,20 +401,19 @@ const EventDetail = () => {
                   target.src = '/assets/images/default-event.jpg';
                 }}
               />
-            </div>
-
-            {/* Event Content */}
+            </div>            {/* Event Content */}
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold mb-4">Chi tiết sự kiện</h2>
-                <div 
-                  className="prose prose-lg max-w-none"
-                  dangerouslySetInnerHTML={{ 
-                    __html: typeof event.content === 'string' 
-                      ? event.content 
-                      : event.content?.toString() || event.summary || '' 
-                  }}
-                />
+                <div className="prose prose-lg max-w-none">
+                  {typeof event.content === 'string' ? (
+                    <div dangerouslySetInnerHTML={{ __html: event.content }} />
+                  ) : event.content?.root?.children ? (
+                    <div>{renderLexicalContent(event.content)}</div>
+                  ) : (
+                    <p className="text-gray-600">{event.summary}</p>
+                  )}
+                </div>
                   {/* Tags */}
                 {event.tags && event.tags.length > 0 && (
                   <div className="mt-8 pt-6 border-t">
@@ -297,11 +421,10 @@ const EventDetail = () => {
                       {event.tags.map((tag, index) => {
                         // Handle tags from relationship (object) or fallback data (string)
                         const tagText = typeof tag === 'string' ? tag : tag?.title || tag?.name || tag?.tag || String(tag);                        const tagSlug = typeof tag === 'string' ? tag.toLowerCase().replace(/\s+/g, '-') : tag?.slug || tag.toLowerCase().replace(/\s+/g, '-');
-                        
-                        return (
+                          return (
                           <Link 
                             key={index} 
-                            to={`/events?tag=${tagSlug}`}
+                            to={`/events/tag/${tagSlug}`}
                             className="inline-flex items-center"
                           >
                             <Badge variant="outline" className="hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer">
