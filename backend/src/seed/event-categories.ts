@@ -74,7 +74,6 @@ export const seedEventCategories = async (payload: Payload): Promise<void> => {
               .replace(/\-\-+/g, '-')
               .replace(/^-+/, '')
               .replace(/-+$/, ''),
-            _status: 'published',
           },
         });
         console.log(`✅ Đã thêm danh mục sự kiện: ${category.name}`);

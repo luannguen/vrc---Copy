@@ -1,6 +1,5 @@
 import { CollectionConfig } from 'payload';
 import { authenticated } from '../access/authenticated';
-import { authenticatedOrPublished } from '../access/authenticatedOrPublished';
 import { slugField } from '../fields/slug';
 
 export const EventCategories: CollectionConfig = {
@@ -15,7 +14,7 @@ export const EventCategories: CollectionConfig = {
   },
   access: {
     create: authenticated,
-    read: authenticatedOrPublished,
+    read: () => true, // Public read access
     update: authenticated,
     delete: authenticated,
   },
@@ -54,13 +53,4 @@ export const EventCategories: CollectionConfig = {
     ...slugField('name'),
   ],
   timestamps: true,
-  versions: {
-    drafts: {
-      autosave: {
-        interval: 100,
-      },
-      schedulePublish: true,
-    },
-    maxPerDoc: 50,
-  },
 };

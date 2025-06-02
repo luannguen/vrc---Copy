@@ -6,6 +6,23 @@ export const seedEvents = async (payload: Payload): Promise<void> => {
   try {
     console.log('🗓️ Đang tạo dữ liệu mẫu cho Events...');
 
+    // Delete all existing events first
+    console.log('🗑️ Xóa tất cả events cũ...');
+    const existingEvents = await payload.find({
+      collection: 'events',
+      limit: 1000,
+    });
+
+    if (existingEvents.docs.length > 0) {
+      for (const event of existingEvents.docs) {
+        await payload.delete({
+          collection: 'events',
+          id: event.id,
+        });
+      }
+      console.log(`✅ Đã xóa ${existingEvents.docs.length} events cũ`);
+    }
+
     // Get existing categories to use in events
     const categoriesResponse = await payload.find({
       collection: 'event-categories',
