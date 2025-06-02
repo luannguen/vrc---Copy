@@ -63,8 +63,7 @@ export const seedEventCategories = async (payload: Payload): Promise<void> => {
         },
       });
 
-      if (exists.docs.length === 0) {
-        await payload.create({
+      if (exists.docs.length === 0) {        await payload.create({
           collection: 'event-categories',
           data: {
             ...category,
@@ -75,17 +74,18 @@ export const seedEventCategories = async (payload: Payload): Promise<void> => {
               .replace(/\-\-+/g, '-')
               .replace(/^-+/, '')
               .replace(/-+$/, ''),
+            _status: 'published',
           },
         });
         console.log(`✅ Đã thêm danh mục sự kiện: ${category.name}`);
       } else {
         console.log(`⏩ Danh mục sự kiện ${category.name} đã tồn tại, bỏ qua`);
       }
-      
+
       // Cập nhật tiến trình
       progressManager.increment();
     }
-    
+
     // Hoàn thành progress bar
     progressManager.complete();
 

@@ -1,7 +1,0 @@
-{
-  "name": "Test Category - CRUD Verification",
-  "description": "Category được tạo để test CRUD operations",
-  "featured": false,
-  "order": 999,
-  "_status": "draft"
-}
