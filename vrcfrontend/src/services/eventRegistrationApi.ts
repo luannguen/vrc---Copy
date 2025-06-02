@@ -21,8 +21,7 @@ export interface RegistrationResponse {
   error?: string;
 }
 
-export class EventRegistrationService {  private static readonly BASE_URL = '/api/event-registrations';
-  
+export class EventRegistrationService {
   // Get API base URL from environment variables for development/debugging
   // In development: Use empty string for relative paths (proxy handles routing)
   // In production: Use full backend URL
@@ -30,6 +29,10 @@ export class EventRegistrationService {  private static readonly BASE_URL = '/ap
     return import.meta.env.NODE_ENV === 'development' 
       ? '' 
       : (import.meta.env.VITE_API_URL || 'http://localhost:3000');
+  }
+  
+  private static get BASE_URL(): string {
+    return `${this.getApiBaseUrl()}/api/event-registrations`;
   }
   /**
    * Create a new event registration
