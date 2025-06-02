@@ -1,4 +1,5 @@
-import { CalendarIcon, ChevronRight, Clock, Eye, MapPin, Tag, User } from "lucide-react";
+import React from "react";
+import { CalendarIcon, ChevronRight, Clock, Eye, MapPin, Tag, User, Grid, Calendar as CalendarViewIcon } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -7,6 +8,8 @@ import { SearchIcon } from "@/components/ui/search-icon";
 import { useEvents, useEventsFilters, useEventCategories, useFilteredEvents, useEventCategoryCounts } from "@/hooks/useEvents";
 import { EventsUtils } from "@/services/eventsApi";
 import { CategoryDisplay } from "@/types/events";
+import Calendar from "@/components/Calendar";
+import { cn } from "@/lib/utils";
 
 // Dữ liệu mẫu cho sự kiện
 const eventItems = [
@@ -111,6 +114,9 @@ const categories = [
 const Events = () => {
   // Get tag parameter from URL
   const { tag } = useParams<{ tag: string }>();
+  
+  // View state - list or calendar
+  const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');
   
   // API Integration: Use filtered events with category support
   const { filters, updateFilter, updatePage, resetFilters } = useEventsFilters();
@@ -259,15 +265,43 @@ const Events = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Nội dung chính */}
+      </div>      {/* Nội dung chính */}
       <div className="container-custom py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content */}
-          <div className="lg:col-span-2">            {/* Sự kiện nổi bật */}
-            <div className="mb-10">
-              <h2 className="text-2xl font-bold text-primary mb-4">Sự kiện nổi bật</h2>
+          <div className="lg:col-span-2">
+            {/* View Toggle */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-primary">
+                {viewMode === 'list' ? 'Danh sách sự kiện' : 'Lịch sự kiện'}
+              </h2>
+              <div className="flex rounded-lg border">
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="rounded-r-none"
+                >
+                  <Grid className="h-4 w-4 mr-2" />
+                  Danh sách
+                </Button>
+                <Button
+                  variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('calendar')}
+                  className="rounded-l-none border-l"
+                >
+                  <CalendarViewIcon className="h-4 w-4 mr-2" />
+                  Lịch
+                </Button>
+              </div>
+            </div>
+
+            {viewMode === 'list' ? (
+              <>
+                {/* Sự kiện nổi bật */}
+                <div className="mb-10">
+                  <h3 className="text-xl font-bold text-primary mb-4">Sự kiện nổi bật</h3>
               <div className="aspect-video rounded-lg overflow-hidden mb-4">
                 <img 
                   src={getEventImage(featuredEvent)} 
@@ -457,8 +491,7 @@ const Events = () => {
                     Trang {pagination.page} / {pagination.pages} 
                     ({pagination.total} sự kiện)
                   </span>
-                  
-                  <Button
+                    <Button
                     variant="outline"
                     size="sm"
                     onClick={() => updatePage(pagination.page + 1)}
@@ -469,6 +502,21 @@ const Events = () => {
                 </div>
               )}
             </div>
+              </>
+            ) : (
+              /* Calendar View */
+              <Calendar
+                events={filteredEvents}
+                onEventClick={(event) => {
+                  // Navigate to event detail
+                  window.location.href = `/event-details/${event.id}`;
+                }}
+                onDateClick={(date) => {
+                  console.log('Date clicked:', date);
+                  // Could show events for that date in a modal or filter
+                }}
+              />
+            )}
           </div>
           
           {/* Sidebar */}
@@ -523,40 +571,91 @@ const Events = () => {
                 </ul>
               )}
             </div>
-            
-            {/* Lịch sự kiện */}
+              {/* Sự kiện sắp tới */}
             <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-              <h3 className="font-semibold text-lg mb-3">Lịch sự kiện</h3>
-              <div className="space-y-4">
-                <div className="text-center p-2 border-b">
-                  <h4 className="font-medium">Tháng 4, 2025</h4>
-                </div>
-                <ul className="space-y-3">
-                  {eventItems
-                    .filter(event => new Date(event.startDate).getMonth() === 3) // April is month 3 (0-indexed)
-                    .map((event, idx) => (
-                      <li key={idx} className="flex gap-3 items-start border-b pb-3">
-                        <div className="bg-primary/10 p-2 rounded text-center min-w-[40px]">
-                          <span className="block text-sm font-medium">
-                            {new Date(event.startDate).getDate()}
+              <h3 className="font-semibold text-lg mb-3">Sự kiện sắp tới</h3>
+              <div className="space-y-3">
+                {filteredEvents
+                  .filter(event => {
+                    const eventDate = new Date(event.startDate);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return eventDate >= today;
+                  })
+                  .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                  .slice(0, 5) // Hiển thị 5 sự kiện sắp tới
+                  .map((event, idx) => {
+                    const eventDate = new Date(event.startDate);
+                    const isToday = eventDate.toDateString() === new Date().toDateString();
+                    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+                    
+                    return (
+                      <div key={idx} className="flex gap-3 items-start p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className={cn(
+                          "p-2 rounded text-center min-w-[45px]",
+                          isToday ? "bg-primary text-white" : "bg-primary/10"
+                        )}>
+                          <span className="block text-sm font-bold">
+                            {eventDate.getDate()}
                           </span>
-                          <span className="text-xs text-muted-foreground">
-                            Th{new Date(event.startDate).getMonth() + 1}
+                          <span className={cn(
+                            "text-xs",
+                            isToday ? "text-white/80" : "text-muted-foreground"
+                          )}>
+                            {dayNames[eventDate.getDay()]}
                           </span>
                         </div>
-                        <div className="flex-grow">
-                          <h5 className="font-medium text-sm line-clamp-2 hover:text-primary">
-                            <Link to={`/event-details/${event.id}`}>{event.title}</Link>
+                        <div className="flex-grow min-w-0">
+                          <h5 className="font-medium text-sm mb-1 hover:text-primary line-clamp-2">
+                            <Link to={`/event-details/${event.id}`} className="hover:underline">
+                              {event.title}
+                            </Link>
                           </h5>
-                          <div className="flex items-center text-xs text-muted-foreground mt-1">
-                            <MapPin size={12} className="mr-1" />
-                            <span className="truncate">{event.location.split(',')[0]}</span>
+                          <div className="flex items-center text-xs text-muted-foreground mb-1">
+                            <CalendarIcon size={12} className="mr-1 flex-shrink-0" />
+                            <span>{formatDate(event.startDate)}</span>
+                            {getEventEndDate(event) !== event.startDate && (
+                              <span> - {formatDate(getEventEndDate(event))}</span>
+                            )}
+                          </div>
+                          <div className="flex items-center text-xs text-muted-foreground">
+                            <MapPin size={12} className="mr-1 flex-shrink-0" />
+                            <span className="truncate">
+                              {typeof event.location === 'string' 
+                                ? event.location.split(',')[0] 
+                                : 'TBA'
+                              }
+                            </span>
+                          </div>
+                          {/* Category badge */}
+                          <div className="mt-2">
+                            <span className="inline-block bg-primary/10 text-primary px-2 py-0.5 rounded text-xs">
+                              {getCategoryName(event)}
+                            </span>
                           </div>
                         </div>
-                      </li>
-                    ))}
-                </ul>
-              </div>
+                      </div>
+                    );
+                  })}
+                
+                {filteredEvents.filter(event => new Date(event.startDate) >= new Date()).length === 0 && (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <CalendarIcon className="mx-auto h-8 w-8 mb-2 opacity-50" />
+                    <p className="text-sm">Không có sự kiện sắp tới</p>
+                  </div>
+                )}
+                
+                {filteredEvents.filter(event => new Date(event.startDate) >= new Date()).length > 5 && (
+                  <div className="pt-3 border-t">
+                    <Link 
+                      to="/events" 
+                      className="text-sm text-primary hover:text-primary/80 font-medium flex items-center justify-center"
+                    >
+                      Xem tất cả sự kiện
+                      <ChevronRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </div>
+                )}              </div>
             </div>
             
             {/* Tags */}
