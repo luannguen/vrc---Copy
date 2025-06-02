@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { SearchIcon } from "@/components/ui/search-icon";
+import { useEvents, useEventsFilters, useEventCategories } from "@/hooks/useEvents";
+import { EventsUtils } from "@/services/eventsApi";
 
 // Dữ liệu mẫu cho sự kiện
 const eventItems = [
@@ -106,6 +108,44 @@ const categories = [
 ];
 
 const Events = () => {
+  // API Integration: Replace static data with API calls
+  const { filters, updateFilter, updatePage, resetFilters } = useEventsFilters();
+  const { events: apiEvents, loading, error, pagination } = useEvents(filters);
+  const { categories: apiCategories, loading: categoriesLoading, error: categoriesError } = useEventCategories();
+
+  // Fallback to static data if API fails (for smooth transition)
+  const hasApiData = apiEvents.length > 0 && !error;
+  const hasApiCategories = apiCategories.length > 0 && !categoriesError;
+  
+  // Use API data or fallback to static data
+  const events = hasApiData ? apiEvents : eventItems;
+  const categoriesForDisplay = hasApiCategories ? apiCategories.map(cat => ({ 
+    name: cat.name, 
+    count: 0 // TODO: Count events per category
+  })) : categories;
+  
+  // Get featured event (first event with featured=true or first event)
+  const featuredEvent = hasApiData 
+    ? apiEvents.find(event => event.featured) || apiEvents[0]
+    : eventItems[0];  // Helper functions to handle both API and static data formats
+  const getEventImage = (event: any) => {
+    if (hasApiData && event.featuredImage) {
+      return EventsUtils.getImageUrl(event, 'card');
+    }
+    return event.image || '/assets/images/default-event.jpg';
+  };
+
+  const getEventCategory = (event: any) => {
+    if (hasApiData && event.categories && event.categories.length > 0) {
+      return event.categories[0].name;
+    }
+    return event.category || 'Sự kiện';
+  };
+
+  const getEventEndDate = (event: any) => {
+    return event.endDate || event.startDate;
+  };
+
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -141,19 +181,18 @@ const Events = () => {
           {/* Main content */}
           <div className="lg:col-span-2">
             {/* Sự kiện nổi bật */}
-            <div className="mb-10">
-              <div className="aspect-video rounded-lg overflow-hidden mb-4">
+            <div className="mb-10">              <div className="aspect-video rounded-lg overflow-hidden mb-4">
                 <img 
-                  src={featuredEvent.image} 
-                  alt={featuredEvent.title}
+                  src={getEventImage(featuredEvent)} 
+                  alt={featuredEvent?.title || 'Event image'}
                   className="w-full h-full object-cover transition-transform hover:scale-105" 
                 />
               </div>
               <div className="flex flex-wrap gap-2 mb-3">
                 <span className="inline-block bg-secondary text-black font-medium px-3 py-1 rounded-md text-sm">
-                  {featuredEvent.category}
+                  {getEventCategory(featuredEvent)}
                 </span>
-                {getStatusBadge(featuredEvent.status)}
+                {getStatusBadge(featuredEvent?.status || 'upcoming')}
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-primary mb-3">
                 <Link to={`/event-details/${featuredEvent.id}`} className="hover:text-accent">
@@ -162,18 +201,17 @@ const Events = () => {
               </h2>
               <p className="text-muted-foreground mb-4">{featuredEvent.summary}</p>
               
-              <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-4 mb-4">
-                <div className="flex items-center">
+              <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-4 mb-4">                <div className="flex items-center">
                   <CalendarIcon size={16} className="mr-1" />
-                  <span>{formatDate(featuredEvent.startDate)}{featuredEvent.endDate !== featuredEvent.startDate ? ` - ${formatDate(featuredEvent.endDate)}` : ''}</span>
+                  <span>{formatDate(featuredEvent?.startDate || '')}{getEventEndDate(featuredEvent) !== featuredEvent?.startDate ? ` - ${formatDate(getEventEndDate(featuredEvent) || '')}` : ''}</span>
                 </div>
                 <div className="flex items-center">
                   <MapPin size={16} className="mr-1" />
-                  <span>{featuredEvent.location}</span>
+                  <span>{featuredEvent?.location || 'Chưa xác định'}</span>
                 </div>
                 <div className="flex items-center">
                   <User size={16} className="mr-1" />
-                  <span>Tổ chức bởi: {featuredEvent.organizer}</span>
+                  <span>Tổ chức bởi: {featuredEvent?.organizer || 'VRC'}</span>
                 </div>
               </div>
               
@@ -190,10 +228,9 @@ const Events = () => {
               <h3 className="text-lg font-medium mb-4">Lọc sự kiện</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm mb-1">Danh mục</label>
-                  <select className="w-full rounded border border-gray-300 p-2">
+                  <label className="block text-sm mb-1">Danh mục</label>                  <select className="w-full rounded border border-gray-300 p-2" aria-label="Chọn danh mục">
                     <option value="">Tất cả danh mục</option>
-                    {categories.map((cat, idx) => (
+                    {categoriesForDisplay.map((cat, idx) => (
                       <option key={idx} value={cat.name}>{cat.name}</option>
                     ))}
                   </select>

@@ -1,0 +1,7 @@
+{
+  "name": "Updated Test Category - CRUD Complete",
+  "description": "Category đã được update thành công cho CRUD testing",
+  "featured": true,
+  "order": 1,
+  "_status": "published"
+}

@@ -2,6 +2,87 @@
 
 **Last Updated: June 2, 2025**
 
+## 🚨 **CRITICAL BUG - JUNE 2, 2025** 
+
+### ❌ **Payload CMS COMPLIANCE VIOLATION - Events API**
+
+**SEVERITY: CRITICAL - Code violates fundamental Payload CMS principles**
+
+**Vấn đề nghiêm trọng:**
+- **Vi phạm nguyên tắc**: Tạo custom API endpoints khi Payload CMS đã có built-in APIs
+- **Security bypass**: Tạo custom access functions để bypass authentication
+- **Kiến trúc sai**: Không sử dụng Payload CMS patterns đúng cách
+- **Maintenance nightmare**: Code custom khó maintain và debug
+
+**Tệp vi phạm đã XÓA:**
+- ❌ `backend/src/app/(payload)/api/event-categories/` - Custom API endpoints
+- ❌ `backend/src/access/authenticatedOrPublishedEvents.ts` - Custom access bypass
+- ❌ `backend/src/access/publicOrAuthenticated.ts` - Security hole
+
+**Giải pháp đã áp dụng - PAYLOAD CMS COMPLIANCE:**
+
+**1. Sử dụng Built-in APIs**
+```typescript
+// OLD - Custom endpoints (WRONG)
+/api/event-categories/route.ts
+
+// NEW - Use Payload's built-in endpoints (CORRECT)
+/api/events - Built-in collection endpoint
+/api/event-categories - Built-in collection endpoint
+```
+
+**2. Payload CMS Standard Access Control**
+```typescript
+// OLD - Custom access functions (VIOLATION)
+import { authenticatedOrPublishedEvents } from '../access/authenticatedOrPublishedEvents';
+
+// NEW - Use Payload's standard patterns (COMPLIANT)
+import { authenticatedOrPublished } from '../access/authenticatedOrPublished';
+
+access: {
+  create: authenticated,
+  read: authenticatedOrPublished, // Standard Payload pattern
+  update: authenticated,
+  delete: authenticated,
+},
+```
+
+**3. Enable Payload Versions (Drafts)**
+```typescript
+// Added to Events.ts and EventCategories.ts
+versions: {
+  drafts: {
+    autosave: { interval: 100 },
+    schedulePublish: true,
+  },
+  maxPerDoc: 50,
+}, // This enables _status field for draft/published
+```
+
+**Security Model được khôi phục:**
+- ✅ Draft content: Requires authentication (401 = correct behavior)
+- ✅ Published content: Publicly accessible
+- ✅ No authentication bypasses
+- ✅ Follow Payload CMS security principles
+
+**Lesson Learned:**
+```
+❌ NEVER create custom API endpoints when Payload has built-in solutions
+❌ NEVER bypass Payload's authentication system
+❌ NEVER ignore Payload CMS documentation and best practices
+✅ ALWAYS use Payload's built-in patterns and APIs
+✅ ALWAYS follow official documentation
+✅ ALWAYS respect the framework's architecture
+```
+
+**Current Status:**
+- ✅ API endpoints tuân thủ Payload CMS standards
+- ✅ Security model được khôi phục đúng
+- ✅ Frontend integration using proper Payload APIs
+- ⏳ Cần publish events để có public data for testing
+
+---
+
 ## 🆕 **RECENT FIXES - JUNE 2, 2025**
 
 ### ✅ **Fix "process is not defined" Error - Tags Loading**

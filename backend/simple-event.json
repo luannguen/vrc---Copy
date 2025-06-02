@@ -1,0 +1,27 @@
+{
+  "title": "Simple Test",
+  "summary": "Simple test event",
+  "content": {
+    "root": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "Simple test content"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "featuredImage": "683c0293b71652d43305f86e",
+  "startDate": "2025-02-15T10:00:00Z",
+  "endDate": "2025-02-15T18:00:00Z",
+  "location": "Test",
+  "organizer": "Test",
+  "categories": ["683d2268494674be1be5e703"],
+  "_status": "draft"
+}

@@ -1,0 +1,48 @@
+{
+  "title": "Test Event - API Testing",
+  "summary": "Event được tạo từ API test để verify chức năng POST",
+  "content": {
+    "root": {
+      "children": [
+        {
+          "children": [
+            {
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Đây là nội dung chi tiết của sự kiện test được tạo qua API. Sự kiện này nhằm mục đích kiểm tra chức năng tạo mới event thông qua REST API.",
+              "type": "text",
+              "version": 1
+            }
+          ],
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "type": "paragraph",
+          "version": 1,
+          "textFormat": 0,
+          "textStyle": ""
+        }
+      ],
+      "direction": "ltr",
+      "format": "",
+      "indent": 0,
+      "type": "root",
+      "version": 1
+    }
+  },
+  "featuredImage": "6831a34777acd617a7e67a9a",
+  "startDate": "2025-06-10T09:00:00.000Z",
+  "endDate": "2025-06-10T17:00:00.000Z",
+  "location": "VRC Office - Test Location",
+  "organizer": "VRC Test Team",
+  "categories": [
+    "682929750f0f19999e0e1bd3"
+  ],
+  "eventType": "workshop",
+  "participants": 50,
+  "status": "upcoming",
+  "featured": false,
+  "publishStatus": "published"
+}

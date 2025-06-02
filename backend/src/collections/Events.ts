@@ -13,8 +13,7 @@ export const Events: CollectionConfig = {
     defaultColumns: ['title', 'categories', 'startDate', 'location', 'status'],
     group: 'Sự kiện',
     description: 'Quản lý sự kiện và thông tin liên quan',
-  },
-  access: {
+  },  access: {
     create: authenticated,
     read: authenticatedOrPublished,
     update: authenticated,
@@ -202,19 +201,28 @@ export const Events: CollectionConfig = {
         const now = new Date();
         const startDate = new Date(data.startDate);
         const endDate = new Date(data.endDate);
-        
+
         let status = 'upcoming';
         if (now >= startDate && now <= endDate) {
           status = 'ongoing';
         } else if (now > endDate) {
           status = 'past';
         }
-        
-        return { 
-          ...data, 
-          status 
+
+        return {
+          ...data,
+          status
         };
       },
     ],
+  },
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 100,
+      },
+      schedulePublish: true,
+    },
+    maxPerDoc: 50,
   },
 };
