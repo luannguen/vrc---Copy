@@ -421,25 +421,43 @@ const Events = () => {
                 </button>
               </div>
             </div>
-            
-            {/* Danh mục */}
+              {/* Danh mục */}
             <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
               <h3 className="font-semibold text-lg mb-3">Danh mục sự kiện</h3>
-              <ul className="space-y-2">
-                {categories.map((category, index) => (
-                  <li key={index}>
-                    <Link 
-                      to={`/events/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`} 
-                      className="flex justify-between items-center py-2 hover:text-primary"
+              {countsLoading ? (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {/* Show all events option */}
+                  <li>
+                    <button 
+                      onClick={() => updateFilter('category', '')}
+                      className={`w-full flex justify-between items-center py-2 hover:text-primary text-left ${!filters.category ? 'text-primary font-medium' : ''}`}
                     >
-                      <span>{category.name}</span>
+                      <span>Tất cả sự kiện</span>
                       <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs">
-                        {category.count}
+                        {totalEvents}
                       </span>
-                    </Link>
+                    </button>
                   </li>
-                ))}
-              </ul>
+                  {/* Category filters */}
+                  {categoriesForDisplay.map((category, index) => (
+                    <li key={index}>
+                      <button 
+                        onClick={() => updateFilter('category', category.name)}
+                        className={`w-full flex justify-between items-center py-2 hover:text-primary text-left ${filters.category === category.name ? 'text-primary font-medium' : ''}`}
+                      >
+                        <span>{category.name}</span>
+                        <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs">
+                          {category.count}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             
             {/* Lịch sự kiện */}

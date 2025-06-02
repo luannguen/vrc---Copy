@@ -187,19 +187,29 @@ export class EventsUtils {
       default:
         return status;
     }
-  }
-
-  // Get featured image URL with fallback
+  }  // Get featured image URL with fallback
   static getImageUrl(event: Event, size: 'thumbnail' | 'card' | 'tablet' | 'original' = 'card'): string {
     if (!event.featuredImage) {
       return '/assets/images/default-event.jpg'; // Default image
     }
 
+    // Fix URL path - Payload CMS returns /api/media/file/xxx but backend serves from /media/xxx
+    // Also ensure we use the correct backend URL since frontend runs on different port
+    const fixUrl = (url: string) => {
+      if (url.startsWith('/api/media/file/')) {
+        return `${API_BASE_URL.replace('/api', '')}/media/${url.split('/').pop()}`;
+      }
+      if (url.startsWith('/media/')) {
+        return `${API_BASE_URL.replace('/api', '')}${url}`;
+      }
+      return url;
+    };
+
     if (size === 'original') {
-      return event.featuredImage.url;
+      return fixUrl(event.featuredImage.url);
     }
 
     const sizeImage = event.featuredImage.sizes?.[size];
-    return sizeImage?.url || event.featuredImage.url;
+    return sizeImage?.url ? fixUrl(sizeImage.url) : fixUrl(event.featuredImage.url);
   }
 }
