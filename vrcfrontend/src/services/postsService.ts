@@ -34,12 +34,12 @@ export interface PostsResponse {
 
 // Get all posts
 export const getPosts = async (): Promise<PostsResponse> => {
-  const response = await apiClient.get<PostsResponse>('/api/posts');
+  const response = await apiClient.get<PostsResponse>('/posts');
   return response.data;
 };
 
 // Get single post by ID
 export const getPost = async (id: string): Promise<Post> => {
-  const response = await apiClient.get<Post>(`/api/posts/${id}`);
+  const response = await apiClient.get<Post>(`/posts/${id}`);
   return response.data;
 };

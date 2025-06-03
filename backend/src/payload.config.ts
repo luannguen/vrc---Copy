@@ -23,6 +23,7 @@ import { Products } from './collections/Products'
 import { Projects } from './collections/Projects'
 import { Services } from './collections/Services'
 import { Technologies } from './collections/Technologies'
+import { TechnologySections } from './collections/TechnologySections'
 import { Tools } from './collections/Tools'
 import { Resources } from './collections/Resources'
 import { Banners } from './collections/Banners'
@@ -110,6 +111,7 @@ export default buildConfig({  admin: {
     EventRegistrations,
     Services,
     Technologies,
+    TechnologySections,
     Tools,
     Resources,
     Banners,

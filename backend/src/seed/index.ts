@@ -5,6 +5,7 @@ import { seedMedia } from './media';
 import { seedServices } from './services';
 import { seedProjects } from './projects';
 import { seedTechnologies } from './technologies';
+import { seedTechnologySections } from './technology-sections';
 import { seedNavigation } from './navigation';
 import { seedCompanyInfo } from './company-info';
 import { seedHeaderFooter } from './header-footer';
@@ -55,7 +56,10 @@ export const seed = async (payload: Payload) => {
     await seedProjects(payload);
     progressManager.increment();
 
-    await seedTechnologies(payload);
+    await seedTechnologies();
+    progressManager.increment();
+
+    await seedTechnologySections(payload);
     progressManager.increment();
 
     await seedPosts(payload);

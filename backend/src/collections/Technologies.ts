@@ -12,7 +12,7 @@ export const Technologies: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'type', 'status', 'order'],
-    group: 'Dự án & Đối tác',
+    group: 'Quản lý Trang Công nghệ',
   },
   access: {
     create: authenticated,

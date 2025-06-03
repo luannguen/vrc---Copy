@@ -28,12 +28,12 @@ export interface EventsResponse {
 
 // Get all events
 export const getEvents = async (): Promise<EventsResponse> => {
-  const response = await apiClient.get<EventsResponse>('/api/events');
+  const response = await apiClient.get<EventsResponse>('/events');
   return response.data;
 };
 
 // Get single event by ID
 export const getEvent = async (id: string): Promise<Event> => {
-  const response = await apiClient.get<Event>(`/api/events/${id}`);
+  const response = await apiClient.get<Event>(`/events/${id}`);
   return response.data;
 };

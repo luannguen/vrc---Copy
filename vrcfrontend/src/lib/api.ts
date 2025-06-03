@@ -6,11 +6,9 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
 // API Configuration
-// For development: Use relative paths for proxy to work correctly
+// For development: Use full backend URL directly
 // For production: Use full backend URL
-const API_BASE_URL = import.meta.env.NODE_ENV === 'development' 
-  ? '' 
-  : (import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api';
 const API_KEY = import.meta.env.VITE_PUBLIC_API_KEY || 'vrc-api-2024-secure';
 const API_TIMEOUT = 30000; // 30 seconds
 

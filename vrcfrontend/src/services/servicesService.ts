@@ -23,12 +23,12 @@ export interface ServicesResponse {
 
 // Get all services
 export const getServices = async (): Promise<ServicesResponse> => {
-  const response = await apiClient.get<ServicesResponse>('/api/services');
+  const response = await apiClient.get<ServicesResponse>('/services');
   return response.data;
 };
 
 // Get single service by ID
 export const getService = async (id: string): Promise<Service> => {
-  const response = await apiClient.get<Service>(`/api/services/${id}`);
+  const response = await apiClient.get<Service>(`/services/${id}`);
   return response.data;
 };

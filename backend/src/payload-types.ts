@@ -85,6 +85,7 @@ export interface Config {
     'event-registrations': EventRegistration;
     services: Service;
     technologies: Technology;
+    'technology-sections': TechnologySection;
     tools: Tool;
     resources: Resource;
     banners: Banner;
@@ -117,6 +118,7 @@ export interface Config {
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
+    'technology-sections': TechnologySectionsSelect<false> | TechnologySectionsSelect<true>;
     tools: ToolsSelect<false> | ToolsSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     banners: BannersSelect<false> | BannersSelect<true>;
@@ -1396,6 +1398,88 @@ export interface Technology {
   createdAt: string;
 }
 /**
+ * Quản lý nội dung các phần của trang Công nghệ & Đối tác
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "technology-sections".
+ */
+export interface TechnologySection {
+  id: string;
+  title: string;
+  section: 'hero' | 'overview' | 'equipment-categories' | 'partners' | 'cta';
+  subtitle?: string | null;
+  /**
+   * Nội dung chi tiết của phần này
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Hình ảnh minh họa cho phần này
+   */
+  image?: (string | null) | Media;
+  features?:
+    | {
+        title: string;
+        description?: string | null;
+        /**
+         * Tên icon từ thư viện Lucide React (vd: CheckCircle, Cpu, Server)
+         */
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  equipmentItems?:
+    | {
+        category: string;
+        items?:
+          | {
+              name: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  partnerLogos?:
+    | {
+        partnerName: string;
+        logo: string | Media;
+        /**
+         * URL website của đối tác (không bắt buộc)
+         */
+        website?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  ctaButtons?:
+    | {
+        text: string;
+        link: string;
+        variant?: ('default' | 'outline' | 'secondary') | null;
+        id?: string | null;
+      }[]
+    | null;
+  backgroundColor?: ('white' | 'muted' | 'primary' | 'accent') | null;
+  order?: number | null;
+  status?: ('draft' | 'published') | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Quản lý các công cụ tính toán và thiết kế HVAC
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2085,6 +2169,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'technologies';
         value: string | Technology;
+      } | null)
+    | ({
+        relationTo: 'technology-sections';
+        value: string | TechnologySection;
       } | null)
     | ({
         relationTo: 'tools';
@@ -2809,6 +2897,59 @@ export interface TechnologiesSelect<T extends boolean = true> {
   status?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "technology-sections_select".
+ */
+export interface TechnologySectionsSelect<T extends boolean = true> {
+  title?: T;
+  section?: T;
+  subtitle?: T;
+  content?: T;
+  image?: T;
+  features?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        icon?: T;
+        id?: T;
+      };
+  equipmentItems?:
+    | T
+    | {
+        category?: T;
+        items?:
+          | T
+          | {
+              name?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  partnerLogos?:
+    | T
+    | {
+        partnerName?: T;
+        logo?: T;
+        website?: T;
+        id?: T;
+      };
+  ctaButtons?:
+    | T
+    | {
+        text?: T;
+        link?: T;
+        variant?: T;
+        id?: T;
+      };
+  backgroundColor?: T;
+  order?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

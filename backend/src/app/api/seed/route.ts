@@ -7,6 +7,7 @@ import { seedProducts } from '@/seed/products';
 import { seedServices } from '@/seed/services';
 import { seedProjects } from '@/seed/projects';
 import { seedTechnologies } from '@/seed/technologies';
+import { seedTechnologySections } from '@/seed/technology-sections';
 import { seedNavigation } from '@/seed/navigation';
 import { seedCompanyInfo } from '@/seed/company-info';
 import { seedHeaderFooter } from '@/seed/header-footer';
@@ -64,10 +65,13 @@ export async function GET(request: Request) {
         case 'projects':
           await seedProjects(payload);
           result.details = { type: 'projects', completed: true };
-          break;
-        case 'technologies':
-          await seedTechnologies(payload);
+          break;        case 'technologies':
+          await seedTechnologies();
           result.details = { type: 'technologies', completed: true };
+          break;
+        case 'technology-sections':
+          await seedTechnologySections(payload);
+          result.details = { type: 'technology-sections', completed: true };
           break;
         case 'navigation':
           await seedNavigation(payload);

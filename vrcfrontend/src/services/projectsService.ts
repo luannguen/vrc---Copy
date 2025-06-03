@@ -27,12 +27,12 @@ export interface ProjectsResponse {
 
 // Get all projects
 export const getProjects = async (): Promise<ProjectsResponse> => {
-  const response = await apiClient.get<ProjectsResponse>('/api/projects');
+  const response = await apiClient.get<ProjectsResponse>('/projects');
   return response.data;
 };
 
 // Get single project by ID
 export const getProject = async (id: string): Promise<Project> => {
-  const response = await apiClient.get<Project>(`/api/projects/${id}`);
+  const response = await apiClient.get<Project>(`/projects/${id}`);
   return response.data;
 };

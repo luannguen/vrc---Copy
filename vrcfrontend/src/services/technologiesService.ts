@@ -24,12 +24,12 @@ export interface TechnologiesResponse {
 
 // Get all technologies
 export const getTechnologies = async (): Promise<TechnologiesResponse> => {
-  const response = await apiClient.get<TechnologiesResponse>('/api/technologies');
+  const response = await apiClient.get<TechnologiesResponse>('/technologies');
   return response.data;
 };
 
 // Get single technology by ID
 export const getTechnology = async (id: string): Promise<Technology> => {
-  const response = await apiClient.get<Technology>(`/api/technologies/${id}`);
+  const response = await apiClient.get<Technology>(`/technologies/${id}`);
   return response.data;
 };

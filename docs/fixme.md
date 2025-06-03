@@ -2,6 +2,59 @@
 
 **Last Updated: June 3, 2025**
 
+## ✅ **LATEST SUCCESS - JUNE 3, 2025**
+
+### 🎯 **TechnologySections Collection API - RESOLVED**
+
+#### PROBLEM: Empty docs array returned from /api/technology-sections
+
+**Vấn đề cụ thể:**
+- Collection TechnologySections đã được tạo và seed thành công
+- Nhưng API `/api/technology-sections` trả về `{"docs": []}` (rỗng)
+- Admin panel hiện dữ liệu nhưng public API không trả về
+
+**Root Cause Analysis:**
+1. **Draft Status Issue**: Collection có `versions.drafts: true` enabled
+2. **Access Control**: `authenticatedOrPublished` chỉ cho phép documents có `_status: 'published'`
+3. **Seed Error**: Seed function sử dụng sai tên trường `status: 'published'` thay vì `_status: 'published'`
+
+**✅ Giải pháp:**
+
+**1. Fix Seed Function:**
+```typescript
+// FILE: backend/src/seed/technology-sections.ts
+// BEFORE (incorrect):
+status: 'published',
+
+// AFTER (correct):
+_status: 'published',
+```
+
+**2. Re-seed Command:**
+```bash
+curl -X POST "http://localhost:3000/api/seed?type=technology-sections"
+```
+
+**3. Verification:**
+```bash
+curl "http://localhost:3000/api/technology-sections"
+# Returns: 5 documents with proper _status: "published"
+```
+
+**✅ KẾT QUẢ THÀNH CÔNG:**
+- API trả về đầy đủ 5 sections: hero, overview, equipment-categories, partners, cta
+- Mỗi document có đầy đủ dữ liệu: title, content, features, equipmentItems, ctaButtons
+- Status đúng `_status: "published"` cho phép public access
+- Collection hoạt động hoàn hảo cho frontend integration
+
+**📝 Ghi chú quan trọng:**
+Khi collection có `versions.drafts: true`, Payload CMS tự động:
+- Thêm trường `_status` (not `status`)  
+- Chỉ trả về documents có `_status: 'published'` qua public API
+- Documents mới mặc định có `_status: 'draft'`
+
+---
+
 ## ✅ **RESOLVED - JUNE 3, 2025**
 
 ### 🎯 **Bulk Delete Dual Toast Messages Issue - FIXED**
@@ -895,5 +948,117 @@ curl http://localhost:3000/api/media
 # Xóa dữ liệu cũ nếu cần (bulk delete)
 curl -X DELETE "http://localhost:3000/api/technologies/bulk" -H "Content-Type: application/json"
 ```
+
+---
+
+## ✅ **FRONTEND INTEGRATION SUCCESS - JUNE 3, 2025 (19:58)**
+
+### 🎯 **API Client Configuration Fix - RESOLVED**
+
+#### PROBLEM: Double /api/ prefix causing 404 errors
+
+**Vấn đề cụ thể:**
+- Frontend API calls were generating URLs like `/api/api/technology-sections`
+- All API requests returning 404 errors
+- Console logs showing double prefix issue
+
+**Root Cause Analysis:**
+1. **Base URL Configuration**: `lib/api.ts` had inconsistent base URL setup
+2. **Service Endpoints**: Services were using `/api/endpoint` instead of `/endpoint`
+3. **Development Mode**: Base URL was set to empty string in development
+
+**✅ Giải pháp:**
+
+**1. Fix API Base URL:**
+```typescript
+// FILE: vrcfrontend/src/lib/api.ts
+// BEFORE:
+const API_BASE_URL = import.meta.env.NODE_ENV === 'development' 
+  ? '' 
+  : (import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api';
+
+// AFTER:
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000') + '/api';
+```
+
+**2. Fix All Service Endpoints:**
+```typescript
+// Fixed in all services:
+- technologiesService.ts: '/api/technologies' → '/technologies'
+- technologySectionsService.ts: '/api/technology-sections' → '/technology-sections'
+- servicesService.ts: '/api/services' → '/services'
+- projectsService.ts: '/api/projects' → '/projects'
+- postsService.ts: '/api/posts' → '/posts'
+- eventsService.ts: '/api/events' → '/events'
+- contactService.ts: '/api/contact' → '/contact'
+```
+
+**✅ KẾT QUẢ THÀNH CÔNG:**
+- All API calls now return 200 OK status
+- Console logs show proper endpoint calls:
+  - `✅ API Response: 200 /company-info`
+  - `✅ API Response: 200 /header-info`
+  - `✅ API Response: 200 /technology-sections?sort=order`
+  - `✅ API Response: 200 /technologies`
+- `/technologies-new` page fully functional with dynamic data
+- No more 404 errors or double prefix issues
+
+**🎉 INTEGRATION COMPLETE:**
+- TechnologySections API integration ✅
+- Frontend dynamic page working ✅
+- All services fixed and operational ✅
+- Ready for production deployment ✅
+
+---
+
+## ✅ **MAJOR COMPLETION - JUNE 3, 2025**
+
+### 🎯 **Technologies Page Migration - COMPLETED**
+
+#### ✅ **Technologies.tsx Migration from Static to Dynamic**
+
+**CHO GOAL:** Thay thế hoàn toàn trang `/technologies` hardcoded bằng version dynamic sử dụng API
+
+**✅ COMPLETED ACTIONS:**
+
+**1. File Backup & Migration:**
+```bash
+# User performed manual backup:
+E:\Download\vrc - Copy\vrcfrontend\src\pages\Technologies.tsx.bak    # Original hardcoded version
+E:\Download\vrc - Copy\vrcfrontend\src\pages\TechnologiesNew.tsx.bak # Dynamic version backup
+
+# Content copied from TechnologiesNew.tsx → Technologies.tsx
+```
+
+**2. App.tsx Route Cleanup:**
+```typescript
+// REMOVED:
+import TechnologiesNew from "./pages/TechnologiesNew.tsx.bak";
+<Route path="technologies-new" element={<TechnologiesNew />} />
+
+// KEPT ONLY:
+import Technologies from "./pages/Technologies";
+<Route path="technologies" element={<Technologies />} />
+```
+
+**3. Verification:**
+- ✅ No TypeScript/ESLint errors in App.tsx or Technologies.tsx
+- ✅ API endpoints working: `/api/technology-sections` returns 5 sections
+- ✅ Route `/technologies` now serves dynamic content from API
+- ✅ Route `/technologies-new` removed (no longer needed)
+
+**🎯 RESULT:**
+- **Route `/technologies`**: Now completely dynamic, uses API data from TechnologySections & Technologies collections
+- **Fallback handling**: Shows "Không thể tải dữ liệu. Đang hiển thị nội dung mẫu." if API fails
+- **Performance**: Loading states, error handling, dynamic rendering of all sections
+- **Maintainability**: Content managed through Payload CMS admin panel
+
+**📋 SECTIONS NOW DYNAMIC:**
+1. Hero Section (title, subtitle, CTA buttons)
+2. Overview Section (features, content)
+3. Technologies Grid (from Technologies collection)
+4. Equipment Categories (equipment items by category)
+5. Partners Section (partner logos)
+6. CTA Section (call-to-action buttons)
 
 ---
