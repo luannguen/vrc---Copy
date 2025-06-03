@@ -4,17 +4,116 @@
 
 ## ✅ **RESOLVED - JUNE 3, 2025**
 
-### 🎯 **Event Registrations Data Persistence Issue - FIXED**
+### 🎯 **Bulk Delete Dual Toast Messages Issue - FIXED**
 
-**SEVERITY: HIGH - Admin interface data refresh issue**
+#### SEVERITY: MEDIUM - Admin interface UX issue
 
 **Vấn đề cụ thể:**
+
+- Bulk delete trong admin interface tại `/admin/collections/event-registrations?limit=10` hoạt động thành công (records được xóa)
+- Nhưng xuất hiện **2 toast messages**: 1 báo thành công + 1 báo lỗi
+- User bị confused vì không biết operation thành công hay thất bại
+- Issue chỉ xảy ra với bulk delete, single delete hoạt động bình thường
+
+**Root Cause Analysis:**
+
+1. **Nguyên nhân chính**: Response format mismatch giữa custom API và Payload CMS admin expectations
+2. **Chi tiết kỹ thuật**: 
+   - Custom DELETE handler trong `/api/event-registrations/route.ts` trả về format không đúng chuẩn Payload
+   - Payload admin frontend expects specific response structure cho bulk operations
+   - Admin requests cần format khác với API requests
+
+**✅ Giải pháp CHÍNH XÁC:**
+
+**1. Admin Request Detection:**
+
+```typescript
+// FILE: src/app/(payload)/api/event-registrations/route.ts
+
+// Detect admin panel requests via referer header
+const referer = request.headers.get('referer') || '';
+const isAdminRequest = referer.includes('/admin');
+```
+
+**2. Dual Response Format Implementation:**
+
+```typescript
+// Admin Success Format (for Payload admin panel)
+if (isAdminRequest) {
+  if (failureCount === 0) {
+    return NextResponse.json({
+      docs: existingIds.slice(0, successCount).map(id => ({ id })),
+      errors: [],
+      message: `Successfully deleted ${successCount} event registration${successCount !== 1 ? 's' : ''}`,
+    }, { status: 200 });
+  } else {
+    // Admin Error Format
+    return NextResponse.json({
+      errors: errors.map(err => ({
+        message: err,
+        name: 'DeleteError',
+      })),
+    }, { status: 400 });
+  }
+} else {
+  // Standard API Format (for external API calls)
+  return NextResponse.json({
+    success: failureCount === 0,
+    message: "...",
+    docs: [...],
+    totalDocs: successCount,
+    errors: failureCount > 0 ? errors : undefined,
+  }, { status: failureCount === 0 ? 200 : 207 });
+}
+```
+
+**3. Error Handling Consistency:**
+
+```typescript
+// Admin error format in catch block
+if (isAdminRequest) {
+  return NextResponse.json({
+    errors: [{
+      message: error instanceof Error ? error.message : 'Server error',
+      name: 'ServerError',
+    }],
+  }, { status: 500 });
+}
+```
+
+**✅ Test Results:**
+
+- ✅ Admin bulk delete: Status 200, format `{docs: [...], errors: [], message: "..."}`
+- ✅ API bulk delete: Status 200/207, format `{success: true, docs: [...], totalDocs: N}`
+- ✅ Single record: `{"docs":[{"id":"683e6e5b347407e42b46d3cd"}],"errors":[],"message":"Successfully deleted 1 event registration"}`
+- ✅ Multiple records: `{"docs":[{"id":"683e79e5ae21dffcd9259d28"},{"id":"683e7994ae21dffcd9259d1a"}],"errors":[],"message":"Successfully deleted 2 event registrations"}`
+- ✅ No more dual toast messages trong admin interface
+
+**Files Modified:**
+
+- `src/app/(payload)/api/event-registrations/route.ts` - Enhanced DELETE handler with dual format support
+
+**Key Learning:**
+
+- Payload CMS admin interface expects specific response formats cho bulk operations
+- Admin requests cần được detect và handle khác với API requests
+- Response format phải match exactly với Payload's internal expectations để tránh dual toast messages
+
+---
+
+### 🎯 **Event Registrations Data Persistence Issue - FIXED**
+
+#### SEVERITY: HIGH - Admin interface data refresh issue
+
+**Vấn đề cụ thể:**
+
 - Sau khi click "Save" trong admin interface cho event-registrations, form không refresh tự động
 - Dữ liệu đã lưu thành công vào database nhưng UI vẫn hiển thị dữ liệu cũ
 - User phải refresh page thủ công để thấy dữ liệu mới
 - Chỉ xảy ra với collection `event-registrations`, các collection khác hoạt động bình thường
 
 **Root Cause Analysis:**
+
 1. **Ban đầu nghi ngờ**: Payload CMS v3 bug #9691 
    - ❌ **Loại trừ**: Các collection khác hoạt động bình thường
 2. **Nguyên nhân thực tế**: Custom PATCH route `/api/event-registrations/[id]/route.ts`
@@ -22,6 +121,7 @@
    - ✅ **Chi tiết**: Response format không tương thích với Payload admin UI
 
 **❌ Các phương pháp đã thử nhưng KHÔNG hiệu quả:**
+
 - Tạo custom components: `AdminFormStateManager`, `EventRegistrationEditWrapper`
 - Thêm `afterChange` hooks trong collection config
 - Tạo `AdminFormRefreshFix` components
@@ -30,6 +130,7 @@
 **✅ Giải pháp CHÍNH XÁC:**
 
 **1. Xóa Custom Components không cần thiết:**
+
 ```bash
 # Removed these files - they were addressing symptoms, not root cause
 - src/components/AdminUI/AdminFormStateManager.tsx
@@ -39,6 +140,7 @@
 ```
 
 **2. Sửa Custom PATCH Route để tuân thủ Payload patterns:**
+
 ```typescript
 // FILE: src/app/(payload)/api/event-registrations/[id]/route.ts
 

@@ -60,7 +60,7 @@ const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = ()
 
       const data = await response.json()
       console.log('📊 Registration data received:', data)
-      const registrations: Registration[] = data.docs || []
+      const registrations: Registration[] = data.docs || data.registrations || []
 
       // Calculate statistics
       const stats: RegistrationStats = {

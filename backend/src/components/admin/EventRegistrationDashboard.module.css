@@ -1,32 +1,59 @@
 .event-registration-dashboard {
   padding: 20px;
   font-family: system-ui, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .event-registration-dashboard h2 {
   margin-bottom: 24px;
   color: #333;
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .event-registration-dashboard h3 {
   margin-bottom: 16px;
   color: #333;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .loading {
   text-align: center;
-  padding: 40px;
+  padding: 60px 40px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #666;
+  font-size: 16px;
 }
 
 .error {
-  color: red;
+  color: #dc3545;
   text-align: center;
-  padding: 40px;
+  padding: 60px 40px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  font-size: 16px;
 }
 
 .error button {
-  margin-top: 10px;
-  padding: 8px 16px;
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.error button:hover {
+  background: #c82333;
 }
 
 .stats-grid {
@@ -40,25 +67,36 @@
   padding: 20px;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .stat-card.total {
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-left: 4px solid #6c757d;
 }
 
 .stat-card.pending {
-  background: #fff3cd;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffffff 100%);
   border: 1px solid #ffeaa7;
+  border-left: 4px solid #ffc107;
 }
 
 .stat-card.confirmed {
-  background: #d4edda;
+  background: linear-gradient(135deg, #d4edda 0%, #ffffff 100%);
   border: 1px solid #c3e6cb;
+  border-left: 4px solid #28a745;
 }
 
 .stat-card.cancelled {
-  background: #f8d7da;
+  background: linear-gradient(135deg, #f8d7da 0%, #ffffff 100%);
   border: 1px solid #f5c6cb;
+  border-left: 4px solid #dc3545;
 }
 
 .stat-card h3 {
@@ -278,4 +316,259 @@
 .action-btn.secondary {
   background: #6c757d;
   color: white;
+}
+
+/* Participation types section styles */
+.participationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.participationCard {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  text-align: center;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.participationCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.participationCard:nth-child(1) {
+  border-left: 4px solid #2196f3;
+  background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+}
+
+.participationCard:nth-child(2) {
+  border-left: 4px solid #9c27b0;
+  background: linear-gradient(135deg, #f3e5f5 0%, #ffffff 100%);
+}
+
+.participationCard:nth-child(3) {
+  border-left: 4px solid #4caf50;
+  background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%);
+}
+
+.participationTitle {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.participationValue {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  line-height: 1;
+}
+
+.participationCard:nth-child(1) .participationValue {
+  color: #1976d2;
+}
+
+.participationCard:nth-child(2) .participationValue {
+  color: #7b1fa2;
+}
+
+.participationCard:nth-child(3) .participationValue {
+  color: #388e3c;
+}
+
+/* Stats grid styles */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.statTitle {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  line-height: 1;
+}
+
+/* Recent registrations section */
+.recentSection {
+  margin-top: 32px;
+}
+
+.recentTitle {
+  margin-bottom: 16px;
+  color: #333;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.recentList {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recentItem {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.recentItem:hover {
+  background-color: #f8f9fa;
+}
+
+.recentItem:last-child {
+  border-bottom: none;
+}
+
+.recentInfo {
+  flex: 1;
+}
+
+.recentName {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+  font-size: 16px;
+}
+
+.recentDetails {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.recentActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionButton {
+  padding: 8px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.confirmButton {
+  background: #28a745;
+  color: white;
+}
+
+.confirmButton:hover {
+  background: #218838;
+}
+
+.emailButton {
+  background: #007bff;
+  color: white;
+}
+
+.emailButton:hover {
+  background: #0056b3;
+}
+
+.noRecentRegistrations {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-style: italic;
+}
+
+/* Status styles */
+.status {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Utility styles */
+.refreshIndicator {
+  margin-left: 8px;
+  color: #007bff;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.lastUpdated {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.retryButton {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.retryButton:hover {
+  background: #0056b3;
 }
