@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, UserPlus, CheckCircle } from "lucide-react";
+import { Loader2, UserPlus, CheckCircle, AlertCircle } from "lucide-react";
 import { EventRegistrationService, type EventRegistrationData } from "@/services/eventRegistrationApi";
 
 interface EventRegistrationFormProps {
@@ -38,6 +38,7 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
 }) => {  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isDuplicateRegistration, setIsDuplicateRegistration] = useState(false);
   
   const [formData, setFormData] = useState<RegistrationFormData>({
     fullName: '',
@@ -116,19 +117,78 @@ const EventRegistrationForm: React.FC<EventRegistrationFormProps> = ({
         title: "Đăng ký thành công!",
         description: result.message || "Chúng tôi đã gửi email xác nhận đến địa chỉ của bạn.",
       });
-      onSuccess?.();
-
-    } catch (error: any) {
+      onSuccess?.();    } catch (error: any) {
       console.error('Registration error:', error);
-      toast({
-        title: "Lỗi đăng ký",
-        description: error.message || "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.",
-        variant: "destructive",
-      });
+      console.log('Error message:', error.message);
+      console.log('Checking if message includes "đã đăng ký":', error.message && error.message.includes('đã đăng ký'));
+      
+      // Handle duplicate registration specifically
+      if (error.message && error.message.includes('đã đăng ký')) {
+        console.log('Setting isDuplicateRegistration to true');
+        setIsDuplicateRegistration(true);
+        toast({
+          title: "Bạn đã đăng ký sự kiện này",
+          description: error.message || "Bạn đã đăng ký tham gia sự kiện này trước đó. Vui lòng kiểm tra email để xem thông tin xác nhận.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Lỗi đăng ký",
+          description: error.message || "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+  if (isDuplicateRegistration) {
+    console.log('Rendering duplicate registration UI');
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6 text-center">
+          <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+          <h3 className="text-2xl font-bold text-orange-700 mb-2">
+            Bạn đã đăng ký sự kiện này
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Bạn đã đăng ký tham gia sự kiện <strong>{eventTitle}</strong> trước đó.
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            Vui lòng kiểm tra hộp thư email để xem thông tin xác nhận đăng ký. 
+            Nếu bạn không tìm thấy email, hãy kiểm tra thư mục spam hoặc liên hệ với chúng tôi.
+          </p>
+          <div className="space-y-3">
+            <Button            
+              onClick={() => {
+                setIsDuplicateRegistration(false);
+                setFormData({
+                  fullName: '',
+                  email: '',
+                  phone: '',
+                  organization: '',
+                  jobTitle: '',
+                  participationType: 'in-person',
+                  dietaryRequirements: 'none',
+                  dietaryNote: '',
+                  accessibilityNeeds: '',
+                  marketingConsent: false,
+                  privacyConsent: false,
+                });
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              Đăng ký cho người khác
+            </Button>
+            <p className="text-xs text-gray-400">
+              Hoặc liên hệ với chúng tôi nếu cần hỗ trợ: support@vrc.com
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isSubmitted) {
     return (

@@ -45,16 +45,15 @@ export class EventRegistrationService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-      });
-
-      // Check if response is OK before trying to parse JSON
+      });      // Check if response is OK before trying to parse JSON
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         
         try {
           // Try to parse response as JSON (if it's an API error)
           const errorResult = await response.json();
-          errorMessage = errorResult.error || errorResult.message || errorMessage;
+          // Prioritize detailed message over generic error
+          errorMessage = errorResult.message || errorResult.error || errorMessage;
         } catch (parseError) {
           // If JSON parsing fails, it's likely an HTML error page (404, 500, etc.)
           console.warn('Failed to parse error response as JSON:', parseError);

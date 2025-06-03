@@ -19,6 +19,7 @@ import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_19c14d561063d8efa922b9b0d3fd3502 } from '@/components/admin/ProjectCategoryCell'
 import { default as default_88b7ddc30065c93f77916642348708c2 } from '@/components/admin/CategoryRelations'
+import { default as default_2f6f7faa518ec960a1fd2fa76e2b5f30 } from '@/components/admin/EventTitleField'
 import { default as default_b31a598bfe66e440b9fd46bb9ec17bd5 } from '@/components/admin/EventRegistrationDashboard'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
@@ -50,6 +51,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/admin/ProjectCategoryCell#default": default_19c14d561063d8efa922b9b0d3fd3502,
   "@/components/admin/CategoryRelations#default": default_88b7ddc30065c93f77916642348708c2,
+  "@/components/admin/EventTitleField#default": default_2f6f7faa518ec960a1fd2fa76e2b5f30,
   "@/components/admin/EventRegistrationDashboard#default": default_b31a598bfe66e440b9fd46bb9ec17bd5,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,

@@ -85,13 +85,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingRegistration.docs.length > 0) {
-      return NextResponse.json(
-        { error: 'Bạn đã đăng ký tham gia sự kiện này rồi' },
-        {
-          status: 409,
-          headers: CORS_HEADERS,
-        }
-      );
+      const registration = existingRegistration.docs[0];
+      if (registration) {
+        return NextResponse.json(
+          {
+            error: 'Bạn đã đăng ký tham gia sự kiện này rồi',
+            message: `Bạn đã đăng ký sự kiện "${body.eventTitle}" với email ${body.email} vào ${new Date(registration.createdAt).toLocaleDateString('vi-VN')}. Vui lòng kiểm tra email để xem thông tin xác nhận.`,
+            existingRegistration: {
+              id: registration.id,
+              status: registration.status,
+              createdAt: registration.createdAt,
+            }
+          },
+          {
+            status: 409,
+            headers: CORS_HEADERS,
+          }
+        );
+      }
     }
 
     // Create registration

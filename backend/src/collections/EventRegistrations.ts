@@ -57,6 +57,11 @@ export const EventRegistrations: CollectionConfig = {
       type: 'text',
       label: 'Tên sự kiện',
       required: true,
+      admin: {
+        components: {
+          Cell: '@/components/admin/EventTitleField',
+        },
+      },
     },
     {
       name: 'eventId',

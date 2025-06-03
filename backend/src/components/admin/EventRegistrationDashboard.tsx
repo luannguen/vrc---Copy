@@ -53,7 +53,8 @@ const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = ({
         }
 
         const data = await response.json()
-        const registrations = data.docs || []
+        console.log('📊 Registration data received:', data)
+        const registrations = data.registrations || []
 
         // Calculate statistics
         const stats: RegistrationStats = {
@@ -71,6 +72,7 @@ const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = ({
             .slice(0, 10)
         }
 
+        console.log('📈 Calculated stats:', stats)
         setStats(stats)
       } catch (err) {
         console.error('Error fetching registration stats:', err)
