@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-interface Tag {
-  id: string;
-  title: string;
-  slug: string;
-}
+import { getNewsTags, Tag } from '@/services/tagsService';
 
 interface TagsListProps {
   className?: string;
@@ -15,35 +10,17 @@ export const TagsList: React.FC<TagsListProps> = ({ className = '' }) => {
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchTags = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/tags`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // Filter out old tags and only show Vietnamese news tags
-        const newsTags = data.tags.filter((tag: Tag) => {
-          const newsTagSlugs = [
-            'dien-lanh', 'trien-lam', 'hoi-thao', 'cong-nghe', 
-            'tiet-kiem-nang-luong', 'bao-tri', 'inverter', 
-            'hop-tac-quoc-te', 'nghien-cuu', 'phat-trien-ben-vung'
-          ];
-          return newsTagSlugs.includes(tag.slug);
-        });
-        
+        const newsTags = await getNewsTags();
         setTags(newsTags);
       } catch (err) {
         console.error('Error fetching tags:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch tags');
+        setError('Không thể tải tags: ' + (err instanceof Error ? err.message : 'Failed to fetch'));
       } finally {
         setLoading(false);
       }

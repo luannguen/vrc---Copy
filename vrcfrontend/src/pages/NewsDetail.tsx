@@ -103,11 +103,11 @@ const NewsDetail: React.FC = () => {
           setLoading(true);
           setError(null);
           // Try to fetch by slug first
-          let response = await fetch(`${import.meta.env.VITE_API_URL}/posts?slug=${slug}&limit=1`);
+          let response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts?slug=${slug}&limit=1`);
           
           if (!response.ok) {
             // If slug doesn't work, try ID
-            response = await fetch(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
+            response = await fetch(`${import.meta.env.VITE_API_URL}/api/posts/${slug}`);
           }
         
         if (!response.ok) {
@@ -150,7 +150,7 @@ const NewsDetail: React.FC = () => {
     // If it's an ID string, fetch the media data
     if (typeof imageIdOrObject === 'string') {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/media/${imageIdOrObject}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/${imageIdOrObject}`);
         if (response.ok) {
           const mediaData = await response.json();
           return mediaData.thumbnailURL 

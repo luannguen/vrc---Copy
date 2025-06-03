@@ -47,9 +47,8 @@ export const TagPage: React.FC = () => {
 
       try {
         setLoading(true);
-        setError(null);
-          const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/posts/by-tag?tag=${encodeURIComponent(tagSlug)}`
+        setError(null);        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/posts/by-tag?tag=${encodeURIComponent(tagSlug)}`
         );
         
         if (!response.ok) {
