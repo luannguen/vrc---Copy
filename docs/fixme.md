@@ -843,3 +843,57 @@ Footer (hoạt động tốt):
 - Code is production-ready and type-safe
 
 ---
+
+## 🌱 **SEED COMMANDS REFERENCE**
+
+### ✅ **Technologies, Partners & Suppliers Seed - WORKING**
+
+**Date Updated: June 3, 2025**
+
+#### **Full Database Seed (All Collections):**
+```bash
+# Seed tất cả collections (bao gồm technologies)
+curl -X POST http://localhost:3000/api/seed
+```
+
+#### **Technologies Only Seed (Recommended):**
+```bash
+# Seed chỉ riêng technologies/partners/suppliers
+curl -X POST "http://localhost:3000/api/seed?type=technologies"
+```
+
+#### **API Verification Commands:**
+```bash
+# Kiểm tra tổng số records
+curl "http://localhost:3000/api/technologies" -H "Accept: application/json"
+
+# Kiểm tra partners only
+curl "http://localhost:3000/api/technologies?where%5Btype%5D%5Bequals%5D=partner" -H "Accept: application/json"
+
+# Kiểm tra suppliers only  
+curl "http://localhost:3000/api/technologies?where%5Btype%5D%5Bequals%5D=supplier" -H "Accept: application/json"
+
+# Kiểm tra technologies only
+curl "http://localhost:3000/api/technologies?where%5Btype%5D%5Bequals%5D=technology" -H "Accept: application/json"
+```
+
+#### **⚠️ Important Notes:**
+- **Server must be running on port 3000** (`npm run dev`)
+- **Skip logic**: Seed sẽ skip nếu đã có dữ liệu trong collection
+- **Force re-seed**: Comment dòng skip trong `src/seed/technologies.ts` line 15-18
+- **Data includes**: 5 technologies + 4 partners + 3 suppliers = 12 new records
+- **Logo images**: All from existing media API endpoints
+
+#### **Troubleshooting:**
+```bash
+# Kiểm tra server status
+curl http://localhost:3000/api/health
+
+# Kiểm tra media có sẵn cho logo
+curl http://localhost:3000/api/media
+
+# Xóa dữ liệu cũ nếu cần (bulk delete)
+curl -X DELETE "http://localhost:3000/api/technologies/bulk" -H "Content-Type: application/json"
+```
+
+---

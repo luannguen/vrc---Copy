@@ -1,5 +1,6 @@
-import { seedProjectCategories } from './src/seed/project-categories.js';
-import { seedForms } from './src/seed/forms.js';
+import { seedProjectCategories } from './src/seed/project-categories.ts';
+import { seedForms } from './src/seed/forms.ts';
+import { seedTechnologies } from './src/seed/technologies.ts';
 
 async function runSeed() {
   try {
@@ -10,6 +11,9 @@ async function runSeed() {
 
     await seedForms();
     console.log('✅ Hoàn thành forms!');
+
+    await seedTechnologies();
+    console.log('✅ Hoàn thành technologies!');
 
     console.log('🎉 Tất cả hoàn thành!');
     process.exit(0);
