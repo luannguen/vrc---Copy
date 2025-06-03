@@ -246,14 +246,4 @@ export const EventRegistrations: CollectionConfig = {
     },
   ],
   timestamps: true,
-  hooks: {
-    afterChange: [
-      ({ doc, operation }) => {
-        // Log registration events
-        if (operation === 'create') {
-          console.log(`New event registration: ${doc.fullName} for ${doc.eventTitle}`);
-        }
-      },
-    ],
-  },
 };

@@ -46,7 +46,9 @@ export default buildConfig({  admin: {
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
       beforeDashboard: ['@/components/BeforeDashboard'],
       // Add only essential UI components to avoid conflicts with bulk operations
-      afterNavLinks: ['@/components/AdminUI/DynamicLogout']
+      afterNavLinks: ['@/components/AdminUI/DynamicLogout'],
+      // Add custom admin styles for better UI including react-select styling
+      afterDashboard: ['@/components/AdminUI/DynamicAdminStyles']
     },
     importMap: {
       baseDir: path.resolve(dirname),

@@ -1,85 +1,108 @@
 # VRC PAYLOAD CMS - FIXME & TROUBLESHOOTING GUIDE
 
-**Last Updated: June 2, 2025**
+**Last Updated: June 3, 2025**
 
-## 🚨 **CRITICAL BUG - JUNE 2, 2025** 
+## ✅ **RESOLVED - JUNE 3, 2025**
 
-### ❌ **Payload CMS COMPLIANCE VIOLATION - Events API**
+### 🎯 **Event Registrations Data Persistence Issue - FIXED**
 
-**SEVERITY: CRITICAL - Code violates fundamental Payload CMS principles**
+**SEVERITY: HIGH - Admin interface data refresh issue**
 
-**Vấn đề nghiêm trọng:**
-- **Vi phạm nguyên tắc**: Tạo custom API endpoints khi Payload CMS đã có built-in APIs
-- **Security bypass**: Tạo custom access functions để bypass authentication
-- **Kiến trúc sai**: Không sử dụng Payload CMS patterns đúng cách
-- **Maintenance nightmare**: Code custom khó maintain và debug
+**Vấn đề cụ thể:**
+- Sau khi click "Save" trong admin interface cho event-registrations, form không refresh tự động
+- Dữ liệu đã lưu thành công vào database nhưng UI vẫn hiển thị dữ liệu cũ
+- User phải refresh page thủ công để thấy dữ liệu mới
+- Chỉ xảy ra với collection `event-registrations`, các collection khác hoạt động bình thường
 
-**Tệp vi phạm đã XÓA:**
-- ❌ `backend/src/app/(payload)/api/event-categories/` - Custom API endpoints
-- ❌ `backend/src/access/authenticatedOrPublishedEvents.ts` - Custom access bypass
-- ❌ `backend/src/access/publicOrAuthenticated.ts` - Security hole
+**Root Cause Analysis:**
+1. **Ban đầu nghi ngờ**: Payload CMS v3 bug #9691 
+   - ❌ **Loại trừ**: Các collection khác hoạt động bình thường
+2. **Nguyên nhân thực tế**: Custom PATCH route `/api/event-registrations/[id]/route.ts`
+   - ✅ **Xác định**: Custom route override Payload's default update behavior
+   - ✅ **Chi tiết**: Response format không tương thích với Payload admin UI
 
-**Giải pháp đã áp dụng - PAYLOAD CMS COMPLIANCE:**
+**❌ Các phương pháp đã thử nhưng KHÔNG hiệu quả:**
+- Tạo custom components: `AdminFormStateManager`, `EventRegistrationEditWrapper`
+- Thêm `afterChange` hooks trong collection config
+- Tạo `AdminFormRefreshFix` components
+- Sử dụng `window.location.reload()` và các refresh mechanisms
 
-**1. Sử dụng Built-in APIs**
+**✅ Giải pháp CHÍNH XÁC:**
+
+**1. Xóa Custom Components không cần thiết:**
+```bash
+# Removed these files - they were addressing symptoms, not root cause
+- src/components/AdminUI/AdminFormStateManager.tsx
+- src/components/AdminUI/DynamicAdminFormStateManager.tsx  
+- src/components/AdminUI/EventRegistrationEditWrapper.tsx
+- src/components/AdminUI/DynamicEventRegistrationEditWrapper.tsx
+```
+
+**2. Sửa Custom PATCH Route để tuân thủ Payload patterns:**
 ```typescript
-// OLD - Custom endpoints (WRONG)
-/api/event-categories/route.ts
+// FILE: src/app/(payload)/api/event-registrations/[id]/route.ts
 
-// NEW - Use Payload's built-in endpoints (CORRECT)
-/api/events - Built-in collection endpoint
-/api/event-categories - Built-in collection endpoint
+export async function PATCH(request: NextRequest, { params }) {
+  try {
+    const { id } = await params;
+    const payload = await getPayload({ config: configPromise });
+
+    // Handle different content types from Payload admin interface
+    let body;
+    const contentType = request.headers.get('content-type') || '';
+    
+    if (contentType.includes('multipart/form-data')) {
+      // Payload admin sends multipart/form-data
+      const formData = await request.formData();
+      const payloadData = formData.get('_payload');
+      body = JSON.parse(payloadData.toString());
+    } else {
+      // Handle JSON data
+      const rawBody = await request.text();
+      body = JSON.parse(rawBody);
+    }
+
+    // Use Payload's standard update method - KEY SOLUTION!
+    const updatedRegistration = await payload.update({
+      collection: 'event-registrations',
+      id: id,
+      data: body,
+      depth: 2, // Standard depth for admin interface
+    });
+
+    // Return in exact format Payload admin UI expects - CRITICAL!
+    return NextResponse.json({
+      message: 'Updated successfully.',
+      doc: updatedRegistration, // Must be 'doc', not 'data' or other keys
+    });
+
+  } catch (error) {
+    return NextResponse.json({
+      message: 'Error updating registration.',
+      errors: [{ message: error.message }]
+    }, { status: 400 });
+  }
+}
 ```
 
-**2. Payload CMS Standard Access Control**
-```typescript
-// OLD - Custom access functions (VIOLATION)
-import { authenticatedOrPublishedEvents } from '../access/authenticatedOrPublishedEvents';
+**3. Key Technical Points:**
+- **Content Type Handling**: Payload admin gửi `multipart/form-data`, không phải JSON
+- **Response Format**: Phải return `{message: '...', doc: updatedData}` - đúng format Payload expects
+- **Payload Standard Methods**: Sử dụng `payload.update()` thay vì custom logic
+- **Depth Setting**: `depth: 2` đảm bảo admin interface hiển thị đúng related data
 
-// NEW - Use Payload's standard patterns (COMPLIANT)
-import { authenticatedOrPublished } from '../access/authenticatedOrPublished';
+**✅ Kết quả:**
+- ✅ Form refresh ngay lập tức sau khi Save
+- ✅ Không cần refresh page thủ công
+- ✅ Không có 405 hoặc 400 errors
+- ✅ Code tuân thủ Payload CMS patterns
+- ✅ Maintenance dễ dàng hơn
 
-access: {
-  create: authenticated,
-  read: authenticatedOrPublished, // Standard Payload pattern
-  update: authenticated,
-  delete: authenticated,
-},
-```
-
-**3. Enable Payload Versions (Drafts)**
-```typescript
-// Added to Events.ts and EventCategories.ts
-versions: {
-  drafts: {
-    autosave: { interval: 100 },
-    schedulePublish: true,
-  },
-  maxPerDoc: 50,
-}, // This enables _status field for draft/published
-```
-
-**Security Model được khôi phục:**
-- ✅ Draft content: Requires authentication (401 = correct behavior)
-- ✅ Published content: Publicly accessible
-- ✅ No authentication bypasses
-- ✅ Follow Payload CMS security principles
-
-**Lesson Learned:**
-```
-❌ NEVER create custom API endpoints when Payload has built-in solutions
-❌ NEVER bypass Payload's authentication system
-❌ NEVER ignore Payload CMS documentation and best practices
-✅ ALWAYS use Payload's built-in patterns and APIs
-✅ ALWAYS follow official documentation
-✅ ALWAYS respect the framework's architecture
-```
-
-**Current Status:**
-- ✅ API endpoints tuân thủ Payload CMS standards
-- ✅ Security model được khôi phục đúng
-- ✅ Frontend integration using proper Payload APIs
-- ⏳ Cần publish events để có public data for testing
+**📚 Bài học:**
+1. **Always follow framework patterns** - đừng tạo custom solutions khi framework đã có built-in
+2. **Check response format requirements** - mỗi framework có expectations riêng
+3. **Handle different content types** - admin interfaces thường gửi multipart data
+4. **Debug at the source** - tìm root cause thay vì fix symptoms
 
 ---
 
