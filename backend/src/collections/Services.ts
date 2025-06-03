@@ -80,13 +80,15 @@ export const Services: CollectionConfig = {
       admin: {
         description: 'Icon đại diện cho dịch vụ',
       },
-    },
-    {
+    },    {
       name: 'featuredImage',
       type: 'upload',
       label: 'Hình ảnh chính',
       relationTo: 'media',
       required: true,
+      admin: {
+        description: 'Hình ảnh đại diện cho dịch vụ',
+      },
     },
     {
       name: 'content',

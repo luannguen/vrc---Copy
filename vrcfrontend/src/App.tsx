@@ -12,6 +12,7 @@ import About from "./pages/About";
 import Products from "./pages/Products";
 import Projects from "./pages/Projects";
 import Services from "./pages/Services";
+import ServiceDetail from "./pages/ServiceDetail";
 import Installation from "./pages/Installation";
 import Maintenance from "./pages/Maintenance";
 import Repair from "./pages/Repair";
@@ -87,6 +88,7 @@ const App = () => (
           <Route path="projects/commercial" element={<CommercialProjects />} />
           <Route path="projects/specialized" element={<SpecializedProjects />} />
           <Route path="services" element={<Services />} />
+          <Route path="services/:slug" element={<ServiceDetail />} />
           <Route path="installation" element={<Installation />} />
           <Route path="maintenance" element={<Maintenance />} />
           <Route path="repair" element={<Repair />} />

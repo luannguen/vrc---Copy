@@ -1062,3 +1062,41 @@ import Technologies from "./pages/Technologies";
 6. CTA Section (call-to-action buttons)
 
 ---
+
+## ✅ **SERVICES SEED SUCCESS - JUNE 4, 2025**
+
+### 🎯 **Services Collection với Images - RESOLVED**
+
+#### ✅ THÀNH CÔNG: Script seed services với upload images
+
+**Command chạy thành công:**
+```bash
+cd "e:\Download\vrc - Copy\backend" && npx payload run src/scripts/seed-services-official.ts
+```
+
+**Kết quả:**
+- ✅ Successfully created: 6 services
+- ✅ All services có featured images được upload từ frontend
+- ✅ Total services in database: 7 (1 cũ + 6 mới)
+
+**Images mapping thành công:**
+```
+tu-van-thiet-ke → vrc-post-he-thong-quan-ly-nang-luong-thong-minh.jpg
+lap-dat-chuyen-nghiep → vrc-post-cong-nghe-inverter-tien-tien-toi-uu-hoa-tieu-thu-dien-nang.jpeg
+bao-tri-dinh-ky → vrc-post-khoa-dao-tao-ky-thuat-vien-bao-tri.jpeg
+sua-chua-khan-cap → vrc-post-giai-phap-tan-dung-nhiet-thai-heat-recovery.jpeg
+nang-cap-he-thong → vrc-post-ung-dung-ai-trong-toi-uu-hoa-van-hanh.jpg
+ho-tro-ky-thuat → vrc-post-hoi-thao-cong-nghe-tiet-kiem-nang-luong.jpeg
+```
+
+**Script file:** `backend/src/scripts/seed-services-official.ts`
+
+**Key Learnings:**
+1. Sử dụng API chính thức: `import { getPayload } from 'payload'` và `import config from '@payload-config'`
+2. Command đúng: `npx payload run script.ts` (không phải npm run)
+3. Upload images thành công qua Payload Local API
+4. Bypass type checking cho Lexical content bằng `@ts-expect-error`
+
+**Frontend verification:**
+- Admin dashboard: http://localhost:3000/admin/collections/services
+- Frontend API: http://localhost:8081/services

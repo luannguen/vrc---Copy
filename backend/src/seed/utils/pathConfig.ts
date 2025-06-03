@@ -5,10 +5,11 @@
  */
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
-// Xác định đường dẫn gốc của dự án
-// Sử dụng __dirname thay vì process.cwd() để đảm bảo đường dẫn luôn đúng
-// __dirname là thư mục chứa file hiện tại (backend/src/seed/utils)
+// Xác định đường dẫn gốc của dự án cho ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../../../..');
 
 // Cấu hình các đường dẫn tuyệt đối
@@ -44,7 +45,7 @@ export function getImageSearchPaths(): string[] {
   return [
     // SVG logos
     PATHS.FRONTEND_ASSETS.SVG,
-    // Image files 
+    // Image files
     PATHS.FRONTEND_ASSETS.IMAGES,
     // Lovable uploads
     PATHS.FRONTEND_ASSETS.UPLOADS,

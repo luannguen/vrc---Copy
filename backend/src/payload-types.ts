@@ -1271,6 +1271,9 @@ export interface Service {
    * Icon đại diện cho dịch vụ
    */
   icon?: (string | null) | Media;
+  /**
+   * Hình ảnh đại diện cho dịch vụ
+   */
   featuredImage: string | Media;
   content?: {
     root: {
