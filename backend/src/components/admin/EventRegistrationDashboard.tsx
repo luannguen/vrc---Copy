@@ -1,18 +1,21 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useEffect, useState, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
+import styles from './EventRegistrationDashboard.module.css'
+
+interface Registration {
+  id: string
+  fullName: string
+  email: string
+  eventTitle: string
+  status: string
+  participationType: string
+  createdAt: string
+}
 
 interface EventRegistrationDashboardProps {
-  doc?: {
-    id: string
-    fullName: string
-    email: string
-    eventTitle: string
-    status: string
-    participationType: string
-    createdAt: string
-  }
+  doc?: Registration
 }
 
 interface RegistrationStats {
@@ -25,65 +28,154 @@ interface RegistrationStats {
     'online': number
     'hybrid': number
   }
-  recentRegistrations: Array<{
-    id: string
-    fullName: string
-    email: string
-    eventTitle: string
-    status: string
-    createdAt: string
-  }>
+  recentRegistrations: Array<Registration>
 }
 
-const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = ({ doc }) => {
+const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = () => {
   const [stats, setStats] = useState<RegistrationStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const searchParams = useSearchParams()
 
+  // Fetch registration statistics
+  const fetchStats = useCallback(async () => {
+    try {
+      setIsRefreshing(true)
+      console.log('🔄 Fetching registration statistics...')
+
+      const response = await fetch('/api/event-registrations', {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch registration data')
+      }
+
+      const data = await response.json()
+      console.log('📊 Registration data received:', data)
+      const registrations: Registration[] = data.docs || []
+
+      // Calculate statistics
+      const stats: RegistrationStats = {
+        total: registrations.length,
+        pending: registrations.filter((r: Registration) => r.status === 'pending').length,
+        confirmed: registrations.filter((r: Registration) => r.status === 'confirmed').length,
+        cancelled: registrations.filter((r: Registration) => r.status === 'cancelled').length,
+        byParticipationType: {
+          'in-person': registrations.filter((r: Registration) => r.participationType === 'in-person').length,
+          'online': registrations.filter((r: Registration) => r.participationType === 'online').length,
+          'hybrid': registrations.filter((r: Registration) => r.participationType === 'hybrid').length,
+        },
+        recentRegistrations: registrations
+          .sort((a: Registration, b: Registration) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 10)
+      }
+
+      console.log('📈 Calculated stats:', stats)
+      setStats(stats)
+      setLastUpdated(new Date())
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching registration stats:', err)
+      setError(err instanceof Error ? err.message : 'Unknown error occurred')
+    } finally {
+      setLoading(false)
+      setIsRefreshing(false)
+    }
+  }, [])
+
+  // Initial fetch
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true)
-        setError(null)
+    fetchStats()
+  }, [fetchStats])
 
-        const response = await fetch('/api/event-registrations?limit=1000&depth=1')
-        if (!response.ok) {
-          throw new Error('Failed to fetch registration data')
-        }
+  // Auto-refresh when URL changes (when user navigates back from edit/detail pages)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log('🔄 Window focused - refreshing dashboard...')
+      fetchStats()
+    }
 
-        const data = await response.json()
-        console.log('📊 Registration data received:', data)
-        const registrations = data.registrations || []
-
-        // Calculate statistics
-        const stats: RegistrationStats = {
-          total: registrations.length,
-          pending: registrations.filter((r: any) => r.status === 'pending').length,
-          confirmed: registrations.filter((r: any) => r.status === 'confirmed').length,
-          cancelled: registrations.filter((r: any) => r.status === 'cancelled').length,
-          byParticipationType: {
-            'in-person': registrations.filter((r: any) => r.participationType === 'in-person').length,
-            'online': registrations.filter((r: any) => r.participationType === 'online').length,
-            'hybrid': registrations.filter((r: any) => r.participationType === 'hybrid').length,
-          },
-          recentRegistrations: registrations
-            .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, 10)
-        }
-
-        console.log('📈 Calculated stats:', stats)
-        setStats(stats)
-      } catch (err) {
-        console.error('Error fetching registration stats:', err)
-        setError(err instanceof Error ? err.message : 'Unknown error occurred')
-      } finally {
-        setLoading(false)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('👁️ Tab became visible - refreshing dashboard...')
+        fetchStats()
       }
     }
 
-    fetchStats()
-  }, [])
+    // Listen for window focus events (when user comes back to tab)
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [fetchStats])
+
+  // Auto-refresh every 30 seconds to keep data fresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('⏰ Auto-refresh triggered')
+      fetchStats()
+    }, 30000) // 30 seconds
+
+    return () => clearInterval(interval)
+  }, [fetchStats])
+
+  // Listen for storage events (in case of changes in other tabs)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      console.log('💾 Storage change detected - refreshing...')
+      fetchStats()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [fetchStats])
+
+  // Listen for popstate events (browser back/forward navigation)
+  useEffect(() => {
+    const handlePopState = () => {
+      console.log('🔙 Navigation detected - refreshing dashboard...')
+      fetchStats()
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [fetchStats])
+
+  // Listen for custom refresh events
+  useEffect(() => {
+    const handleCustomRefresh = () => {
+      console.log('🔄 Custom refresh event - refreshing dashboard...')
+      fetchStats()
+    }
+
+    window.addEventListener('dashboardRefresh', handleCustomRefresh)
+    return () => window.removeEventListener('dashboardRefresh', handleCustomRefresh)
+  }, [fetchStats])
+
+  // Listen for URL parameter changes to detect when user returns from edit/detail pages
+  useEffect(() => {
+    const currentUrl = window.location.href
+    console.log('🔍 URL changed:', currentUrl)
+
+    // If we're back on the main list page, refresh
+    if (currentUrl.includes('/admin/collections/event-registrations') && !currentUrl.includes('/edit') && !currentUrl.includes('/create')) {
+      setTimeout(() => {
+        console.log('🏠 Back to list page - refreshing...')
+        fetchStats()
+      }, 500) // Small delay to ensure page is fully loaded
+    }
+  }, [searchParams, fetchStats])
 
   const handleConfirmRegistration = async (registrationId: string) => {
     try {
@@ -98,8 +190,12 @@ const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = ({
       })
 
       if (response.ok) {
-        // Refresh stats
-        window.location.reload()
+        // Refresh stats immediately instead of page reload
+        console.log('✅ Registration confirmed - refreshing stats...')
+        await fetchStats()
+
+        // Trigger custom event for other components
+        window.dispatchEvent(new CustomEvent('dashboardRefresh'))
       } else {
         console.error('Failed to confirm registration')
       }
@@ -128,24 +224,24 @@ const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = ({
     }
   }
 
-  if (loading) {
+  if (loading && !stats) {
     return (
-      <div className="event-registration-dashboard" style={{ padding: '20px' }}>
-        <div className="loading" style={{ textAlign: 'center', padding: '40px' }}>
+      <div className={styles['event-registration-dashboard']}>
+        <div className={styles.loading}>
           <div>Đang tải thống kê đăng ký sự kiện...</div>
         </div>
       </div>
     )
   }
 
-  if (error) {
+  if (error && !stats) {
     return (
-      <div className="event-registration-dashboard" style={{ padding: '20px' }}>
-        <div className="error" style={{ color: 'red', textAlign: 'center', padding: '40px' }}>
+      <div className={styles['event-registration-dashboard']}>
+        <div className={styles.error}>
           <div>Lỗi: {error}</div>
           <button
-            onClick={() => window.location.reload()}
-            style={{ marginTop: '10px', padding: '8px 16px' }}
+            onClick={() => fetchStats()}
+            className={styles.retryButton}
           >
             Thử lại
           </button>
@@ -156,278 +252,109 @@ const EventRegistrationDashboard: React.FC<EventRegistrationDashboardProps> = ({
 
   if (!stats) {
     return (
-      <div className="event-registration-dashboard" style={{ padding: '20px' }}>
-        <div>Không có dữ liệu thống kê</div>
+      <div className={styles['event-registration-dashboard']}>
+        <div className={styles.loading}>Không có dữ liệu thống kê</div>
       </div>
     )
   }
 
   return (
-    <div className="event-registration-dashboard" style={{ padding: '20px', fontFamily: 'system-ui, sans-serif' }}>
-      <h2 style={{ marginBottom: '24px', color: '#333' }}>Thống kê Đăng ký Sự kiện</h2>
+    <div className={styles['event-registration-dashboard']}>
+      <h2>
+        Thống kê Đăng ký Sự kiện
+        {isRefreshing && <span className={styles.refreshIndicator}>⟳</span>}
+      </h2>
+
+      {lastUpdated && (
+        <div className={styles.lastUpdated}>
+          Cập nhật lần cuối: {lastUpdated.toLocaleString('vi-VN')}
+        </div>
+      )}
 
       {/* Stats Overview */}
-      <div className="stats-grid" style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '16px',
-        marginBottom: '32px'
-      }}>
-        <div className="stat-card" style={{
-          background: '#f8f9fa',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #e9ecef'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#666', textTransform: 'uppercase' }}>
-            Tổng đăng ký
-          </h3>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#333' }}>{stats.total}</div>
+      <div className={`${styles['stats-grid']} ${styles.statsGrid}`}>
+        <div className={`${styles['stat-card']} ${styles.statCard} ${styles.total}`}>
+          <h3 className={styles.statTitle}>Tổng đăng ký</h3>
+          <div className={styles.statValue}>{stats.total}</div>
         </div>
 
-        <div className="stat-card" style={{
-          background: '#fff3cd',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #ffeaa7'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#856404', textTransform: 'uppercase' }}>
-            Chờ xác nhận
-          </h3>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#856404' }}>{stats.pending}</div>
+        <div className={`${styles['stat-card']} ${styles.statCard} ${styles.pending}`}>
+          <h3 className={styles.statTitle}>Chờ xác nhận</h3>
+          <div className={styles.statValue}>{stats.pending}</div>
         </div>
 
-        <div className="stat-card" style={{
-          background: '#d4edda',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #c3e6cb'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#155724', textTransform: 'uppercase' }}>
-            Đã xác nhận
-          </h3>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#155724' }}>{stats.confirmed}</div>
+        <div className={`${styles['stat-card']} ${styles.statCard} ${styles.confirmed}`}>
+          <h3 className={styles.statTitle}>Đã xác nhận</h3>
+          <div className={styles.statValue}>{stats.confirmed}</div>
         </div>
 
-        <div className="stat-card" style={{
-          background: '#f8d7da',
-          padding: '20px',
-          borderRadius: '8px',
-          border: '1px solid #f5c6cb'
-        }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#721c24', textTransform: 'uppercase' }}>
-            Đã hủy
-          </h3>
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#721c24' }}>{stats.cancelled}</div>
+        <div className={`${styles['stat-card']} ${styles.statCard} ${styles.cancelled}`}>
+          <h3 className={styles.statTitle}>Đã hủy</h3>
+          <div className={styles.statValue}>{stats.cancelled}</div>
         </div>
       </div>
 
-      {/* Participation Type Stats */}
-      <div className="participation-stats" style={{ marginBottom: '32px' }}>
-        <h3 style={{ marginBottom: '16px', color: '#333' }}>Loại tham gia</h3>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: '12px'
-        }}>
-          <div style={{
-            background: '#e3f2fd',
-            padding: '16px',
-            borderRadius: '6px',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1976d2' }}>
-              {stats.byParticipationType['in-person']}
-            </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>Trực tiếp</div>
-          </div>
-          <div style={{
-            background: '#f3e5f5',
-            padding: '16px',
-            borderRadius: '6px',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#7b1fa2' }}>
-              {stats.byParticipationType['online']}
-            </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>Online</div>
-          </div>
-          <div style={{
-            background: '#e8f5e8',
-            padding: '16px',
-            borderRadius: '6px',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#388e3c' }}>
-              {stats.byParticipationType['hybrid']}
-            </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>Hybrid</div>
-          </div>
+      {/* Participation Types */}
+      <h3>Phân loại theo hình thức tham gia</h3>
+      <div className={styles.participationGrid}>
+        <div className={styles.participationCard}>
+          <h4 className={styles.participationTitle}>Trực tiếp</h4>
+          <div className={styles.participationValue}>{stats.byParticipationType['in-person']}</div>
+        </div>
+        <div className={styles.participationCard}>
+          <h4 className={styles.participationTitle}>Trực tuyến</h4>
+          <div className={styles.participationValue}>{stats.byParticipationType['online']}</div>
+        </div>
+        <div className={styles.participationCard}>
+          <h4 className={styles.participationTitle}>Kết hợp</h4>
+          <div className={styles.participationValue}>{stats.byParticipationType['hybrid']}</div>
         </div>
       </div>
 
       {/* Recent Registrations */}
-      <div className="recent-registrations">
-        <h3 style={{ marginBottom: '16px', color: '#333' }}>Đăng ký gần đây</h3>
-        {stats.recentRegistrations.length === 0 ? (
-          <div style={{
-            padding: '40px',
-            textAlign: 'center',
-            color: '#666',
-            background: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            Chưa có đăng ký nào
-          </div>
-        ) : (
-          <div style={{
-            background: 'white',
-            border: '1px solid #e9ecef',
-            borderRadius: '8px',
-            overflow: 'hidden'
-          }}>
-            {stats.recentRegistrations.map((registration, index) => (
-              <div
-                key={registration.id}
-                style={{
-                  padding: '16px',
-                  borderBottom: index < stats.recentRegistrations.length - 1 ? '1px solid #e9ecef' : 'none',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                    {registration.fullName}
-                  </div>
-                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>
-                    {registration.email}
-                  </div>
-                  <div style={{ fontSize: '14px', color: '#666' }}>
-                    {registration.eventTitle}
+      <div className={styles.recentSection}>
+        <h3 className={styles.recentTitle}>Đăng ký gần đây</h3>
+        {stats.recentRegistrations.length > 0 ? (
+          <div className={styles.recentList}>
+            {stats.recentRegistrations.map((registration) => (
+              <div key={registration.id} className={styles.recentItem}>
+                <div className={styles.recentInfo}>
+                  <div className={styles.recentName}>{registration.fullName}</div>
+                  <div className={styles.recentDetails}>
+                    {registration.email} | {registration.eventTitle} |
+                    <span className={`${styles.status} ${styles[registration.status]}`}>
+                      {registration.status === 'pending' && 'Chờ xác nhận'}
+                      {registration.status === 'confirmed' && 'Đã xác nhận'}
+                      {registration.status === 'cancelled' && 'Đã hủy'}
+                    </span>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{
-                    display: 'inline-block',
-                    padding: '4px 8px',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    marginBottom: '8px',
-                    background: registration.status === 'confirmed' ? '#d4edda' :
-                               registration.status === 'pending' ? '#fff3cd' : '#f8d7da',
-                    color: registration.status === 'confirmed' ? '#155724' :
-                           registration.status === 'pending' ? '#856404' : '#721c24'
-                  }}>
-                    {registration.status === 'confirmed' ? 'Đã xác nhận' :
-                     registration.status === 'pending' ? 'Chờ xác nhận' : 'Đã hủy'}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#666' }}>
-                    {new Date(registration.createdAt).toLocaleDateString('vi-VN')}
-                  </div>
+                <div className={styles.recentActions}>
                   {registration.status === 'pending' && (
-                    <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
+                    <>
                       <button
                         onClick={() => handleConfirmRegistration(registration.id)}
-                        style={{
-                          padding: '4px 8px',
-                          fontSize: '12px',
-                          background: '#28a745',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
+                        className={`${styles.actionButton} ${styles.confirmButton}`}
                       >
                         Xác nhận
                       </button>
                       <button
                         onClick={() => handleSendConfirmationEmail(registration.id)}
-                        style={{
-                          padding: '4px 8px',
-                          fontSize: '12px',
-                          background: '#007bff',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
+                        className={`${styles.actionButton} ${styles.emailButton}`}
                       >
                         Gửi email
                       </button>
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
             ))}
           </div>
+        ) : (
+          <div className={styles.noRecentRegistrations}>
+            Không có đăng ký gần đây
+          </div>
         )}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="quick-actions" style={{ marginTop: '32px' }}>
-        <h3 style={{ marginBottom: '16px', color: '#333' }}>Thao tác nhanh</h3>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => router.push('/admin/collections/event-registrations')}
-            style={{
-              padding: '12px 24px',
-              background: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            Quản lý tất cả đăng ký
-          </button>
-          <button
-            onClick={() => router.push('/admin/collections/events')}
-            style={{
-              padding: '12px 24px',
-              background: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            Quản lý sự kiện
-          </button>
-          <button
-            onClick={() => {
-              const csvContent = 'data:text/csv;charset=utf-8,' +
-                ['Họ tên,Email,Sự kiện,Trạng thái,Loại tham gia,Ngày đăng ký']
-                  .concat(stats.recentRegistrations.map(r =>
-                    `"${r.fullName}","${r.email}","${r.eventTitle}","${r.status}","",${new Date(r.createdAt).toLocaleDateString('vi-VN')}`
-                  ))
-                  .join('\n')
-
-              const encodedUri = encodeURI(csvContent)
-              const link = document.createElement('a')
-              link.setAttribute('href', encodedUri)
-              link.setAttribute('download', `event-registrations-${new Date().toISOString().split('T')[0]}.csv`)
-              document.body.appendChild(link)
-              link.click()
-              document.body.removeChild(link)
-            }}
-            style={{
-              padding: '12px 24px',
-              background: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            Xuất CSV
-          </button>
-        </div>
       </div>
     </div>
   )

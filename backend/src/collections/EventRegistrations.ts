@@ -7,6 +7,11 @@ export const EventRegistrations: CollectionConfig = {
     description: 'Đăng ký tham gia sự kiện',
     group: 'Sự kiện',
     defaultColumns: ['fullName', 'email', 'eventTitle', 'participationType', 'status', 'createdAt'],
+    enableRichTextRelationship: false,
+    pagination: {
+      defaultLimit: 50,
+      limits: [10, 25, 50, 100]
+    },
     components: {
       beforeList: ['@/components/admin/EventRegistrationDashboard'],
     },
