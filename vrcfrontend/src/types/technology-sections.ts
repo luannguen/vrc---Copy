@@ -19,10 +19,11 @@ export interface TechnologySectionEquipmentCategory {
 
 export interface TechnologySectionPartnerLogo {
   id: string;
-  name: string;
+  partnerName: string;
   logo?: {
     url: string;
     alt?: string;
+    thumbnailURL?: string;
   };
   website?: string;
 }

@@ -55,15 +55,13 @@ const getIconForTechnology = (category: string) => {
   return iconMap[category] || <Server className="text-primary" />;
 };
 
-const Technologies = () => {
-  const [sections, setSections] = useState<TechnologySectionsByType>({});
+const Technologies = () => {  const [sections, setSections] = useState<TechnologySectionsByType>({});
   const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
+    const fetchData = async () => {      try {
         setLoading(true);
         setError(null);
 
@@ -334,21 +332,19 @@ const Technologies = () => {
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               {partnersSection?.subtitle || 'Chúng tôi hợp tác với các thương hiệu hàng đầu thế giới để mang đến những giải pháp công nghệ tốt nhất.'}
-            </p>
-          </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            </p>          </div>            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {partnersSection?.partnerLogos && partnersSection.partnerLogos.length > 0 ? (
-              partnersSection.partnerLogos.map((partner) => (
-                <div key={partner.id} className="bg-white rounded-lg p-4 flex items-center justify-center h-24 shadow-sm">
-                  {partner.logo?.url ? (
+              partnersSection.partnerLogos.map((partnerLogo) => (
+                <div key={partnerLogo.id} className="bg-white rounded-lg p-4 flex items-center justify-center h-24 shadow-sm">
+                  {partnerLogo.logo?.url ? (
                     <img 
-                      src={partner.logo.url} 
-                      alt={partner.logo.alt || partner.name}
+                      src={`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${partnerLogo.logo.url}`}
+                      alt={partnerLogo.logo.alt || partnerLogo.partnerName}
                       className="max-w-full max-h-full object-contain"
                     />
                   ) : (
                     <div className="text-center">
-                      <div className="font-medium text-sm">{partner.name}</div>
+                      <div className="font-medium text-sm">{partnerLogo.partnerName}</div>
                     </div>
                   )}
                 </div>
@@ -360,8 +356,7 @@ const Technologies = () => {
                   <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center text-muted-foreground">
                     Logo đối tác {index + 1}
                   </div>
-                </div>
-              ))
+                </div>              ))
             )}
           </div>
         </div>

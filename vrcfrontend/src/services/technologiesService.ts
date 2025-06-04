@@ -3,12 +3,23 @@ import { apiClient } from '@/lib/api';
 export interface Technology {
   id: string;
   name: string;
-  description: string;
+  description: any; // Lexical richtext content
+  type?: 'technology' | 'partner' | 'supplier';
   category?: string;
+  logo?: {
+    id: string;
+    filename: string;
+    alt?: string;
+    url: string;
+    thumbnailURL?: string;
+  };
+  website?: string;
   specifications?: Record<string, any>;
   images?: string[];
   slug?: string;
   featured?: boolean;
+  order?: number;
+  status?: string;
   createdAt: string;
   updatedAt: string;
 }
