@@ -56,6 +56,9 @@ import AuxiliaryProducts from "./pages/products/Auxiliary";
 import IndustrialProjects from "./pages/projects/Industrial";
 import CommercialProjects from "./pages/projects/Commercial";
 import SpecializedProjects from "./pages/projects/Specialized";
+import ProjectDetail from "./pages/ProjectDetail";
+import ProjectCategory from "./pages/ProjectCategory";
+import AllProjects from "./pages/AllProjects";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -84,9 +87,12 @@ const App = () => (
           <Route path="products/cold-storage" element={<ColdStorageProducts />} />
           <Route path="products/auxiliary" element={<AuxiliaryProducts />} />
           <Route path="projects" element={<Projects />} />
+          <Route path="projects/all" element={<AllProjects />} />
           <Route path="projects/industrial" element={<IndustrialProjects />} />
           <Route path="projects/commercial" element={<CommercialProjects />} />
           <Route path="projects/specialized" element={<SpecializedProjects />} />
+          <Route path="projects/category/:categorySlug" element={<ProjectCategory />} />
+          <Route path="projects/detail/:slug" element={<ProjectDetail />} />
           <Route path="services" element={<Services />} />
           <Route path="services/:slug" element={<ServiceDetail />} />
           <Route path="installation" element={<Installation />} />

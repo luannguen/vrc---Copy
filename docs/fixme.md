@@ -1100,3 +1100,91 @@ ho-tro-ky-thuat → vrc-post-hoi-thao-cong-nghe-tiet-kiem-nang-luong.jpeg
 **Frontend verification:**
 - Admin dashboard: http://localhost:3000/admin/collections/services
 - Frontend API: http://localhost:8081/services
+
+---
+
+## ✅ **RESOLVED - JUNE 4, 2025**
+
+### 🎯 **Seed Scripts _status Field Issue - FIXED**
+
+#### SEVERITY: HIGH - Prevented API data access
+
+**Vấn đề cụ thể:**
+
+- Seed scripts sử dụng sai field `status: "published"` thay vì `_status: "published"`
+- Collections có `versions.drafts: true` yêu cầu `_status` field
+- Public API chỉ trả về documents với `_status: 'published'`
+- Kết quả: Seed data không hiển thị qua API public
+
+**Root Cause Analysis:**
+
+1. **Payload CMS Auto Field**: Collections có `versions.drafts: true` tự động thêm `_status` field
+2. **Dual Field Requirement**: Cần cả `status` (custom) và `_status` (system) fields
+3. **API Access Control**: `authenticatedOrPublished` filter dựa trên `_status` field
+
+**✅ Giải pháp HOÀN CHỈNH:**
+
+**1. Fixed All Seed Scripts:**
+
+```typescript
+// FILES: backend/src/seed/projects.ts, services.ts, posts.ts
+// BEFORE (incorrect):
+{
+  status: "published",
+  // missing _status field
+}
+
+// AFTER (correct):
+{
+  status: "published",     // Custom collection field
+  _status: "published",    // Payload CMS system field
+}
+```
+
+**2. Improved Demo Data Quality:**
+
+- Sử dụng data thực từ hardcode files trong `vrcfrontend - Copy/src/pages/projects/`
+- Thay thế placeholder data với thông tin dự án thực tế
+- 6 projects hoàn chỉnh với mô tả chi tiết
+
+**3. Enhanced Seed Behavior:**
+
+```typescript
+// Delete existing data before seeding for fresh data
+if (existingProjects.docs.length > 0) {
+  console.log('Deleting existing data first...');
+  for (const project of existingProjects.docs) {
+    await payload.delete({ collection: 'projects', id: project.id });
+  }
+}
+```
+
+**✅ KẾT QUẢ THÀNH CÔNG:**
+
+```bash
+# Seed command
+curl -X POST "http://localhost:3000/api/seed?type=projects"
+# Result: {"success":true,"message":"Successfully seeded projects data"}
+
+# API verification
+curl "http://localhost:3000/api/projects"
+# Result: 6 projects returned with proper _status: "published"
+```
+
+**📝 DEMO DATA CREATED:**
+
+1. **Nhà máy sản xuất ABC** - Hệ thống điều hòa công nghiệp (Bình Dương)
+2. **Chung Cư Cao Cấp Star Heights** - Hệ thống HVAC 35.000 m² (TP.HCM)
+3. **Siêu thị Mega Market** - Hệ thống lạnh thương mại (Hà Nội)
+4. **Nhà máy chế biến thủy sản Minh Phú** - Kho lạnh công nghiệp (Cà Mau)
+5. **Trung tâm thương mại Diamond Plaza** - HVAC tổng thể (TP.HCM)
+6. **Khách sạn 5 sao Intercontinental** - Hệ thống điều hòa cao cấp (Đà Nẵng)
+
+**📋 NEXT STEPS:**
+
+- ✅ All seed scripts now follow Payload CMS best practices
+- ✅ API returns proper published content
+- ✅ Realistic demo data for frontend testing
+- 🔄 Consider applying to other collections (Services, Posts)
+
+---

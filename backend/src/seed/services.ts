@@ -1,9 +1,9 @@
 import { Payload } from 'payload';
 
 // Import our improved media management utilities
-import { 
+import {
   getImageForCollectionItem,
-  getOrCreateDefaultMediaId 
+  getOrCreateDefaultMediaId
 } from './utils/seedMediaManagement';
 
 // Import RichText utils with advanced formatting
@@ -32,10 +32,10 @@ export const seedServices = async (payload: Payload) => {
     const services = [
       {
         title: "Dịch vụ bảo trì chuyên nghiệp",
-        summary: "Đội ngũ kỹ thuật hàng đầu, phục vụ 24/7 cho các hệ thống điện lạnh công nghiệp và thương mại",
-        type: "maintenance", // Required field
+        summary: "Đội ngũ kỹ thuật hàng đầu, phục vụ 24/7 cho các hệ thống điện lạnh công nghiệp và thương mại",        type: "maintenance", // Required field
         featured: true,
         status: "published",
+        _status: "published",
         featuredImage: defaultMediaId, // Required field
         content: createRichText(`# Dịch vụ bảo trì chuyên nghiệp
 
@@ -57,10 +57,10 @@ Liên hệ ngay để được tư vấn gói bảo trì phù hợp!`, 'markdown
       },
       {
         title: "Tư vấn giải pháp tiết kiệm năng lượng",
-        summary: "Giải pháp xanh cho tương lai bền vững, giúp doanh nghiệp tiết kiệm chi phí",
-        type: "consulting", // Required field
+        summary: "Giải pháp xanh cho tương lai bền vững, giúp doanh nghiệp tiết kiệm chi phí",        type: "consulting", // Required field
         featured: true,
         status: "published",
+        _status: "published",
         featuredImage: defaultMediaId, // Required field
         content: createRichText(`# Tư vấn giải pháp tiết kiệm năng lượng
 
@@ -84,10 +84,10 @@ Chúng tôi áp dụng các **công nghệ tiên tiến** nhằm tối ưu hóa 
       },
       {
         title: "Dịch vụ sửa chữa khẩn cấp",
-        summary: "Khắc phục sự cố nhanh chóng, hỗ trợ 24/7 cho mọi hệ thống điện lạnh",
-        type: "repair", // Required field
+        summary: "Khắc phục sự cố nhanh chóng, hỗ trợ 24/7 cho mọi hệ thống điện lạnh",        type: "repair", // Required field
         featured: true,
         status: "published",
+        _status: "published",
         featuredImage: defaultMediaId, // Required field
         content: createRichText(`# Dịch vụ sửa chữa khẩn cấp
 
@@ -115,28 +115,28 @@ Hotline hỗ trợ: 1900-xxxx`, 'markdown'),
     ];    // Create services
     // Khởi tạo progress bar cho việc tạo dịch vụ
     progressManager.initProgressBar(services.length, 'Uploading service images');
-    
+
     for (const service of services) {
       try {
         // Get appropriate image for this service
         const mediaId = await getImageForCollectionItem(
-          payload, 
-          'service', 
+          payload,
+          'service',
           service.title
         );
-        
+
         // Create service with the appropriate image
         const data = {
           ...service,
           featuredImage: mediaId || defaultMediaId
         };
-        
+
         const createdService = await payload.create({
           collection: 'services',
           data: data as any, // Using type assertion as a temporary solution
         });
         console.log(`Created service: ${createdService.title} with media ID: ${data.featuredImage}`);
-        
+
         // Cập nhật tiến trình
         progressManager.increment();
       } catch (error) {
@@ -144,7 +144,7 @@ Hotline hỗ trợ: 1900-xxxx`, 'markdown'),
         progressManager.increment(); // Vẫn cập nhật nếu có lỗi
       }
     }
-    
+
     // Hoàn thành progress bar
     progressManager.complete();
 

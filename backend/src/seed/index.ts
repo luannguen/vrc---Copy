@@ -16,6 +16,8 @@ import { seedTools } from './seed-tools';
 import { seedResources } from './seed-resources';
 import { seedBanners } from './seed-banners';
 import { seedHomepageSettings } from './homepage-settings';
+import { seedProjectsPageSettings } from './projectsPageSettings';
+import { seedProjectsMedia } from './projectsMedia';
 import { seedForms } from './forms';
 import { progressManager } from './utils/progressUtils';
 
@@ -23,7 +25,7 @@ export const seed = async (payload: Payload) => {
   console.log('🌱 Starting seed process...');
   console.log('🖼️ Images will be automatically uploaded from the frontend directory during seeding');
   // Tổng số collection/global cần seed
-  const totalSeedTasks = 18; // Increased for forms
+  const totalSeedTasks = 20; // Increased for forms, projects page settings and projects media
   progressManager.initProgressBar(totalSeedTasks, 'Seeding application data');
 
   try {
@@ -40,6 +42,10 @@ export const seed = async (payload: Payload) => {
 
     // Seed Media trước
     await seedMedia(payload);
+    progressManager.increment();
+
+    // Seed projects media for dynamic content
+    await seedProjectsMedia(payload);
     progressManager.increment();
 
     // Seed Product Categories
@@ -88,6 +94,10 @@ export const seed = async (payload: Payload) => {
 
     // Seed homepage settings (after all related data)
     await seedHomepageSettings(payload);
+    progressManager.increment();
+
+    // Seed projects page settings
+    await seedProjectsPageSettings(payload);
     progressManager.increment();
 
     // Hoàn thành progress bar

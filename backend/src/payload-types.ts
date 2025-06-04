@@ -140,6 +140,7 @@ export interface Config {
     'company-info': CompanyInfo;
     'homepage-settings': HomepageSetting;
     'about-page-settings': AboutPageSetting;
+    'projects-page-settings': ProjectsPageSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
@@ -147,6 +148,7 @@ export interface Config {
     'company-info': CompanyInfoSelect<false> | CompanyInfoSelect<true>;
     'homepage-settings': HomepageSettingsSelect<false> | HomepageSettingsSelect<true>;
     'about-page-settings': AboutPageSettingsSelect<false> | AboutPageSettingsSelect<true>;
+    'projects-page-settings': ProjectsPageSettingsSelect<false> | ProjectsPageSettingsSelect<true>;
   };
   locale: null;
   user: User & {
@@ -3861,6 +3863,81 @@ export interface AboutPageSetting {
   createdAt?: string | null;
 }
 /**
+ * Quản lý nội dung và hiển thị trang dự án
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects-page-settings".
+ */
+export interface ProjectsPageSetting {
+  id: string;
+  heroSection: {
+    title: string;
+    subtitle: string;
+    /**
+     * Hình nền cho banner trang dự án. Kích thước khuyến nghị: 1920x600px
+     */
+    backgroundImage?: (string | null) | Media;
+  };
+  categorySection?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Bật/tắt hiển thị phần danh mục dự án
+     */
+    enableCategories?: boolean | null;
+  };
+  featuredSection?: {
+    title?: string | null;
+    /**
+     * Bật/tắt hiển thị phần dự án nổi bật
+     */
+    showFeaturedProjects?: boolean | null;
+    /**
+     * Số lượng dự án nổi bật hiển thị trên trang chính
+     */
+    featuredProjectsLimit?: number | null;
+  };
+  statsSection?: {
+    /**
+     * Bật/tắt hiển thị phần thống kê thành tựu
+     */
+    enableStats?: boolean | null;
+    stats?:
+      | {
+          /**
+           * VD: 500+ hoặc 20 năm
+           */
+          value: string;
+          /**
+           * VD: Dự án đã hoàn thành
+           */
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  ctaSection: {
+    title?: string | null;
+    description?: string | null;
+    primaryButton: {
+      text: string;
+      /**
+       * Đường dẫn tương đối hoặc tuyệt đối. VD: /contact hoặc https://example.com
+       */
+      link: string;
+    };
+    secondaryButton?: {
+      text?: string | null;
+      /**
+       * Đường dẫn tương đối hoặc tuyệt đối. VD: /services hoặc https://example.com
+       */
+      link?: string | null;
+    };
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -4157,6 +4234,66 @@ export interface AboutPageSettingsSelect<T extends boolean = true> {
         description?: T;
         icon?: T;
         id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects-page-settings_select".
+ */
+export interface ProjectsPageSettingsSelect<T extends boolean = true> {
+  heroSection?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        backgroundImage?: T;
+      };
+  categorySection?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        enableCategories?: T;
+      };
+  featuredSection?:
+    | T
+    | {
+        title?: T;
+        showFeaturedProjects?: T;
+        featuredProjectsLimit?: T;
+      };
+  statsSection?:
+    | T
+    | {
+        enableStats?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+      };
+  ctaSection?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        primaryButton?:
+          | T
+          | {
+              text?: T;
+              link?: T;
+            };
+        secondaryButton?:
+          | T
+          | {
+              text?: T;
+              link?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;

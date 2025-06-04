@@ -19,6 +19,7 @@
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "seed:forms": "npx payload run src/scripts/seed-forms.js",
     "seed:services": "cross-env NODE_OPTIONS=--no-deprecation npx payload run src/scripts/seed-services-with-images.ts",
+    "seed:projects-media": "cross-env NODE_OPTIONS=--no-deprecation npx payload run src/scripts/seed-projects-media.ts",
     "seed:js": "cross-env NODE_OPTIONS=--no-deprecation node scripts/run-seed.js",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test:health": "node src/endpoints/test-health.js",

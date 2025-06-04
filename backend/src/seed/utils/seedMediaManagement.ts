@@ -9,8 +9,8 @@ import { progressManager } from './progressUtils';
  * to avoid TypeScript compatibility issues
  */
 export async function createMediaRecord(
-  payload: Payload, 
-  filename: string, 
+  payload: Payload,
+  filename: string,
   alt: string
 ): Promise<string | null> {
   try {
@@ -67,7 +67,7 @@ const imageMap: CollectionImageMap = {
     default: 'logo.svg',
     images: {
       'Daikin': 'logo.svg',
-      'Carrier': 'logo.svg', 
+      'Carrier': 'logo.svg',
       'Mitsubishi Electric': 'logo.svg',
       'Trane': 'logo.svg',
       'LG Electronics': 'logo.svg',
@@ -93,10 +93,24 @@ const imageMap: CollectionImageMap = {
   service: {
     default: 'service-overview.jpg',
   },
-
   // Project image mapping
   project: {
     default: 'projects-overview.jpg',
+    images: {
+      'industrial hero': 'projects-overview.jpg',
+      'commercial hero': 'service-overview.jpg',
+      'specialized hero': 'projects-overview.jpg',
+      'industrial gallery 1': 'service-overview.jpg',
+      'industrial gallery 2': 'projects-overview.jpg',
+      'industrial gallery 3': 'service-overview.jpg',
+      'commercial gallery 1': 'projects-overview.jpg',
+      'commercial gallery 2': 'service-overview.jpg',
+      'commercial gallery 3': 'projects-overview.jpg',
+      'specialized gallery 1': 'service-overview.jpg',
+      'specialized gallery 2': 'projects-overview.jpg',
+      'specialized gallery 3': 'service-overview.jpg',
+      'Projects Hero Background': 'projects-overview.jpg',
+    }
   },
 
   // Post image mapping
@@ -118,7 +132,7 @@ const uploadedMediaCache: Record<string, string> = {};
 
 /**
  * Find an image file in the frontend directories
- * 
+ *
  * @param fileName Name of the file to find
  * @returns Full path to the found file or null
  */
@@ -126,20 +140,20 @@ function findImageInFrontend(fileName: string): string | null {
   for (const dirPath of imageDirPaths) {
     // Đường dẫn đã là tuyệt đối từ pathConfig.ts
     const filePath = path.join(dirPath, fileName);
-    
+
     if (fs.existsSync(filePath)) {
       console.log(`Found image: ${filePath}`);
       return filePath;
     }
   }
-  
+
   console.log(`Could not find image: ${fileName}`);
   return null;
 }
 
 /**
  * Get an appropriate image for a collection item
- * 
+ *
  * @param payload Payload instance
  * @param collectionType Type of collection (technology, partner, product, etc.)
  * @param itemName Name of the item
@@ -152,28 +166,28 @@ export async function getImageForCollectionItem(
 ): Promise<string | null> {
   // Normalize collection type for matching
   const normalizedType = collectionType.toLowerCase();
-  
+
   try {
     let imagePath: string | null = null;
-    
+
     // Find specific image for this item
     if (imageMap[normalizedType]?.images?.[itemName]) {
       // Try specific image mapping first
       const fileName = imageMap[normalizedType].images[itemName];
       imagePath = findImageInFrontend(fileName);
     }
-    
+
     // If no specific image found, try collection default
     if (!imagePath && imageMap[normalizedType]?.default) {
       const defaultFileName = imageMap[normalizedType].default;
       imagePath = findImageInFrontend(defaultFileName);
     }
-    
+
     // If still not found, try using any commonly available image
     if (!imagePath) {
       // Try common images that should be available
       const commonOptions = ['logo.svg', 'service-overview.jpg', 'projects-overview.jpg'];
-      
+
       for (const option of commonOptions) {
         const fallbackPath = findImageInFrontend(option);
         if (fallbackPath) {
@@ -182,31 +196,31 @@ export async function getImageForCollectionItem(
         }
       }
     }
-    
+
     // If we found an image, upload it
     if (imagePath) {
       // Cache key is combination of collection type and item name
       const cacheKey = `${normalizedType}:${itemName}`;
-      
+
       // Check if we've already uploaded this
       if (uploadedMediaCache[cacheKey]) {
         return uploadedMediaCache[cacheKey];
       }
-      
+
       // Upload the image
       const mediaId = await uploadMediaFromFrontend(
         payload,
         imagePath,
         `Image for ${itemName} (${collectionType})`
       );
-      
+
       if (mediaId) {
         // Cache the result
         uploadedMediaCache[cacheKey] = mediaId;
         return mediaId;
       }
     }
-    
+
     console.warn(`No image found for ${collectionType} - ${itemName}`);
     return null;
   } catch (error) {
@@ -225,17 +239,17 @@ export async function getOrCreateDefaultMediaId(payload: Payload): Promise<strin
       collection: 'media',
       limit: 1,
     });
-    
+
     if (media?.docs && media.docs.length > 0 && media.docs[0]?.id) {
       return media.docs[0].id;
     }
-    
+
     // If no media exists, upload the default logo
     const logoPath = findImageInFrontend('logo.svg');
     if (logoPath) {
       return await uploadMediaFromFrontend(payload, logoPath, 'Default logo');
     }
-    
+
     return null;
   } catch (error) {
     console.error('Error getting default media ID:', error);
