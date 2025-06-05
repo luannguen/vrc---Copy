@@ -1,192 +1,119 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import AppLink from "@/components/ui/app-link";
+import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  imageUrl: string;
-  features: string[];
-  specifications?: Record<string, string>;
-  price?: string;
-  isNew?: boolean;
-  isBestseller?: boolean;
-}
-
-// Danh sách sản phẩm trong lĩnh vực kỹ thuật lạnh
-const productsData: Product[] = [
-  {
-    id: 1,
-    name: "Điều hòa công nghiệp VRC-5000",
-    description: "Hệ thống điều hòa công nghiệp công suất lớn, phù hợp cho nhà xưởng, nhà máy sản xuất",
-    category: "industrial",
-    imageUrl: "/assets/images/projects-overview.jpg",
-    features: ["Công suất làm lạnh: 50.000 BTU", "Tiết kiệm điện năng 40%", "Vận hành êm ái", "Điều khiển thông minh từ xa"],
-    specifications: {
-      "Công suất làm lạnh": "50.000 BTU/h",
-      "Công suất điện tiêu thụ": "4.8kW",
-      "Nguồn điện": "380V-415V/3Ph/50Hz",
-      "Độ ồn": "55dB(A)",
-      "Kích thước (DxRxC)": "1800x900x1950mm",
-      "Khối lượng": "320kg",
-      "Gas làm lạnh": "R410A",
-      "Xuất xứ": "Việt Nam"
-    },
-    price: "Liên hệ",
-    isNew: true
-  },
-  {
-    id: 2,
-    name: "Kho lạnh bảo quản VRC-KL500",
-    description: "Kho lạnh công nghiệp lắp đặt nhanh chóng, bảo quản thực phẩm, dược phẩm với nhiệt độ ổn định",
-    category: "cold-storage",
-    imageUrl: "/assets/images/service-overview.jpg",
-    features: ["Diện tích: 50-500m²", "Nhiệt độ: -30°C đến +20°C", "Panel cách nhiệt PU 100mm", "Hệ thống điều khiển tự động"],
-    specifications: {
-      "Diện tích": "50-500m²",
-      "Nhiệt độ làm việc": "-30°C đến +20°C",
-      "Panel cách nhiệt": "PU 100mm",
-      "Độ dày": "100mm",
-      "Khối lượng panel": "12kg/m²",
-      "Cửa kho lạnh": "Cửa trượt/cửa mở",
-      "Hệ thống điều khiển": "Tự động, giám sát từ xa",
-      "Xuất xứ": "Việt Nam"
-    },
-    price: "Liên hệ",
-    isBestseller: true
-  },
-  {
-    id: 3,
-    name: "Máy làm lạnh nước công nghiệp VRC-Chiller",
-    description: "Hệ thống làm lạnh nước trung tâm cho nhà máy sản xuất, cao ốc văn phòng",
-    category: "chiller",
-    imageUrl: "/lovable-uploads/0bd3c048-8e37-4775-a6bc-0b54ec07edbe.png",
-    features: ["Công suất: 30-1000RT", "Hiệu suất năng lượng cao", "Vận hành ổn định", "Hệ thống khởi động mềm"],
-    specifications: {
-      "Công suất làm lạnh": "30-1000RT",
-      "Công suất tiêu thụ": "0.65kW/RT",
-      "Gas làm lạnh": "R134a/R407C/R410A",
-      "Nhiệt độ nước đầu ra": "5°C ~ 15°C",
-      "Điện áp vận hành": "380V-415V/3Ph/50Hz",
-      "Kiểu máy nén": "Scroll/Screw",
-      "Hệ thống điều khiển": "Màn hình cảm ứng, kết nối BMS",
-      "Xuất xứ": "Liên doanh Việt-Đức"
-    },
-    price: "Liên hệ"
-  },
-  {
-    id: 4,
-    name: "Điều hòa dân dụng VRC Smart Inverter",
-    description: "Điều hòa tiết kiệm năng lượng, thông minh cho gia đình và văn phòng nhỏ",
-    category: "residential",
-    imageUrl: "/assets/images/projects-overview.jpg",
-    features: ["Công nghệ Inverter", "Lọc không khí kháng khuẩn", "Kết nối WiFi", "Tiết kiệm điện đến 60%"],
-    specifications: {
-      "Công suất làm lạnh": "9.000 - 24.000 BTU",
-      "Chế độ": "Làm lạnh/Sưởi ấm",
-      "Công nghệ": "DC Inverter",
-      "Gas làm lạnh": "R32 thân thiện môi trường",
-      "Hiệu suất năng lượng": "CSPF 5.8",
-      "Độ ồn dàn lạnh": "18-36dB",
-      "Kết nối": "WiFi, điều khiển qua smartphone",
-      "Xuất xứ": "Việt Nam"
-    },
-    price: "8.500.000 - 15.900.000 VNĐ",
-    isNew: true,
-    isBestseller: true
-  },
-  {
-    id: 5,
-    name: "Tháp giải nhiệt VRC-CT250",
-    description: "Tháp giải nhiệt công nghiệp cho nhà máy sản xuất và hệ thống điều hòa trung tâm",
-    category: "auxiliary",
-    imageUrl: "/assets/images/service-overview.jpg",
-    features: ["Công suất: 50-1000RT", "Thiết kế chống ăn mòn", "Quạt tiết kiệm điện", "Dễ dàng bảo trì"],
-    specifications: {
-      "Công suất giải nhiệt": "50-1000RT",
-      "Vật liệu thân": "FRP chống ăn mòn",
-      "Vật liệu tấm tản nhiệt": "PVC chống UV",
-      "Năng lượng tiêu thụ": "0.03-0.05kW/RT",
-      "Độ ồn": "65-75dB",
-      "Trọng lượng hoạt động": "2000-25000kg",
-      "Xuất xứ": "Việt Nam"
-    },
-    price: "Liên hệ"
-  },
-  {
-    id: 6,
-    name: "Hệ thống thông gió VRC-Ventilation",
-    description: "Hệ thống thông gió và lọc không khí công nghiệp cho nhà xưởng, tòa nhà",
-    category: "auxiliary",
-    imageUrl: "/assets/images/projects-overview.jpg",
-    features: ["Lưu lượng: 1.000-100.000 m³/h", "Tiết kiệm năng lượng", "Điều khiển tự động", "Lọc không khí hiệu quả"],
-    specifications: {
-      "Lưu lượng gió": "1.000-100.000 m³/h",
-      "Áp suất tĩnh": "100-2000 Pa",
-      "Công suất tiêu thụ": "0.75-75kW",
-      "Vật liệu quạt": "Thép mạ kẽm/thép không gỉ",
-      "Loại quạt": "Ly tâm/Hướng trục",
-      "Lọc không khí": "G4, F7, HEPA (tùy chọn)",
-      "Điều khiển": "Biến tần, cảm biến CO2, nhiệt độ",
-      "Xuất xứ": "Việt Nam"
-    },
-    price: "Liên hệ"
-  },
-  {
-    id: 7,
-    name: "Hệ thống VRV/VRF VRC-Multi",
-    description: "Hệ thống điều hòa đa cục, phù hợp cho các tòa nhà văn phòng, khách sạn, trung tâm thương mại",
-    category: "commercial",
-    imageUrl: "/lovable-uploads/0bd3c048-8e37-4775-a6bc-0b54ec07edbe.png",
-    features: ["Điều khiển độc lập từng phòng", "Tiết kiệm năng lượng", "Vận hành êm ái", "Lắp đặt linh hoạt"],
-    specifications: {
-      "Công suất làm lạnh": "8HP - 60HP",
-      "Số dàn lạnh tối đa": "64 dàn",
-      "Gas làm lạnh": "R410A",
-      "Chiều dài đường ống tối đa": "165m",
-      "Chênh lệch độ cao tối đa": "90m",
-      "IPLV": "6.8",
-      "Kết nối BMS": "LonWorks, BACnet, Modbus",
-      "Xuất xứ": "Liên doanh Việt-Nhật"
-    },
-    price: "Liên hệ",
-    isNew: true
-  },
-  {
-    id: 8,
-    name: "Hệ thống lọc bụi công nghiệp VRC-DustFilter",
-    description: "Hệ thống lọc bụi và khí thải công nghiệp cho nhà máy sản xuất",
-    category: "auxiliary",
-    imageUrl: "/assets/images/service-overview.jpg",
-    features: ["Hiệu suất lọc > 99%", "Tự động làm sạch", "Tuổi thọ cao", "Giám sát từ xa"],
-    specifications: {
-      "Lưu lượng xử lý": "1.000-100.000 m³/h",
-      "Hiệu suất lọc": ">99%",
-      "Kích thước hạt lọc": "0.3-100 μm",
-      "Áp suất tĩnh": "1500-3000 Pa",
-      "Công suất tiêu thụ": "1.5-90kW",
-      "Phương pháp làm sạch": "Khí nén/Cơ học",
-      "Vật liệu lọc": "Polyester/PTFE",
-      "Xuất xứ": "Việt Nam"
-    },
-    price: "Liên hệ"
-  }
-];
+// Import our types and services
+import { Product, ProductCategory, ApiError } from "@/types/Product";
+import { productsService, productCategoriesService } from "@/services";
+import { transformApiProductsToProducts } from "@/utils/productUtils";
 
 const Products = () => {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  
-  const filteredProducts = activeCategory === "all" 
-    ? productsData 
-    : productsData.filter(product => product.category === activeCategory);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Load products and categories from API
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Load products and categories in parallel
+        const [productsResult, categoriesResult] = await Promise.allSettled([
+          productsService.getProducts(),
+          productCategoriesService.getCategories()
+        ]);
+
+        // Handle products result
+        if (productsResult.status === 'fulfilled') {
+          setProducts(productsResult.value);
+        } else {
+          console.error('Error loading products:', productsResult.reason);
+          throw new Error('Không thể tải danh sách sản phẩm');
+        }
+
+        // Handle categories result (optional, won't break if fails)
+        if (categoriesResult.status === 'fulfilled') {
+          setCategories(categoriesResult.value);
+        } else {
+          console.warn('Warning loading categories:', categoriesResult.reason);
+          // Set default categories if API fails
+          setCategories([
+            { id: 'industrial', title: 'Công nghiệp', description: '', slug: 'industrial', showInMenu: true, orderNumber: 1 },
+            { id: 'commercial', title: 'Thương mại', description: '', slug: 'commercial', showInMenu: true, orderNumber: 2 },
+            { id: 'residential', title: 'Dân dụng', description: '', slug: 'residential', showInMenu: true, orderNumber: 3 },
+            { id: 'cold-storage', title: 'Kho lạnh', description: '', slug: 'cold-storage', showInMenu: true, orderNumber: 4 },
+            { id: 'auxiliary', title: 'Phụ trợ', description: '', slug: 'auxiliary', showInMenu: true, orderNumber: 5 },
+          ]);
+        }
+      } catch (err) {
+        console.error('Error loading data:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Không thể tải dữ liệu';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Filter products by category
+  const filteredProducts = activeCategory === "all" 
+    ? products 
+    : products.filter(product => product.category === activeCategory);
+  // Retry loading data
+  const retryLoadData = async () => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        toast.info("Đang tải lại dữ liệu...");
+        
+        // Load products and categories in parallel
+        const [productsResult, categoriesResult] = await Promise.allSettled([
+          productsService.getProducts(),
+          productCategoriesService.getCategories()
+        ]);
+
+        // Handle products result
+        if (productsResult.status === 'fulfilled') {
+          setProducts(productsResult.value);
+          toast.success("Đã tải lại sản phẩm thành công!");
+        } else {
+          console.error('Error loading products:', productsResult.reason);
+          throw new Error('Không thể tải danh sách sản phẩm');
+        }
+
+        // Handle categories result (optional, won't break if fails)
+        if (categoriesResult.status === 'fulfilled') {
+          setCategories(categoriesResult.value);
+        } else {
+          console.warn('Warning loading categories:', categoriesResult.reason);
+        }
+      } catch (err) {
+        console.error('Error loading data:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Không thể tải dữ liệu';
+        setError(errorMessage);
+        toast.error(`Lỗi: ${errorMessage}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    await loadData();
+  };
   return (
     <main className="flex-grow">
       {/* Banner */}
@@ -201,60 +128,173 @@ const Products = () => {
 
       {/* Nội dung chính */}
       <div className="container mx-auto py-12 px-4">
-        <Tabs defaultValue="all" className="mb-10">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-8">
-            <TabsTrigger value="all" onClick={() => setActiveCategory("all")}>Tất cả</TabsTrigger>
-            <TabsTrigger value="industrial" onClick={() => setActiveCategory("industrial")}>Công nghiệp</TabsTrigger>
-            <TabsTrigger value="commercial" onClick={() => setActiveCategory("commercial")}>Thương mại</TabsTrigger>
-            <TabsTrigger value="residential" onClick={() => setActiveCategory("residential")}>Dân dụng</TabsTrigger>
-            <TabsTrigger value="cold-storage" onClick={() => setActiveCategory("cold-storage")}>Kho lạnh</TabsTrigger>
-            <TabsTrigger value="auxiliary" onClick={() => setActiveCategory("auxiliary")}>Phụ trợ</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value={activeCategory} className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <Card key={product.id} className="overflow-hidden transition-all hover:shadow-lg">
-                  <div className="h-60 w-full bg-gray-100 flex items-center justify-center relative overflow-hidden">
-                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover transition-transform hover:scale-105" />
-                    {product.isNew && (
-                      <Badge className="absolute top-3 right-3 bg-green-600">Mới</Badge>
-                    )}
-                    {product.isBestseller && (
-                      <Badge className="absolute top-3 left-3 bg-amber-600">Bán chạy</Badge>
-                    )}
-                  </div>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl">{product.name}</CardTitle>
-                      {product.price && (
-                        <div className="text-primary font-semibold">{product.price}</div>
-                      )}
-                    </div>
-                    <CardDescription>{product.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <h4 className="font-medium mb-2">Tính năng nổi bật:</h4>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
-                      {product.features.map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline" onClick={() => setSelectedProduct(product)}>
-                      Thông số kỹ thuật
-                    </Button>                    <Button>
-                      <AppLink routeKey="CONTACT" query={{ product: product.id.toString() }}>
-                        Yêu cầu báo giá
-                      </AppLink>
-                    </Button>
-                  </CardFooter>
-                </Card>
+        {/* Error State */}
+        {error && (
+          <Alert className="mb-6 border-red-200 bg-red-50">
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800">
+              {error}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="ml-4"
+                onClick={retryLoadData}
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Thử lại
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2 text-lg text-muted-foreground">Đang tải sản phẩm...</span>
+          </div>
+        )}        {/* Products Content */}
+        {!loading && (
+          <Tabs defaultValue="all" className="mb-10">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 mb-8">
+              <TabsTrigger value="all" onClick={() => setActiveCategory("all")}>Tất cả</TabsTrigger>
+              {categories.map((category) => (
+                <TabsTrigger 
+                  key={category.id} 
+                  value={category.slug} 
+                  onClick={() => setActiveCategory(category.slug)}
+                >
+                  {category.title}
+                </TabsTrigger>
               ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+            </TabsList>            
+            <TabsContent value="all" className="mt-6">
+              {filteredProducts.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-lg text-muted-foreground">
+                    {products.length === 0 ? 'Chưa có sản phẩm nào.' : 'Không có sản phẩm nào trong danh mục này.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProducts.map((product) => (
+                    <Card key={product.id} className="overflow-hidden transition-all hover:shadow-lg">
+                      <div className="h-60 w-full bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                        <img 
+                          src={product.imageUrl} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover transition-transform hover:scale-105"
+                          onError={(e) => {
+                            // Fallback image if API image fails to load
+                            (e.target as HTMLImageElement).src = "/assets/images/projects-overview.jpg";
+                          }}
+                        />
+                        {product.isNew && (
+                          <Badge className="absolute top-3 right-3 bg-green-600">Mới</Badge>
+                        )}
+                        {product.isBestseller && (
+                          <Badge className="absolute top-3 left-3 bg-amber-600">Bán chạy</Badge>
+                        )}
+                      </div>
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-xl">{product.name}</CardTitle>
+                          {product.price && (
+                            <div className="text-primary font-semibold">{product.price}</div>
+                          )}
+                        </div>
+                        <CardDescription>{product.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <h4 className="font-medium mb-2">Tính năng nổi bật:</h4>
+                        <ul className="list-disc pl-5 space-y-1 text-sm">
+                          {product.features.map((feature, index) => (
+                            <li key={index}>{feature}</li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                      <CardFooter className="flex justify-between">
+                        <Button variant="outline" onClick={() => setSelectedProduct(product)}>
+                          Thông số kỹ thuật
+                        </Button>
+                        <Button>
+                          <AppLink routeKey="CONTACT" query={{ product: product.id.toString() }}>
+                            Yêu cầu báo giá
+                          </AppLink>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+            
+            {/* Tab content for each category */}
+            {categories.map((category) => (
+              <TabsContent key={category.id} value={category.slug} className="mt-6">
+                {filteredProducts.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-lg text-muted-foreground">
+                      Không có sản phẩm nào trong danh mục này.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProducts.map((product) => (
+                      <Card key={product.id} className="overflow-hidden transition-all hover:shadow-lg">
+                        <div className="h-60 w-full bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                          <img 
+                            src={product.imageUrl} 
+                            alt={product.name} 
+                            className="w-full h-full object-cover transition-transform hover:scale-105"
+                            onError={(e) => {
+                              // Fallback image if API image fails to load
+                              (e.target as HTMLImageElement).src = "/assets/images/projects-overview.jpg";
+                            }}
+                          />
+                          {product.isNew && (
+                            <Badge className="absolute top-3 right-3 bg-green-600">Mới</Badge>
+                          )}
+                          {product.isBestseller && (
+                            <Badge className="absolute top-3 left-3 bg-amber-600">Bán chạy</Badge>
+                          )}
+                        </div>
+                        <CardHeader>
+                          <div className="flex justify-between items-start">
+                            <CardTitle className="text-xl">{product.name}</CardTitle>
+                            {product.price && (
+                              <div className="text-primary font-semibold">{product.price}</div>
+                            )}
+                          </div>
+                          <CardDescription>{product.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <h4 className="font-medium mb-2">Tính năng nổi bật:</h4>
+                          <ul className="list-disc pl-5 space-y-1 text-sm">
+                            {product.features.map((feature, index) => (
+                              <li key={index}>{feature}</li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                          <Button variant="outline" onClick={() => setSelectedProduct(product)}>
+                            Thông số kỹ thuật
+                          </Button>
+                          <Button>
+                            <AppLink routeKey="CONTACT" query={{ product: product.id.toString() }}>
+                              Yêu cầu báo giá
+                            </AppLink>
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
+        )}
 
         {/* Thông số kỹ thuật */}
         {selectedProduct && selectedProduct.specifications && (
@@ -274,7 +314,7 @@ const Products = () => {
                       {Object.entries(selectedProduct.specifications).map(([key, value], index) => (
                         <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                           <td className="px-6 py-3 text-sm font-medium">{key}</td>
-                          <td className="px-6 py-3 text-sm">{value}</td>
+                          <td className="px-6 py-3 text-sm">{String(value)}</td>
                         </tr>
                       ))}
                     </tbody>
