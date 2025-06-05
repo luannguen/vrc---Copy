@@ -1946,21 +1946,7 @@ export interface Faq {
   /**
    * Câu trả lời chi tiết
    */
-  answer: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
+  answer: string;
   /**
    * Phân loại câu hỏi theo danh mục
    */
@@ -1983,14 +1969,6 @@ export interface Faq {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Dịch vụ liên quan đến câu hỏi này
-   */
-  relatedServices?: (string | Service)[] | null;
-  /**
-   * Sản phẩm liên quan đến câu hỏi này
-   */
-  relatedProducts?: (string | Product)[] | null;
   /**
    * Đánh dấu đây là câu hỏi được hỏi nhiều nhất
    */
@@ -3217,8 +3195,6 @@ export interface FaqsSelect<T extends boolean = true> {
         tag?: T;
         id?: T;
       };
-  relatedServices?: T;
-  relatedProducts?: T;
   isPopular?: T;
   order?: T;
   featured?: T;

@@ -9,7 +9,7 @@ import { ApiError } from '../types/Product';
  * API Configuration
  */
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  BASE_URL: import.meta.env.VITE_API_URL || '', // Use empty string to use relative paths (proxy)
   TIMEOUT: 30000, // Increased from 10000 to 30000 (30 seconds)
   HEADERS: {
     'Content-Type': 'application/json',

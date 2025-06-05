@@ -2,17 +2,16 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import AppLink from "@/components/ui/app-link";
 import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import FAQ from "@/components/FAQ";
 
 // Import our types and services
 import { Product, ProductCategory, ApiError } from "@/types/Product";
 import { productsService, productCategoriesService } from "@/services";
-import { transformApiProductsToProducts } from "@/utils/productUtils";
 
 const Products = () => {
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -341,63 +340,14 @@ const Products = () => {
               Liên hệ tư vấn
             </AppLink>
           </Button>
-        </section>
-
-        {/* Câu hỏi thường gặp */}
+        </section>        {/* Câu hỏi thường gặp */}
         <section className="mt-16">
-          <h2 className="text-3xl font-bold mb-8 text-primary">Câu hỏi thường gặp</h2>
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="item-1">
-              <AccordionTrigger>Làm thế nào để chọn công suất điều hòa phù hợp?</AccordionTrigger>
-              <AccordionContent>
-                Để chọn công suất điều hòa phù hợp, bạn cần tính toán dựa trên diện tích phòng, số người sử dụng, hướng phòng, 
-                thiết bị sinh nhiệt trong phòng và vị trí địa lý. Thông thường, cần 9.000 BTU cho phòng 15m², 
-                12.000 BTU cho phòng 20m², 18.000 BTU cho phòng 30m². Với không gian công nghiệp hoặc thương mại, 
-                VRC có đội ngũ kỹ sư sẽ tính toán chi tiết và đề xuất giải pháp tối ưu.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger>Thời gian bảo hành cho các sản phẩm của VRC là bao lâu?</AccordionTrigger>
-              <AccordionContent>
-                VRC cung cấp chế độ bảo hành 24 tháng cho tất cả các sản phẩm điều hòa dân dụng, 
-                36 tháng đối với máy nén của hệ thống VRV/VRF, và 12 tháng đối với các thiết bị công nghiệp. 
-                Ngoài ra, chúng tôi có các gói bảo trì và gia hạn bảo hành để đảm bảo hệ thống của bạn 
-                luôn vận hành ổn định và hiệu quả trong suốt vòng đời sản phẩm.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3">
-              <AccordionTrigger>Chi phí lắp đặt hệ thống kho lạnh phụ thuộc vào yếu tố nào?</AccordionTrigger>
-              <AccordionContent>
-                Chi phí lắp đặt kho lạnh phụ thuộc vào nhiều yếu tố như: diện tích kho, nhiệt độ yêu cầu, 
-                loại hàng hóa cần bảo quản, độ dày panel cách nhiệt, hệ thống điện, hệ thống giám sát, 
-                và các trang thiết bị đi kèm. VRC cung cấp giải pháp kho lạnh theo yêu cầu cụ thể 
-                của từng khách hàng với mức giá cạnh tranh nhất trên thị trường.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-4">
-              <AccordionTrigger>Làm thế nào để tiết kiệm điện năng khi sử dụng điều hòa?</AccordionTrigger>
-              <AccordionContent>
-                Để tiết kiệm điện năng khi sử dụng điều hòa, bạn nên: 
-                (1) Chọn điều hòa có công nghệ Inverter, 
-                (2) Đặt nhiệt độ ở mức 25-26°C, 
-                (3) Bảo dưỡng định kỳ 6 tháng/lần, 
-                (4) Sử dụng quạt kết hợp với điều hòa, 
-                (5) Tắt điều hòa khi không sử dụng, 
-                (6) Cách nhiệt tốt cho phòng/công trình, và 
-                (7) Lắp đặt hệ thống điều khiển thông minh để tối ưu hóa việc sử dụng.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-5">
-              <AccordionTrigger>VRC có cung cấp dịch vụ bảo trì định kỳ không?</AccordionTrigger>
-              <AccordionContent>
-                Có, VRC cung cấp các gói dịch vụ bảo trì định kỳ cho tất cả các sản phẩm kỹ thuật lạnh. 
-                Chúng tôi có đội ngũ kỹ thuật viên được đào tạo chuyên nghiệp, sẵn sàng phục vụ 24/7. 
-                Các gói bảo trì bao gồm vệ sinh thiết bị, kiểm tra an toàn, tối ưu hóa vận hành, 
-                và thay thế vật tư tiêu hao theo định kỳ. Hợp đồng bảo trì dài hạn sẽ được hưởng 
-                chính sách ưu đãi đặc biệt và ưu tiên xử lý sự cố.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <FAQ 
+            category="products"
+            title="Câu hỏi thường gặp về sản phẩm"
+            maxItems={6}
+            className="max-w-4xl mx-auto"
+          />
         </section>
       </div>
     </main>

@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload';
 import { authenticated } from '../access/authenticated';
+import { authenticatedOrPublishedStatus } from '../access/authenticatedOrPublishedStatus';
 
 export const FAQs: CollectionConfig = {
   slug: 'faqs',
@@ -15,7 +16,7 @@ export const FAQs: CollectionConfig = {
   },
   access: {
     create: authenticated,
-    read: () => true, // Allow public read access
+    read: authenticatedOrPublishedStatus,
     update: authenticated,
     delete: authenticated,
   },
@@ -29,9 +30,10 @@ export const FAQs: CollectionConfig = {
         description: 'Câu hỏi của khách hàng',
       },
     },
+    // Temporarily commented out answer to debug
     {
       name: 'answer',
-      type: 'textarea',
+      type: 'richText',
       label: 'Trả lời',
       required: true,
       admin: {
@@ -101,8 +103,7 @@ export const FAQs: CollectionConfig = {
         description: 'Thẻ để dễ dàng tìm kiếm và phân loại',
       },
     },
-    // Testing both relationship fields - temporarily commented out
-    /*
+    // Testing both relationship fields
     {
       name: 'relatedServices',
       type: 'relationship',
@@ -123,7 +124,6 @@ export const FAQs: CollectionConfig = {
         description: 'Sản phẩm liên quan đến câu hỏi này',
       },
     },
-    */
     {
       name: 'isPopular',
       type: 'checkbox',
