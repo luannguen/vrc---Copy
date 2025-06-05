@@ -27,6 +27,7 @@ import { TagPage } from "./pages/TagPage";
 import Contact from "./pages/Contact";
 import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
+import FAQs from "./pages/FAQs";
 import NotFound from "./pages/NotFound";
 
 // Legal pages
@@ -115,6 +116,7 @@ const App = () => (
           <Route path="events" element={<Events />} />
           <Route path="events/tag/:tag" element={<Events />} />
           <Route path="event-details/:id" element={<EventDetail />} />
+          <Route path="faq" element={<FAQs />} />
           <Route path="publications" element={<Publications />} />
           <Route path="publications/inverter-technology" element={<InverterTechnology />} />
           <Route path="publications/heat-recovery-solutions" element={<HeatRecoverySolutions />} />

@@ -60,11 +60,12 @@ export const ROUTES = {
   PROJECTS_COMMERCIAL: { path: '/projects/commercial', label: 'Dự án thương mại' },
   PROJECTS_INDUSTRIAL: { path: '/projects/industrial', label: 'Dự án công nghiệp' },
   PROJECTS_SPECIALIZED: { path: '/projects/specialized', label: 'Dự án đặc biệt' },
-    // Other key pages
+  // Other key pages
   NEWS: { path: '/news', label: 'Tin tức' },
   EVENTS: { path: '/events', label: 'Sự kiện' },
   TECHNOLOGIES: { path: '/technologies', label: 'Công nghệ' },
   CONSULTING: { path: '/consulting', label: 'Tư vấn' },
+  FAQ: { path: '/faq', label: 'Câu hỏi thường gặp' },
   
   // Legal pages
   PRIVACY: { path: '/legal/privacy', label: 'Chính sách bảo mật' },

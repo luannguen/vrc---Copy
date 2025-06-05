@@ -21,12 +21,13 @@ const MainNavigation = ({ isMobile = false }: MainNavigationProps) => {
   
   if (isMobile) {
     return (
-      <nav className="flex flex-col space-y-4">
-        <AppLink routeKey="HOME" className="navbar-link text-lg">{t('nav.home')}</AppLink>
+      <nav className="flex flex-col space-y-4">        <AppLink routeKey="HOME" className="navbar-link text-lg">{t('nav.home')}</AppLink>
         {navLinks.map((item, index) => (
           <AppLink key={index} routeKey={item.routeKey} className="navbar-link text-lg">{item.title}</AppLink>
-        ))}        <AppLink routeKey="NEWS" className="navbar-link text-lg">Tin tức</AppLink>
+        ))}
+        <AppLink routeKey="NEWS" className="navbar-link text-lg">Tin tức</AppLink>
         <AppLink routeKey="EVENTS" className="navbar-link text-lg">Sự kiện</AppLink>
+        <AppLink routeKey="FAQ" className="navbar-link text-lg">Câu hỏi thường gặp</AppLink>
         <AppLink routeKey="CONSULTING" className="navbar-link text-lg">Tư vấn</AppLink>
       </nav>
     );
@@ -41,11 +42,11 @@ const MainNavigation = ({ isMobile = false }: MainNavigationProps) => {
         <button className="navbar-link text-base font-medium flex items-center">
           <span>More</span>
           <ChevronDown size={16} className="ml-1" />
-        </button>
-        <div className="absolute hidden group-hover:block bg-white/10 backdrop-blur-sm shadow-lg p-4 rounded min-w-40 right-0">
+        </button>        <div className="absolute hidden group-hover:block bg-white/10 backdrop-blur-sm shadow-lg p-4 rounded min-w-40 right-0">
           <div className="flex flex-col space-y-2">
             <AppLink routeKey="NEWS" className="text-primary hover:text-accent text-base">Tin tức</AppLink>
             <AppLink routeKey="EVENTS" className="text-primary hover:text-accent text-base">Sự kiện</AppLink>
+            <AppLink routeKey="FAQ" className="text-primary hover:text-accent text-base">Câu hỏi thường gặp</AppLink>
             <AppLink routeKey="CONSULTING" className="text-primary hover:text-accent text-base">Tư vấn</AppLink>
             <hr className="border-gray-300 my-2" />
             <AppLink routeKey="INSTALLATION" className="text-primary hover:text-accent text-base">Lắp đặt</AppLink>
