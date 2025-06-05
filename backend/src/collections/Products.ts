@@ -1,6 +1,6 @@
 import { CollectionConfig } from 'payload';
 import { authenticated } from '../access/authenticated';
-import { authenticatedOrPublished } from '../access/authenticatedOrPublished';
+import { authenticatedOrPublishedStatus } from '../access/authenticatedOrPublishedStatus';
 import { slugField } from '../fields/slug';
 import { productHooks } from './Products/hooks';
 
@@ -23,7 +23,7 @@ export const Products: CollectionConfig = {
     enableRichTextRelationship: false,
   },access: {
     create: authenticated,
-    read: authenticatedOrPublished,
+    read: authenticatedOrPublishedStatus,
     update: authenticated,
     delete: authenticated,
   },  hooks: {

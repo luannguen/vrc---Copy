@@ -1,15 +1,15 @@
 import type { Access } from 'payload'
 
-export const authenticatedOrPublished: Access = ({ req: { user } }) => {
+export const authenticatedOrPublishedStatus: Access = ({ req: { user } }) => {
   if (user) {
     return true
   }
 
   return {
-    _status: {
+    status: {
       equals: 'published',
     },
-    status: {
+    _status: {
       equals: 'published',
     },
   }

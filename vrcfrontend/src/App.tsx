@@ -19,6 +19,7 @@ import Repair from "./pages/Repair";
 import Consulting from "./pages/Consulting";
 import ServiceSupport from "./pages/ServiceSupport";
 import Technologies from "./pages/Technologies";
+import TechnologyDetail from "./pages/TechnologyDetail";
 import EnergyEfficiency from "./pages/technologies/EnergyEfficiency";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
@@ -101,6 +102,7 @@ const App = () => (
           <Route path="consulting" element={<Consulting />} />
           <Route path="service-support" element={<ServiceSupport />} />
           <Route path="technologies" element={<Technologies />} />
+          <Route path="technologies/:slug" element={<TechnologyDetail />} />
           <Route path="technologies/energy-efficiency" element={<EnergyEfficiency />} />
           <Route path="technology" element={<Navigate to="/technologies" replace />} />
           <Route path="news" element={<News />} />

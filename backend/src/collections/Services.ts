@@ -1,6 +1,6 @@
 import { CollectionConfig } from 'payload';
 import { authenticated } from '../access/authenticated';
-import { authenticatedOrPublished } from '../access/authenticatedOrPublished';
+import { authenticatedOrPublishedStatus } from '../access/authenticatedOrPublishedStatus';
 import { slugField } from '../fields/slug';
 
 export const Services: CollectionConfig = {
@@ -16,7 +16,7 @@ export const Services: CollectionConfig = {
   },
   access: {
     create: authenticated,
-    read: authenticatedOrPublished,
+    read: authenticatedOrPublishedStatus,
     update: authenticated,
     delete: authenticated,
   },

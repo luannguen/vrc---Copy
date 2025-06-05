@@ -27,6 +27,7 @@ import { TechnologySections } from './collections/TechnologySections'
 import { Tools } from './collections/Tools'
 import { Resources } from './collections/Resources'
 import { Banners } from './collections/Banners'
+import { FAQs } from './collections/FAQs'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { CompanyInfo } from './globals/CompanyInfo'
@@ -116,6 +117,7 @@ export default buildConfig({  admin: {
     Tools,
     Resources,
     Banners,
+    FAQs,
   ],cors: {
     origins: process.env.NODE_ENV === 'production'
       ? [
@@ -151,6 +153,13 @@ export default buildConfig({  admin: {
     // But we keep it here with a stub to avoid build errors
     // See /app/api/health/route.ts for the new implementation
     (await import('./endpoints/health')).healthEndpoint,
+
+    // FAQ endpoints
+    (await import('./endpoints/faqs')).getFAQsEndpoint,
+    (await import('./endpoints/faqs')).getFAQCategoriesEndpoint,
+    (await import('./endpoints/faqs')).getPopularFAQsEndpoint,
+    (await import('./endpoints/faqs')).getFeaturedFAQsEndpoint,
+    (await import('./endpoints/faqs')).searchFAQsEndpoint,
   ],
   jobs: {
     access: {

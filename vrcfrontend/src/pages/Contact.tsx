@@ -1,6 +1,7 @@
 import ContactForm from "@/components/ContactForm";
 import SocialMediaLinks from "@/components/SocialMediaLinks";
 import ZaloChatWidget from "@/components/ZaloChatWidget";
+import SafeGoogleMaps from "@/components/SafeGoogleMaps";
 import { useCompanyInfo } from "@/hooks/useApi";
 import { useState } from "react";
 
@@ -12,29 +13,7 @@ const Contact = () => {
   const companyName = companyInfo?.companyName || 'Tổng công ty Kỹ thuật lạnh Việt Nam (VRC)';
   const companyDescription = companyInfo?.companyDescription || 'Tiên phong trong lĩnh vực kỹ thuật lạnh tại Việt Nam';
   const contactSection = companyInfo?.contactSection;
-  const socialMedia = companyInfo?.socialMedia || companyInfo?.socialMediaLinks || {};
-  const mapsInfo = companyInfo?.maps;
-
-  // Extract URL from iframe string if needed
-  const getMapsSrc = () => {
-    if (mapsInfo?.googleMapsEmbed) {
-      // If it's a full iframe string, extract the src URL
-      const srcMatch = mapsInfo.googleMapsEmbed.match(/src="([^"]+)"/);
-      if (srcMatch) {
-        return srcMatch[1];
-      }
-      // If it's already just a URL
-      return mapsInfo.googleMapsEmbed;
-    }
-    
-    // Fallback to coordinates
-    if (mapsInfo?.latitude && mapsInfo?.longitude) {
-      return `https://maps.google.com/maps?q=${mapsInfo.latitude},${mapsInfo.longitude}&hl=vi&z=${mapsInfo.mapZoom || 15}&output=embed`;
-    }
-    
-    // Final fallback to address
-    return `https://maps.google.com/maps?q=${encodeURIComponent(contactSection?.address || 'VRC Vietnam, Ho Chi Minh City')}&hl=vi&z=15&output=embed`;
-  };
+  const socialMedia = companyInfo?.socialMedia || companyInfo?.socialMediaLinks || {};  const mapsInfo = companyInfo?.maps;
 
   if (isLoading) {
     return (
@@ -114,20 +93,12 @@ const Contact = () => {
               </div>
             </div>            <div className="mt-8">
               <div className="bg-white shadow-md rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-primary mb-4">Bản đồ</h2>
-                
-                {/* Google Maps Embed iframe */}                <div className="aspect-video w-full rounded-lg overflow-hidden border border-gray-200 mb-4">
-                  <iframe
-                    src={getMapsSrc()}
-                    width="100%"
-                    height="100%"
-                    className="border-0"
-                    allowFullScreen={mapsInfo?.showMapControls !== false}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`Bản đồ vị trí ${companyName}`}
-                  ></iframe>
-                </div>
+                <h2 className="text-xl font-semibold text-primary mb-4">Bản đồ</h2>                {/* Safe Google Maps Component with Error Handling */}
+                <SafeGoogleMaps 
+                  mapsInfo={mapsInfo}
+                  contactSection={contactSection}
+                  companyName={companyName}
+                />
 
                 {/* Location Info */}
                 <div className="space-y-3">
@@ -189,8 +160,7 @@ const Contact = () => {
           
           <div className="lg:col-span-7">
             <ContactForm />          </div>
-        </div>
-      </div>        {/* Zalo Chat Widget */}
+        </div>      </div>      {/* Zalo Chat Widget */}
       {typeof socialMedia?.zalo === 'object' && socialMedia.zalo?.oaId && (
         <ZaloChatWidget
           oaId={socialMedia.zalo.oaId}

@@ -2,7 +2,7 @@
 // Sử dụng API seed chính thức của Payload CMS
 // Tuân thủ codequality.md: TypeScript, type-safe, proper error handling
 
-import { getPayload, Payload } from 'payload';
+import { getPayload } from 'payload';
 import config from '@payload-config';
 import fs from 'fs';
 import path from 'path';
@@ -73,24 +73,26 @@ const servicesData: ServiceData[] = [
     title: 'Tư vấn thiết kế',
     slug: 'tu-van-thiet-ke',
     type: 'consulting',
-    summary: 'Giải pháp thiết kế hệ thống điện lạnh tối ưu cho mọi công trình từ dân dụng đến công nghiệp.',
-    content: {
+    summary: 'Giải pháp thiết kế hệ thống điện lạnh tối ưu cho mọi công trình từ dân dụng đến công nghiệp.',    content: {
       root: {
-        children: [
-          {
-            type: 'paragraph',
-            children: [
-              {
-                type: 'text',
+        type: 'root' as const,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        version: 1,
+        children: [          {
+            type: 'paragraph' as const,
+            children: [{
+                type: 'text' as const,
                 text: 'Dịch vụ tư vấn thiết kế hệ thống điện lạnh chuyên nghiệp của VRC giúp bạn có được giải pháp tối ưu nhất cho công trình của mình. Với đội ngũ kỹ sư giàu kinh nghiệm và công nghệ thiết kế hiện đại, chúng tôi cam kết mang đến những hệ thống điện lạnh hiệu quả, tiết kiệm năng lượng và phù hợp với ngân sách.',
               },
             ],
           },
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Quy trình tư vấn thiết kế của chúng tôi bao gồm: khảo sát hiện trạng, phân tích nhu cầu, thiết kế sơ bộ, tính toán chi tiết, lựa chọn thiết bị, và lập dự toán tổng thể. Mỗi dự án đều được nghiên cứu kỹ lưỡng để đảm bảo tính khả thi và hiệu quả cao nhất.',
               },
             ],
@@ -153,29 +155,32 @@ const servicesData: ServiceData[] = [
     title: 'Lắp đặt chuyên nghiệp',
     slug: 'lap-dat-chuyen-nghiep',
     type: 'installation',
-    summary: 'Dịch vụ lắp đặt hệ thống điện lạnh chuyên nghiệp với đội ngũ kỹ thuật viên giàu kinh nghiệm.',
-    content: {
+    summary: 'Dịch vụ lắp đặt hệ thống điện lạnh chuyên nghiệp với đội ngũ kỹ thuật viên giàu kinh nghiệm.',    content: {
       root: {
+        type: 'root' as const,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'VRC cung cấp dịch vụ lắp đặt hệ thống điện lạnh chuyên nghiệp với đội ngũ kỹ thuật viên được đào tạo bài bản và có nhiều năm kinh nghiệm trong lĩnh vực. Chúng tôi cam kết thực hiện đúng tiến độ, đảm bảo chất lượng và tuân thủ nghiêm ngặt các tiêu chuẩn kỹ thuật.',
               },
             ],
           },
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Quy trình lắp đặt của chúng tôi bao gồm: chuẩn bị mặt bằng, lắp đặt thiết bị, đấu nối hệ thống, kiểm tra vận hành, và nghiệm thu bàn giao. Mọi công việc đều được thực hiện theo đúng quy trình và tiêu chuẩn kỹ thuật.',
               },
             ],
-          },
-        ],
+          },        ],
       },
     },
     features: [
@@ -233,24 +238,28 @@ const servicesData: ServiceData[] = [
     title: 'Bảo trì định kỳ',
     slug: 'bao-tri-dinh-ky',
     type: 'maintenance',
-    summary: 'Dịch vụ bảo trì định kỳ giúp hệ thống điện lạnh hoạt động ổn định và tiết kiệm năng lượng.',
-    content: {
+    summary: 'Dịch vụ bảo trì định kỳ giúp hệ thống điện lạnh hoạt động ổn định và tiết kiệm năng lượng.',    content: {
       root: {
+        type: 'root' as const,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Dịch vụ bảo trì định kỳ của VRC giúp duy trì hiệu quả hoạt động của hệ thống điện lạnh, kéo dài tuổi thọ thiết bị và giảm thiểu rủi ro hỏng hóc. Chúng tôi có các gói bảo trì linh hoạt phù hợp với nhu cầu và ngân sách của từng khách hàng.',
               },
             ],
           },
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Quy trình bảo trì bao gồm: kiểm tra tổng thể hệ thống, vệ sinh thiết bị, thay thế linh kiện hao mòn, điều chỉnh thông số vận hành, và lập báo cáo chi tiết về tình trạng hệ thống.',
               },
             ],
@@ -313,24 +322,28 @@ const servicesData: ServiceData[] = [
     title: 'Sửa chữa khẩn cấp',
     slug: 'sua-chua-khan-cap',
     type: 'repair',
-    summary: 'Dịch vụ sửa chữa khẩn cấp 24/7, khắc phục nhanh chóng mọi sự cố hệ thống điện lạnh.',
-    content: {
+    summary: 'Dịch vụ sửa chữa khẩn cấp 24/7, khắc phục nhanh chóng mọi sự cố hệ thống điện lạnh.',    content: {
       root: {
+        type: 'root' as const,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'VRC cung cấp dịch vụ sửa chữa khẩn cấp 24/7 để khắc phục nhanh chóng mọi sự cố hệ thống điện lạnh. Đội ngũ kỹ thuật viên của chúng tôi sẵn sàng can thiệp ngay khi nhận được thông báo, đảm bảo hệ thống được khôi phục hoạt động trong thời gian ngắn nhất.',
               },
             ],
           },
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Chúng tôi có kinh nghiệm xử lý các sự cố phức tạp và trang bị đầy đủ thiết bị, linh kiện thay thế để có thể khắc phục hầu hết các lỗi ngay tại chỗ.',
               },
             ],
@@ -393,24 +406,28 @@ const servicesData: ServiceData[] = [
     title: 'Nâng cấp hệ thống',
     slug: 'nang-cap-he-thong',
     type: 'other',
-    summary: 'Dịch vụ nâng cấp và cải tiến hệ thống điện lạnh hiện có để tăng hiệu quả và tiết kiệm năng lượng.',
-    content: {
+    summary: 'Dịch vụ nâng cấp và cải tiến hệ thống điện lạnh hiện có để tăng hiệu quả và tiết kiệm năng lượng.',    content: {
       root: {
+        type: 'root' as const,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Dịch vụ nâng cấp hệ thống của VRC giúp cải thiện hiệu quả hoạt động của các hệ thống điện lạnh cũ, ứng dụng công nghệ mới để tiết kiệm năng lượng và nâng cao chất lượng điều hòa không khí.',
               },
             ],
           },
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Chúng tôi đánh giá toàn diện hệ thống hiện tại và đề xuất các giải pháp nâng cấp phù hợp với ngân sách và mục tiêu của khách hàng.',
               },
             ],
@@ -473,24 +490,28 @@ const servicesData: ServiceData[] = [
     title: 'Hỗ trợ kỹ thuật',
     slug: 'ho-tro-ky-thuat',
     type: 'support',
-    summary: 'Dịch vụ hỗ trợ kỹ thuật chuyên nghiệp, tư vấn và giải quyết mọi vấn đề điện lạnh.',
-    content: {
+    summary: 'Dịch vụ hỗ trợ kỹ thuật chuyên nghiệp, tư vấn và giải quyết mọi vấn đề điện lạnh.',    content: {
       root: {
+        type: 'root' as const,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        version: 1,
         children: [
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'VRC cung cấp dịch vụ hỗ trợ kỹ thuật toàn diện cho các khách hàng có nhu cầu tư vấn, giải đáp thắc mắc hoặc hỗ trợ vận hành hệ thống điện lạnh. Đội ngũ chuyên gia của chúng tôi sẵn sàng chia sẻ kiến thức và kinh nghiệm.',
               },
             ],
           },
           {
-            type: 'paragraph',
+            type: 'paragraph' as const,
             children: [
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Chúng tôi hỗ trợ cả qua điện thoại, email và trực tiếp tại hiện trường khi cần thiết.',
               },
             ],

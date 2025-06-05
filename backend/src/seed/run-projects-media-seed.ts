@@ -5,14 +5,19 @@
  * Sử dụng: npm run seed:projects-media
  */
 
+import { getPayload } from 'payload'
+import config from '@payload-config'
 import { seedProjectsMedia } from './projectsMedia'
 
 const runProjectsMediaSeed = async () => {
   try {
     console.log('🚀 Starting Projects Media Seed...')
 
-    // Chạy seed projects media (hàm tự tạo payload instance)
-    await seedProjectsMedia()
+    // Initialize Payload
+    const payload = await getPayload({ config })
+
+    // Chạy seed projects media
+    await seedProjectsMedia(payload)
 
     console.log('🎉 Projects Media Seed completed successfully!')
 

@@ -89,6 +89,7 @@ export interface Config {
     tools: Tool;
     resources: Resource;
     banners: Banner;
+    faqs: Faq;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -122,6 +123,7 @@ export interface Config {
     tools: ToolsSelect<false> | ToolsSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     banners: BannersSelect<false> | BannersSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1930,6 +1932,95 @@ export interface Banner {
   createdAt: string;
 }
 /**
+ * Quản lý câu hỏi thường gặp
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: string;
+  /**
+   * Câu hỏi của khách hàng
+   */
+  question: string;
+  /**
+   * Câu trả lời chi tiết
+   */
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Phân loại câu hỏi theo danh mục
+   */
+  category:
+    | 'general'
+    | 'services'
+    | 'products'
+    | 'projects'
+    | 'technology'
+    | 'technical-support'
+    | 'payment'
+    | 'warranty'
+    | 'other';
+  /**
+   * Thẻ để dễ dàng tìm kiếm và phân loại
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Dịch vụ liên quan đến câu hỏi này
+   */
+  relatedServices?: (string | Service)[] | null;
+  /**
+   * Sản phẩm liên quan đến câu hỏi này
+   */
+  relatedProducts?: (string | Product)[] | null;
+  /**
+   * Đánh dấu đây là câu hỏi được hỏi nhiều nhất
+   */
+  isPopular?: boolean | null;
+  /**
+   * Số càng nhỏ thì hiển thị càng trước
+   */
+  order?: number | null;
+  /**
+   * Hiển thị trong danh sách nổi bật
+   */
+  featured?: boolean | null;
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Từ khóa để tăng khả năng tìm kiếm (cách nhau bằng dấu phẩy)
+   */
+  searchKeywords?: string | null;
+  /**
+   * Số lượt xem câu hỏi này
+   */
+  viewCount?: number | null;
+  /**
+   * Số lượt đánh giá hữu ích
+   */
+  helpfulCount?: number | null;
+  language: 'vi' | 'en';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -2190,6 +2281,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'banners';
         value: string | Banner;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: string | Faq;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -3105,6 +3200,33 @@ export interface BannersSelect<T extends boolean = true> {
         altText?: T;
         keywords?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  category?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  relatedServices?: T;
+  relatedProducts?: T;
+  isPopular?: T;
+  order?: T;
+  featured?: T;
+  status?: T;
+  searchKeywords?: T;
+  viewCount?: T;
+  helpfulCount?: T;
+  language?: T;
   updatedAt?: T;
   createdAt?: T;
 }

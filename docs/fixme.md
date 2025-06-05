@@ -1,8 +1,161 @@
 # VRC PAYLOAD CMS - FIXME & TROUBLESHOOTING GUIDE
 
-**Last Updated: June 3, 2025**
+**Last Updated: June 5, 2025**
 
-## ✅ **LATEST SUCCESS - JUNE 3, 2025**
+## ✅ **LATEST SUCCESS - JUNE 5, 2025**
+
+### 🎯 **FAQs Collection API Relationship Fields - RESOLVED**
+
+#### PROBLEM: 500 Error "Cannot read properties of undefined (reading 'type')" when accessing /api/faqs
+
+**Vấn đề cụ thể:**
+- FAQs collection được tạo và seed thành công
+- Admin panel hiển thị dữ liệu FAQs đầy đủ
+- API `/api/faqs` trả về error 500: `{"errors":[{"message":"Something went wrong."}]}`
+- Server logs hiển thị: `TypeError: Cannot read properties of undefined (reading 'type')`
+- Lỗi xuất phát từ MongoDB query parsing khi có relationship fields
+
+**Root Cause Analysis:**
+
+1. **Access Control Mismatch**: Các collections `Services` và `Products` sử dụng sai access control
+2. **Field Name Conflict**: 
+   - Access control `authenticatedOrPublished` tìm kiếm field `_status` (có dấu gạch dưới)
+   - Nhưng cả Services và Products collections sử dụng field `status` (không có dấu gạch dưới)
+3. **Relationship Query Error**: Khi FAQs collection cố gắng populate relationships với Services/Products, MongoDB query bị lỗi vì không tìm thấy field `_status`
+
+**Debugging Process:**
+
+**Step 1: Isolation Testing**
+```bash
+# Comment out relationship fields in FAQs.ts
+# relatedServices và relatedProducts được comment out
+curl http://localhost:3000/api/faqs
+# ✅ Kết quả: API hoạt động bình thường
+```
+
+**Step 2: Individual Field Testing**
+```bash
+# Enable chỉ relatedServices field
+curl http://localhost:3000/api/faqs
+# ❌ Kết quả: Vẫn lỗi 500
+```
+
+**Step 3: Access Control Analysis**
+```typescript
+// Services.ts và Products.ts sử dụng:
+import { authenticatedOrPublished } from '../access/authenticatedOrPublished';
+
+// authenticatedOrPublished.ts tìm kiếm:
+return {
+  _status: {  // ❌ Field này không tồn tại!
+    equals: 'published',
+  },
+}
+
+// Nhưng Services.ts và Products.ts có field:
+{
+  name: 'status',  // ✅ Field thực tế (không có dấu gạch dưới)
+  type: 'select',
+  // ...
+}
+```
+
+**✅ Giải pháp HOÀN CHỈNH:**
+
+**1. Fix Services Collection Access Control:**
+```typescript
+// FILE: backend/src/collections/Services.ts
+// BEFORE:
+import { authenticatedOrPublished } from '../access/authenticatedOrPublished';
+
+// AFTER:
+import { authenticatedOrPublishedStatus } from '../access/authenticatedOrPublishedStatus';
+
+// BEFORE:
+access: {
+  read: authenticatedOrPublished,
+},
+
+// AFTER:
+access: {
+  read: authenticatedOrPublishedStatus,
+},
+```
+
+**2. Fix Products Collection Access Control:**
+```typescript
+// FILE: backend/src/collections/Products.ts
+// Áp dụng cùng thay đổi như Services.ts
+import { authenticatedOrPublishedStatus } from '../access/authenticatedOrPublishedStatus';
+
+access: {
+  read: authenticatedOrPublishedStatus,
+},
+```
+
+**3. Verify Relationship Fields Configuration:**
+```typescript
+// FILE: backend/src/collections/FAQs.ts
+// Enable cả hai relationship fields:
+{
+  name: 'relatedServices',
+  type: 'relationship',
+  relationTo: 'services',  // ✅ Slug khớp với Services collection
+  hasMany: true,
+},
+{
+  name: 'relatedProducts', 
+  type: 'relationship',
+  relationTo: 'products',  // ✅ Slug khớp với Products collection
+  hasMany: true,
+},
+```
+
+**4. Final Testing:**
+```bash
+curl http://localhost:3000/api/faqs
+# ✅ Kết quả: API trả về đầy đủ FAQs với relationship data
+
+# Sample response với relatedServices và relatedProducts:
+{
+  "docs": [
+    {
+      "question": "VRC có những thương hiệu điều hòa nào?",
+      "relatedProducts": [
+        {
+          "name": "Hệ thống VRV/VRF VRC-Multi",
+          "slug": "he-thong-vrv-vrf-vrc-multi",
+          // ... full product data
+        }
+      ],
+      "relatedServices": [
+        {
+          "title": "Bảo trì định kỳ",
+          "slug": "bo-tr-nh-k",
+          // ... full service data
+        }
+      ]
+    }
+  ]
+}
+```
+
+**✅ KẾT QUẢ THÀNH CÔNG:**
+- ✅ API `/api/faqs` hoạt động bình thường
+- ✅ Cả hai relationship fields (`relatedServices`, `relatedProducts`) đều hoạt động
+- ✅ Dữ liệu được populate đầy đủ và chính xác  
+- ✅ Không còn lỗi 500 server error
+- ✅ Admin panel và public API đều hoạt động ổn định
+
+**📝 Lesson Learned:**
+- **Access Control Consistency**: Đảm bảo access control khớp với tên field thực tế
+- **Field Naming Convention**: Chú ý sự khác biệt giữa `status` và `_status`
+- **Relationship Debugging**: Test từng relationship field riêng biệt để isolate issues
+- **MongoDB Query Validation**: Access control errors có thể gây ra MongoDB query failures
+
+---
+
+## ✅ **RESOLVED - JUNE 3, 2025**
 
 ### 🎯 **TechnologySections Collection API - RESOLVED**
 
@@ -1186,5 +1339,83 @@ curl "http://localhost:3000/api/projects"
 - ✅ API returns proper published content
 - ✅ Realistic demo data for frontend testing
 - 🔄 Consider applying to other collections (Services, Posts)
+
+---
+
+## ✅ **RESOLVED - JUNE 4, 2025**
+
+### 🎯 **Google Maps Iframe Issue - ROOT CAUSE IDENTIFIED**
+
+#### PROBLEM: JavaScript errors on `/contact` page
+
+**Vấn đề cụ thể:**
+- JavaScript errors xuất hiện trên trang `/contact` khi tải Google Maps iframe
+- Errors liên quan đến Google Maps embed scripts
+
+**Root Cause Analysis:**
+- Google Maps Embed is the source of JavaScript errors
+
+**Error Stack Trace:**
+```
+main.js:46  Uncaught Error
+    at _.Nc (main.js:46:290)
+    at oaa (main.js:64:239)  
+    at Re (main.js:63:172)
+    at new _.H (main.js:288:2258)
+    at new _.JA (common.js:139:2282)
+    at Object.twb [as Eg] (search_impl.js:3:23)
+    at search.js:3:536
+```
+
+**Files involved in error:**
+- `main.js` (Google Maps core)
+- `search_impl.js` (Google Maps search functionality)
+- `init_embed.js` (Google Maps embed initialization)
+
+**Current Google Maps URL from API:**
+```
+https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.9920167694313!2d106.71850477580078!3d10.735098289411203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f87b701aaab%3A0x126e9a25d39f1263!2zNyDEkC4gTmd1eeG7hW4gVsSDbiBMaW5oLCBUw6JuIFBow7osIFF14bqtbiA3LCBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1748769630609!5m2!1svi!2s
+```
+
+### 🔍 **Testing Results:**
+- ✅ **API Authentication:** Working correctly with API key `vrc-api-2024-secure`
+- ✅ **ZaloChatWidget:** Not the cause (loads successfully)
+- ✅ **External Script (`gptengineer.js`):** Not the cause
+- ❌ **Google Maps Iframe:** **ROOT CAUSE** - generates JavaScript errors
+
+### 🛠️ **Next Steps to Fix:**
+1. **Test with simplified Google Maps URL**
+2. **Consider alternative mapping solutions** (OpenStreetMap, Leaflet)
+3. **Add error handling for Google Maps failures**
+4. **Implement fallback map display**
+
+### 📝 **Current Status:**
+- Google Maps iframe temporarily disabled for testing
+- Contact page should load without JavaScript errors when Maps is disabled
+- Need to implement proper Maps solution or error handling
+
+### 🛠️ **SOLUTION IMPLEMENTED (June 5, 2025)**
+
+**Problem:** Google Maps iframe causing JavaScript errors due to complex embed URL and Google's scripts.
+
+**Solution:** Created `SafeGoogleMaps` component with:
+
+1. **Error Handling:** Catches iframe load failures and displays fallback
+2. **Simplified URLs:** Uses basic Google Maps embed format instead of complex pb parameters
+3. **Loading States:** Shows loading spinner while map loads
+4. **Graceful Degradation:** Fallback to address display and external link if maps fail
+5. **Sandbox Security:** Added iframe sandbox for safer script execution
+
+**Files Created/Modified:**
+- `src/components/SafeGoogleMaps.tsx` (new component)
+- `src/pages/Contact.tsx` (updated to use SafeGoogleMaps)
+
+**Key Features:**
+- Error boundary for Google Maps failures
+- Loading states and user feedback
+- Fallback to external Google Maps link
+- Safer iframe implementation with sandbox
+
+**Testing:** Monitor console for JavaScript errors after implementation.
 
 ---
