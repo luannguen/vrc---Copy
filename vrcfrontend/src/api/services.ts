@@ -38,8 +38,15 @@ export interface Service {
     height?: number;
   };
   content: LexicalContent;
-  features: string[];
-  benefits: string[];
+  features: Array<{
+    title: string;
+    description?: string;
+    icon?: string;
+  }>;
+  benefits: Array<{
+    title: string;
+    description?: string;
+  }>;
   pricing: {
     showPricing: boolean;
     priceType: 'fixed' | 'range' | 'custom' | 'contact';

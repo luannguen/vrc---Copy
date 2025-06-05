@@ -202,9 +202,7 @@ const ServiceDetail = () => {
                 <div>
                   <h2 className="text-2xl font-bold mb-6">Thông tin chi tiết</h2>
                   {renderContent(service.content)}
-                </div>
-
-                {/* Features */}
+                </div>                {/* Features */}
                 {service.features && service.features.length > 0 && (
                   <div>
                     <h3 className="text-xl font-semibold mb-4">Tính năng chính</h3>
@@ -212,14 +210,17 @@ const ServiceDetail = () => {
                       {service.features.map((feature, index) => (
                         <li key={index} className="flex items-start">
                           <CheckCircle size={20} className="text-primary mr-3 mt-1 flex-shrink-0" />
-                          <span>{feature}</span>
+                          <div>
+                            <span className="font-medium">{feature.title}</span>
+                            {feature.description && (
+                              <p className="text-muted-foreground text-sm mt-1">{feature.description}</p>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>
                   </div>
-                )}
-
-                {/* Benefits */}
+                )}                {/* Benefits */}
                 {service.benefits && service.benefits.length > 0 && (
                   <div>
                     <h3 className="text-xl font-semibold mb-4">Lợi ích</h3>
@@ -227,7 +228,12 @@ const ServiceDetail = () => {
                       {service.benefits.map((benefit, index) => (
                         <li key={index} className="flex items-start">
                           <CheckCircle size={20} className="text-accent mr-3 mt-1 flex-shrink-0" />
-                          <span>{benefit}</span>
+                          <div>
+                            <span className="font-medium">{benefit.title}</span>
+                            {benefit.description && (
+                              <p className="text-muted-foreground text-sm mt-1">{benefit.description}</p>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>
