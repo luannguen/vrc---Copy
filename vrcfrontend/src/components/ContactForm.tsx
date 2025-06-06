@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -8,18 +9,32 @@ import { useContactFormSection } from "../hooks/useHomepageSettings";
 import { apiService } from "../lib/api";
 
 const ContactForm = () => {
+  const { t } = useTranslation();
+  
+  // Hook automatically uses current locale for localized form labels, messages, and settings
   const { settings: contactFormData, isLoading, error, isEnabled } = useContactFormSection();
   
-  // Fallback data if API fails
+  // Initialize state first (hooks must be called in the same order)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "general",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  
+  // Fallback data if API fails - use translation keys
   const fallbackData = {
     enabled: true,
-    sectionTitle: "Liên hệ với chúng tôi",
-    sectionSubtitle: "Hãy để lại thông tin liên hệ, chúng tôi sẽ sớm phản hồi tới quý khách hàng.",
-    successMessage: "Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi trong thời gian sớm nhất!",
+    sectionTitle: t('contactForm.sectionTitle'),
+    sectionSubtitle: t('contactForm.sectionSubtitle'),
+    successMessage: t('contactForm.successMessage'),
     enableNotifications: true
   };
 
-  // Use API data or fallback
+  // Use API data (localized) or fallback
   const sectionData = contactFormData || fallbackData;
 
   if (error) {
@@ -30,22 +45,13 @@ const ContactForm = () => {
   if (!isEnabled) {
     return null;
   }
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "general",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-
   if (isLoading) {
     return (
       <section className="bg-gray-100 py-16">
         <div className="container-custom">
           <div className="flex justify-center items-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <span className="ml-2 text-muted-foreground">{t('contactForm.loading')}</span>
           </div>
         </div>
       </section>
@@ -62,8 +68,10 @@ const ContactForm = () => {
   };  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus("idle");    try {
-      const result = await apiService.post('/contact-form', formData);
+    setSubmitStatus("idle");
+
+    try {
+      const result = await apiService.post('/contact-form', formData) as { success: boolean; message?: string };
 
       if (result.success) {
         setSubmitStatus("success");
@@ -89,29 +97,28 @@ const ContactForm = () => {
   return (
     <section className="bg-gray-100 py-16">
       <div className="container-custom">        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-primary mb-2">{sectionData?.sectionTitle || "Liên hệ với chúng tôi"}</h2>
+          <h2 className="text-3xl font-bold text-primary mb-2">{sectionData?.sectionTitle || t('contactForm.sectionTitle')}</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            {sectionData?.sectionSubtitle || "Hãy để lại thông tin liên hệ, chúng tôi sẽ sớm phản hồi tới quý khách hàng."}
+            {sectionData?.sectionSubtitle || t('contactForm.sectionSubtitle')}
           </p>
         </div>
 
         <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">          {submitStatus === "success" && (
             <div className="bg-green-50 border border-green-200 text-green-800 rounded-md p-4 mb-6">
-              {sectionData?.successMessage || "Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi trong thời gian sớm nhất!"}
+              {sectionData?.successMessage || t('contactForm.successMessage')}
             </div>
           )}
 
           {submitStatus === "error" && (
             <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4 mb-6">
-              Đã có lỗi xảy ra. Vui lòng thử lại sau!
+              {t('contactForm.errorMessage')}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">              <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Họ và tên *
+                  {t('contactForm.form.name.label')}
                 </label>
                 <Input
                   id="name"
@@ -119,12 +126,12 @@ const ContactForm = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  placeholder="Nhập họ và tên của bạn"
+                  placeholder={t('contactForm.form.name.placeholder')}
                 />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
+                  {t('contactForm.form.email.label')}
                 </label>
                 <Input
                   id="email"
@@ -133,49 +140,46 @@ const ContactForm = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  placeholder="example@domain.com"
+                  placeholder={t('contactForm.form.email.placeholder')}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">              <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Số điện thoại
+                  {t('contactForm.form.phone.label')}
                 </label>
                 <Input
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Nhập số điện thoại"
+                  placeholder={t('contactForm.form.phone.placeholder')}
                 />
               </div>
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  Chủ đề
+                  {t('contactForm.form.subject.label')}
                 </label>
                 <Select value={formData.subject} onValueChange={handleSelectChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Chọn chủ đề" />
+                    <SelectValue placeholder={t('contactForm.form.subject.placeholder')} />
                   </SelectTrigger>                  <SelectContent>
-                    <SelectItem value="general">Tư vấn chung</SelectItem>
-                    <SelectItem value="repair">Dịch vụ sửa chữa</SelectItem>
-                    <SelectItem value="maintenance">Bảo trì thiết bị</SelectItem>
-                    <SelectItem value="installation">Lắp đặt</SelectItem>
-                    <SelectItem value="consulting">Tư vấn kỹ thuật</SelectItem>
-                    <SelectItem value="inverter-technology">Công nghệ Inverter</SelectItem>
-                    <SelectItem value="heat-recovery">Giải pháp thu hồi nhiệt</SelectItem>
-                    <SelectItem value="energy-efficiency">Hiệu quả năng lượng</SelectItem>
-                    <SelectItem value="other">Khác</SelectItem>
+                    <SelectItem value="general">{t('contactForm.form.subject.options.general')}</SelectItem>
+                    <SelectItem value="repair">{t('contactForm.form.subject.options.repair')}</SelectItem>
+                    <SelectItem value="maintenance">{t('contactForm.form.subject.options.maintenance')}</SelectItem>
+                    <SelectItem value="installation">{t('contactForm.form.subject.options.installation')}</SelectItem>
+                    <SelectItem value="consulting">{t('contactForm.form.subject.options.consulting')}</SelectItem>
+                    <SelectItem value="inverter-technology">{t('contactForm.form.subject.options.inverterTechnology')}</SelectItem>
+                    <SelectItem value="heat-recovery">{t('contactForm.form.subject.options.heatRecovery')}</SelectItem>
+                    <SelectItem value="energy-efficiency">{t('contactForm.form.subject.options.energyEfficiency')}</SelectItem>
+                    <SelectItem value="other">{t('contactForm.form.subject.options.other')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            <div>
+            </div>            <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                Nội dung *
+                {t('contactForm.form.message.label')}
               </label>
               <Textarea
                 id="message"
@@ -184,18 +188,17 @@ const ContactForm = () => {
                 value={formData.message}
                 onChange={handleChange}
                 required
-                placeholder="Nhập nội dung liên hệ"
+                placeholder={t('contactForm.form.message.placeholder')}
                 className="resize-none"
               />
             </div>
 
-            <div className="text-center">
-              <Button 
+            <div className="text-center">              <Button 
                 type="submit" 
                 disabled={isSubmitting}
                 className="px-8 py-2"
               >
-                {isSubmitting ? "Đang gửi..." : "Gửi liên hệ"}
+                {isSubmitting ? t('contactForm.submitting') : t('contactForm.submitButton')}
               </Button>
             </div>
           </form>

@@ -39,14 +39,24 @@ export async function OPTIONS() {
 
 /**
  * Get homepage settings
- * GET /api/homepage-settings
+ * GET /api/homepage-settings?locale=en|vi|tr
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const payload = await getPayload({ config });
 
+    // Get locale from query parameters, default to 'vi'
+    const { searchParams } = new URL(request.url);
+    const locale = searchParams.get('locale') || 'vi';
+
+    // Validate locale
+    const validLocales: readonly string[] = ['vi', 'en', 'tr'];
+    const finalLocale = validLocales.includes(locale) ? (locale as 'vi' | 'en' | 'tr') : 'vi';
+
     const homepageSettings = await payload.findGlobal({
       slug: 'homepage-settings',
+      locale: finalLocale,
+      fallbackLocale: 'vi', // Fallback to Vietnamese if requested locale has no data
     });
 
     const extendedSettings: ExtendedHomepageSettings = { ...homepageSettings };
@@ -59,6 +69,8 @@ export async function GET() {
 
       const banners = await payload.find({
         collection: 'banners',
+        locale: finalLocale,
+        fallbackLocale: 'vi',
         where: {
           and: [
             { id: { in: bannerIds } },
@@ -93,6 +105,8 @@ export async function GET() {
 
       const products = await payload.find({
         collection: 'products',
+        locale: finalLocale,
+        fallbackLocale: 'vi',
         where: {
           id: { in: productIds },
         },
@@ -107,6 +121,8 @@ export async function GET() {
         homepageSettings.publicationsSection?.displayMode === 'auto') {
       const posts = await payload.find({
         collection: 'posts',
+        locale: finalLocale,
+        fallbackLocale: 'vi',
         where: {
           _status: { equals: 'published' },
         },
@@ -126,6 +142,8 @@ export async function GET() {
 
       const posts = await payload.find({
         collection: 'posts',
+        locale: finalLocale,
+        fallbackLocale: 'vi',
         where: {
           and: [
             { id: { in: postIds } },
@@ -206,6 +224,8 @@ export async function GET() {
       {
         success: true,
         data: extendedSettings,
+        locale: finalLocale, // Include current locale in response
+        availableLocales: ['vi', 'en', 'tr'], // Available locales
       },
       {
         status: 200,
@@ -294,7 +314,7 @@ export async function PUT(req: NextRequest) {
 
 /**
  * Create/Update homepage settings (Alternative POST method)
- * POST /api/homepage-settings
+ * POST /api/homepage-settings?locale=en|vi|tr
  */
 export async function POST(req: NextRequest) {
   try {
@@ -306,10 +326,19 @@ export async function POST(req: NextRequest) {
     //   return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     // }
 
+    // Get locale from query parameters, default to 'vi'
+    const { searchParams } = new URL(req.url);
+    const locale = searchParams.get('locale') || 'vi';
+
+    // Validate locale
+    const validLocales: readonly string[] = ['vi', 'en', 'tr'];
+    const finalLocale = validLocales.includes(locale) ? (locale as 'vi' | 'en' | 'tr') : 'vi';
+
     const body = await req.json();
 
     const updatedSettings = await payload.updateGlobal({
       slug: 'homepage-settings',
+      locale: finalLocale,
       data: body,
     });
 

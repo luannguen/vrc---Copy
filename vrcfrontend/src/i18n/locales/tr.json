@@ -11,6 +11,49 @@
     "loading": "Yükleniyor...",
     "error": "Bir hata oluştu"
   },
+  "heroSection": {
+    "loading": "Banner yükleniyor...",
+    "learnMore": "Daha Fazla Öğren",
+    "goToSlide": "Slayta git",
+    "fallbackSlides": {
+      "slide1": {
+        "title": "Endüstriyel Soğutma Sistemleri",
+        "subtitle": "Her ölçekteki işletme için modern çözümler"
+      },
+      "slide2": {
+        "title": "Enerji Tasarruflu Teknoloji",
+        "subtitle": "Sürdürülebilir gelecek için yeşil çözümler"
+      },
+      "slide3": {
+        "title": "Profesyonel Bakım Hizmetleri",
+        "subtitle": "Lider teknik ekip, 7/24 hizmet"
+      }
+    }
+  },
+  "featuredTopics": {
+    "loading": "Öne çıkan ürünler yükleniyor...",
+    "viewAllProducts": "Tüm Ürünleri Gör",
+    "learnMore": "Daha Fazla Öğren",
+    "defaultSectionTitle": "Öne Çıkan Ürünler",
+    "defaultSectionSubtitle": "Tüm endüstriyel ve ticari ihtiyaçlara uygun, önde gelen soğutma çözümlerimizi keşfedin.",
+    "fallbackProducts": {
+      "product1": {
+        "title": "Endüstriyel Klima Sistemleri",
+        "description": "Fabrikalar, depolar ve geniş alanlar için soğutma çözümleri",
+        "alt": "Endüstriyel Klima Sistemleri"
+      },
+      "product2": {
+        "title": "Ticari Soğutma Sistemleri",
+        "description": "Süpermarketler, restoranlar ve perakende mağazalar için soğutma ekipmanları",
+        "alt": "Ticari Soğutma Sistemleri"
+      },
+      "product3": {
+        "title": "Enerji Tasarruf Çözümleri",
+        "description": "Maliyetleri azaltmak ve çevreyi korumak için modern teknoloji",
+        "alt": "Enerji Tasarruf Çözümleri"
+      }
+    }
+  },
   "navigation": {
     "home": "Ana Sayfa",
     "about": "Hakkımızda",
@@ -58,6 +101,105 @@
     "translationManager": "Çeviri Yöneticisi (Admin)",
     "cacheStatistics": "Çeviri Önbellek İstatistikleri",
     "rerunTests": "Testleri Yeniden Çalıştır"
+  },
+  "latestPublications": {
+    "loading": "En son yayınlar yükleniyor...",
+    "defaultSectionTitle": "En Son Yayınlar",
+    "defaultSectionSubtitle": "Enerji tasarrufu teknolojisi ve yüksek verimli klima çözümleri hakkında en son raporları, araştırmaları ve kılavuzları keşfedin.",
+    "viewAllPublications": "Tüm Yayınları Görüntüle",
+    "readMore": "Devamını Oku",
+    "authorBy": "Yazan",
+    "fallbackPublications": {
+      "publication1": {
+        "title": "Gelişmiş İnvertör Teknolojisi: HVAC Sistemlerinde Güç Tüketimini Optimize Etme",
+        "excerpt": "En son İnvertör teknolojisini ve enerji maliyetlerini nasıl minimize edebileceğini keşfedin.",
+        "alt": "İnvertör Teknolojisi"
+      },
+      "publication2": {
+        "title": "Endüstriyel Sistemler için Atık Isı Geri Kazanım Çözümleri",
+        "excerpt": "Atık Isı Geri Kazanım sistemlerinin işletmeler için nasıl enerji tasarrufu sağlayabileceğini öğrenin.",
+        "alt": "Atık Isı Geri Kazanım Sistemi"
+      },
+      "publication3": {
+        "title": "Yeşil Bina Standartları: Uzun Vadeli Ekonomik ve Çevresel Faydalar",
+        "excerpt": "İnşaatta yeşil bina standartlarını uygulamanın faydalarının analizi.",
+        "alt": "Yeşil Bina"
+      },
+      "publication4": {
+        "title": "Enerji Verimliliği Raporu: Yeni Teknolojilerin Maliyet-Fayda Analizi",
+        "excerpt": "Modern teknolojilerin enerji verimliliğinin kapsamlı değerlendirmesi.",
+        "alt": "Enerji Verimliliği Raporu"
+      }
+    }
+  },
+  "dataResources": {
+    "loading": "Araçlar ve kaynaklar yükleniyor...",
+    "sectionTitle": "Araçlar ve Kaynaklar",
+    "sectionSubtitle": "Verimli klima sistemlerinin seçimi ve işletimi için hesaplama araçları, analitik veriler ve destek kaynaklarına erişin.",
+    "leftPanel": {
+      "title": "Enerji Verileri ve İstatistikleri",
+      "description": "Klima sistemlerinin enerji performansı, işletme maliyetleri ve farklı teknolojilerin çevresel etkisi hakkında analitik veriler ve istatistiklere erişin.",
+      "features": {
+        "feature1": "Enerji Verimlilik Endeksi (EER/COP)",
+        "feature2": "İşletme ve bakım maliyetleri",
+        "feature3": "ROI analizi ve geri ödeme süresi",
+        "feature4": "Karbon emisyon verileri ve çevresel etki"
+      },
+      "linkText": "İstatistikleri Görüntüle"
+    },
+    "rightPanel": {
+      "title": "Hesaplama ve Tasarım Araçları",
+      "description": "Uygun klima sistemlerini seçmek, performansı optimize etmek ve uzun vadeli işletme maliyetlerini tahmin etmek için hesaplama ve tasarım araçlarını kullanın.",
+      "features": {
+        "feature1": "Alanlar için soğutma yükü hesaplaması",
+        "feature2": "Sistemler arası performans ve maliyet karşılaştırması",
+        "feature3": "Enerji tasarrufu ve maliyet azaltma analizi",
+        "feature4": "Uygun çözüm seçimi konusunda danışmanlık"
+      },
+      "linkText": "Araçları Keşfet"
+    }
+  },
+  "contactForm": {
+    "loading": "İletişim formu yükleniyor...",
+    "sectionTitle": "Bizimle İletişime Geçin",
+    "sectionSubtitle": "Lütfen iletişim bilgilerinizi bırakın, size en kısa sürede yanıt vereceğiz.",
+    "successMessage": "Bizimle iletişime geçtiğiniz için teşekkür ederiz. En kısa sürede yanıt vereceğiz!",
+    "errorMessage": "Bir hata oluştu. Lütfen daha sonra tekrar deneyin!",
+    "submitting": "Gönderiliyor...",
+    "submitButton": "Mesaj Gönder",
+    "form": {
+      "name": {
+        "label": "Ad Soyad *",
+        "placeholder": "Ad soyadınızı girin"
+      },
+      "email": {
+        "label": "E-posta *",
+        "placeholder": "example@domain.com"
+      },
+      "phone": {
+        "label": "Telefon Numarası",
+        "placeholder": "Telefon numarası girin"
+      },
+      "subject": {
+        "label": "Konu",
+        "placeholder": "Konu seçin",
+        "options": {
+          "general": "Genel Danışmanlık",
+          "repair": "Onarım Hizmeti",
+          "maintenance": "Ekipman Bakımı",
+          "installation": "Kurulum",
+          "consulting": "Teknik Danışmanlık",
+          "inverterTechnology": "İnvertör Teknolojisi",
+          "heatRecovery": "Atık Isı Geri Kazanım Çözümleri",
+          "energyEfficiency": "Enerji Verimliliği",
+          "other": "Diğer"
+        }
+      },
+      "message": {
+        "label": "Mesaj *",
+        "placeholder": "Mesajınızı girin"
+      }
+    }
   },
   "faq": {
     "title": "Sık Sorulan Sorular",

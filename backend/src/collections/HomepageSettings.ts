@@ -80,13 +80,15 @@ const HomepageSettings: CollectionConfig = {
           name: 'sectionTitle',
           type: 'text',
           defaultValue: 'Featured Topics',
-          label: 'Section Title'
+          label: 'Section Title',
+          localized: true
         },
         {
           name: 'sectionSubtitle',
           type: 'textarea',
           defaultValue: 'Explore our most popular research topics',
-          label: 'Section Subtitle'
+          label: 'Section Subtitle',
+          localized: true
         }
       ]
     },
@@ -111,7 +113,8 @@ const HomepageSettings: CollectionConfig = {
           name: 'sectionTitle',
           type: 'text',
           defaultValue: 'Latest Publications',
-          label: 'Section Title'
+          label: 'Section Title',
+          localized: true
         },
         {
           name: 'showDate',
@@ -154,13 +157,15 @@ const HomepageSettings: CollectionConfig = {
           name: 'resourcesTitle',
           type: 'text',
           defaultValue: 'Data Resources',
-          label: 'Resources Panel Title'
+          label: 'Resources Panel Title',
+          localized: true
         },
         {
           name: 'toolsTitle',
           type: 'text',
           defaultValue: 'Tools & Software',
-          label: 'Tools Panel Title'
+          label: 'Tools Panel Title',
+          localized: true
         }
       ]
     },
@@ -179,19 +184,22 @@ const HomepageSettings: CollectionConfig = {
           name: 'sectionTitle',
           type: 'text',
           defaultValue: 'Get in Touch',
-          label: 'Section Title'
+          label: 'Section Title',
+          localized: true
         },
         {
           name: 'sectionSubtitle',
           type: 'textarea',
           defaultValue: 'Have questions or need support? Contact our team.',
-          label: 'Section Subtitle'
+          label: 'Section Subtitle',
+          localized: true
         },
         {
           name: 'successMessage',
           type: 'textarea',
           defaultValue: 'Thank you for your message! We will get back to you soon.',
-          label: 'Success Message'
+          label: 'Success Message',
+          localized: true
         },
         {
           name: 'enableNotifications',
@@ -210,13 +218,15 @@ const HomepageSettings: CollectionConfig = {
           name: 'metaTitle',
           type: 'text',
           defaultValue: 'VRC - Vietnam Research Center',
-          label: 'Homepage Meta Title'
+          label: 'Homepage Meta Title',
+          localized: true
         },
         {
           name: 'metaDescription',
           type: 'textarea',
           defaultValue: 'Leading research center providing comprehensive analysis and insights on Vietnam',
-          label: 'Homepage Meta Description'
+          label: 'Homepage Meta Description',
+          localized: true
         },
         {
           name: 'ogImage',
@@ -249,7 +259,8 @@ const HomepageSettings: CollectionConfig = {
               ]
             }
           ],
-          label: 'Maintenance Message'
+          label: 'Maintenance Message',
+          localized: true
         }
       ]
     }

@@ -24,6 +24,7 @@ export const Banners: CollectionConfig = {
       label: 'Tiêu đề',
       type: 'text',
       required: true,
+      localized: true,
       admin: {
         description: 'Tiêu đề chính của banner',
       },
@@ -32,6 +33,7 @@ export const Banners: CollectionConfig = {
       name: 'subtitle',
       label: 'Phụ đề',
       type: 'textarea',
+      localized: true,
       admin: {
         description: 'Mô tả ngắn gọn xuất hiện dưới tiêu đề',
       },
@@ -59,6 +61,7 @@ export const Banners: CollectionConfig = {
       label: 'Văn bản nút',
       type: 'text',
       defaultValue: 'Tìm hiểu thêm',
+      localized: true,
       admin: {
         description: 'Văn bản hiển thị trên nút call-to-action',
       },
@@ -211,6 +214,7 @@ export const Banners: CollectionConfig = {
           name: 'altText',
           label: 'Alt text cho hình ảnh',
           type: 'text',
+          localized: true,
           admin: {
             description: 'Mô tả hình ảnh cho accessibility và SEO',
           },
@@ -219,6 +223,7 @@ export const Banners: CollectionConfig = {
           name: 'keywords',
           label: 'Từ khóa',
           type: 'text',
+          localized: true,
           admin: {
             description: 'Từ khóa liên quan đến banner (cách nhau bởi dấu phẩy)',
           },

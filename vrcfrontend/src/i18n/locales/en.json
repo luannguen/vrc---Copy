@@ -11,6 +11,49 @@
     "loading": "Loading...",
     "error": "An error occurred"
   },
+  "heroSection": {
+    "loading": "Loading banners...",
+    "learnMore": "Learn More",
+    "goToSlide": "Go to slide",
+    "fallbackSlides": {
+      "slide1": {
+        "title": "Industrial Refrigeration Systems",
+        "subtitle": "Modern solutions for businesses of all scales"
+      },
+      "slide2": {
+        "title": "Energy-Saving Technology",
+        "subtitle": "Green solutions for a sustainable future"
+      },
+      "slide3": {
+        "title": "Professional Maintenance Services",
+        "subtitle": "Leading technical team, serving 24/7"
+      }
+    }
+  },
+  "featuredTopics": {
+    "loading": "Loading featured products...",
+    "viewAllProducts": "View All Products",
+    "learnMore": "Learn More",
+    "defaultSectionTitle": "Featured Products",
+    "defaultSectionSubtitle": "Discover our leading refrigeration solutions, suitable for all industrial and commercial needs.",
+    "fallbackProducts": {
+      "product1": {
+        "title": "Industrial Air Conditioning Systems",
+        "description": "Cooling solutions for factories, warehouses and large spaces",
+        "alt": "Industrial Air Conditioning Systems"
+      },
+      "product2": {
+        "title": "Commercial Refrigeration Systems",
+        "description": "Refrigeration equipment for supermarkets, restaurants and retail stores",
+        "alt": "Commercial Refrigeration Systems"
+      },
+      "product3": {
+        "title": "Energy Saving Solutions",
+        "description": "Modern technology to save costs and protect the environment",
+        "alt": "Energy Saving Solutions"
+      }
+    }
+  },
   "navigation": {
     "home": "Home",
     "about": "About",
@@ -58,6 +101,105 @@
     "translationManager": "Translation Manager (Admin)",
     "cacheStatistics": "Translation Cache Statistics",
     "rerunTests": "Re-run Tests"
+  },
+  "latestPublications": {
+    "loading": "Loading latest publications...",
+    "defaultSectionTitle": "Latest Publications",
+    "defaultSectionSubtitle": "Explore the latest reports, research and guides on energy-saving technology and high-efficiency air conditioning solutions.",
+    "viewAllPublications": "View All Publications",
+    "readMore": "Read More",
+    "authorBy": "By",
+    "fallbackPublications": {
+      "publication1": {
+        "title": "Advanced Inverter Technology: Optimizing Power Consumption in HVAC Systems",
+        "excerpt": "Discover the latest Inverter technology and how it can minimize energy costs.",
+        "alt": "Inverter Technology"
+      },
+      "publication2": {
+        "title": "Heat Recovery Solutions for Industrial Systems",
+        "excerpt": "Learn how Heat Recovery systems can save energy for businesses.",
+        "alt": "Heat Recovery System"
+      },
+      "publication3": {
+        "title": "Green Building Standards: Long-term Economic and Environmental Benefits",
+        "excerpt": "Analysis of the benefits of applying green building standards in construction.",
+        "alt": "Green Building"
+      },
+      "publication4": {
+        "title": "Energy Efficiency Report: Cost-Benefit Analysis of New Technologies",
+        "excerpt": "Comprehensive evaluation of energy efficiency of modern technologies.",
+        "alt": "Energy Efficiency Report"
+      }
+    }
+  },
+  "dataResources": {
+    "loading": "Loading tools and resources...",
+    "sectionTitle": "Tools & Resources",
+    "sectionSubtitle": "Access calculation tools, analytical data and support resources for selecting and operating efficient air conditioning systems.",
+    "leftPanel": {
+      "title": "Energy Data & Statistics",
+      "description": "Access analytical data and statistics on energy performance of air conditioning systems, operating costs and environmental impact of different technologies.",
+      "features": {
+        "feature1": "Energy Efficiency Index (EER/COP)",
+        "feature2": "Operating and maintenance costs",
+        "feature3": "ROI analysis and payback period",
+        "feature4": "Carbon emissions data and environmental impact"
+      },
+      "linkText": "View Statistics"
+    },
+    "rightPanel": {
+      "title": "Calculation & Design Tools",
+      "description": "Use calculation and design tools to select suitable air conditioning systems, optimize performance and estimate long-term operating costs.",
+      "features": {
+        "feature1": "Cooling load calculation for spaces",
+        "feature2": "Performance and cost comparison between systems",
+        "feature3": "Energy savings and cost reduction analysis",
+        "feature4": "Consultation on suitable solution selection"
+      },
+      "linkText": "Explore Tools"
+    }
+  },
+  "contactForm": {
+    "loading": "Loading contact form...",
+    "sectionTitle": "Contact Us",
+    "sectionSubtitle": "Please leave your contact information, we will respond to you soon.",
+    "successMessage": "Thank you for contacting us. We will respond as soon as possible!",
+    "errorMessage": "An error occurred. Please try again later!",
+    "submitting": "Sending...",
+    "submitButton": "Send Message",
+    "form": {
+      "name": {
+        "label": "Full Name *",
+        "placeholder": "Enter your full name"
+      },
+      "email": {
+        "label": "Email *",
+        "placeholder": "example@domain.com"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "placeholder": "Enter phone number"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Select subject",
+        "options": {
+          "general": "General Consultation",
+          "repair": "Repair Service",
+          "maintenance": "Equipment Maintenance",
+          "installation": "Installation",
+          "consulting": "Technical Consulting",
+          "inverterTechnology": "Inverter Technology",
+          "heatRecovery": "Heat Recovery Solutions",
+          "energyEfficiency": "Energy Efficiency",
+          "other": "Other"
+        }
+      },
+      "message": {
+        "label": "Message *",
+        "placeholder": "Enter your message"
+      }
+    }
   },
   "faq": {
     "title": "Frequently Asked Questions",

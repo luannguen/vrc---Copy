@@ -1,23 +1,28 @@
 
 import { LineChart, BarChart3, Gauge, ArrowRight, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useDataResourcesSection } from '../hooks/useHomepageSettings';
 
 const DataResources = () => {
+  const { t } = useTranslation();
+  
+  // Hook automatically uses current locale for localized panel titles and descriptions
   const { settings: dataResourcesData, isLoading, error, isEnabled } = useDataResourcesSection();
-  // Fallback data if API fails
+  
+  // Fallback data if API fails - use translation keys
   const fallbackData = {
     enabled: true,
     leftPanel: {
-      title: "Dữ liệu & Thống kê năng lượng",
+      title: t('dataResources.leftPanel.title'),
       linkUrl: "/data/statistics"
     },
     rightPanel: {
-      title: "Công cụ tính toán & Thiết kế", 
+      title: t('dataResources.rightPanel.title'), 
       linkUrl: "/data/tools"
     }
   };
 
-  // Use API data or fallback
+  // Use API data (localized) or fallback
   const sectionData = dataResourcesData || fallbackData;
 
   if (error) {
@@ -27,24 +32,23 @@ const DataResources = () => {
   if (!isEnabled) {
     return null;
   }
-
   if (isLoading) {
     return (
       <section className="py-16 bg-white">
         <div className="container-custom">
           <div className="flex justify-center items-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <span className="ml-2 text-muted-foreground">{t('dataResources.loading')}</span>
           </div>
         </div>
       </section>
     );
-  }  return (
+  }return (
     <section className="py-16 bg-white">
-      <div className="container-custom">
-        <div className="mb-12">
-          <h2 className="mb-4">Công cụ & Tài nguyên</h2>
+      <div className="container-custom">        <div className="mb-12">
+          <h2 className="mb-4">{t('dataResources.sectionTitle')}</h2>
           <p className="text-muted-foreground max-w-2xl">
-            Truy cập các công cụ tính toán, dữ liệu phân tích và tài nguyên hỗ trợ cho việc lựa chọn và vận hành hệ thống điều hòa không khí hiệu quả.
+            {t('dataResources.sectionSubtitle')}
           </p>
         </div>
         
@@ -54,38 +58,34 @@ const DataResources = () => {
             <div className="flex items-start mb-6">
               <div className="bg-primary rounded-full p-3 mr-4">
                 <LineChart className="text-white w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">{sectionData?.leftPanel?.title || "Dữ liệu & Thống kê năng lượng"}</h3>
+              </div>              <div>
+                <h3 className="text-xl font-semibold mb-2">{sectionData?.leftPanel?.title || t('dataResources.leftPanel.title')}</h3>
                 <p className="text-muted-foreground">
-                  Truy cập dữ liệu phân tích và thống kê về hiệu suất năng lượng của các hệ thống điều hòa không khí, 
-                  chi phí vận hành và tác động môi trường của các công nghệ khác nhau.
+                  {t('dataResources.leftPanel.description')}
                 </p>
               </div>
-            </div>
-            <ul className="space-y-3 mb-6">
+            </div>            <ul className="space-y-3 mb-6">
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>Chỉ số hiệu suất năng lượng (EER/COP)</span>
+                <span>{t('dataResources.leftPanel.features.feature1')}</span>
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>Chi phí vận hành và bảo trì</span>
+                <span>{t('dataResources.leftPanel.features.feature2')}</span>
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>Phân tích ROI và thời gian hoàn vốn</span>
+                <span>{t('dataResources.leftPanel.features.feature3')}</span>
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>Dữ liệu phát thải carbon và tác động môi trường</span>
+                <span>{t('dataResources.leftPanel.features.feature4')}</span>
               </li>
-            </ul>
-            <a 
+            </ul>            <a 
               href={sectionData?.leftPanel?.linkUrl || "/data/statistics"}
               className="inline-flex items-center text-accent hover:text-primary transition-colors font-medium"
             >
-              Xem thống kê
+              {t('dataResources.leftPanel.linkText')}
               <ArrowRight size={18} className="ml-2" />
             </a>
           </div>
@@ -95,38 +95,34 @@ const DataResources = () => {
             <div className="flex items-start mb-6">
               <div className="bg-primary rounded-full p-3 mr-4">
                 <Gauge className="text-white w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">{sectionData?.rightPanel?.title || "Công cụ tính toán & Thiết kế"}</h3>
+              </div>              <div>
+                <h3 className="text-xl font-semibold mb-2">{sectionData?.rightPanel?.title || t('dataResources.rightPanel.title')}</h3>
                 <p className="text-muted-foreground">
-                  Sử dụng các công cụ tính toán và thiết kế để lựa chọn hệ thống điều hòa không khí phù hợp, 
-                  tối ưu hóa hiệu suất và ước tính chi phí vận hành dài hạn.
+                  {t('dataResources.rightPanel.description')}
                 </p>
               </div>
-            </div>
-            <ul className="space-y-3 mb-6">
+            </div>            <ul className="space-y-3 mb-6">
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>Tính toán tải lạnh cho không gian</span>
+                <span>{t('dataResources.rightPanel.features.feature1')}</span>
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>So sánh hiệu suất và chi phí giữa các hệ thống</span>
+                <span>{t('dataResources.rightPanel.features.feature2')}</span>
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>Phân tích tiết kiệm năng lượng và giảm chi phí</span>
+                <span>{t('dataResources.rightPanel.features.feature3')}</span>
               </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                <span>Tư vấn lựa chọn giải pháp phù hợp</span>
+                <span>{t('dataResources.rightPanel.features.feature4')}</span>
               </li>
-            </ul>
-            <a 
+            </ul>            <a 
               href={sectionData?.rightPanel?.linkUrl || "/data/tools"}
               className="inline-flex items-center text-accent hover:text-primary transition-colors font-medium"
             >
-              Khám phá công cụ
+              {t('dataResources.rightPanel.linkText')}
               <ArrowRight size={18} className="ml-2" />
             </a>
           </div>

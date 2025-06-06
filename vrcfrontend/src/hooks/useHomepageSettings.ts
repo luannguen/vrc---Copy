@@ -12,12 +12,39 @@ import {
   type PostData
 } from '@/services/homepageSettingsService';
 
-// Query Keys
+// Helper function to get current locale for cache keys
+const getCurrentLocale = (): string => {
+  if (typeof window !== 'undefined') {
+    // Check URL params for locale
+    const urlParams = new URLSearchParams(window.location.search);
+    const localeFromUrl = urlParams.get('locale');
+    if (localeFromUrl && ['vi', 'en', 'tr'].includes(localeFromUrl)) {
+      return localeFromUrl;
+    }
+    
+    // Check localStorage for saved preference
+    const savedLocale = localStorage.getItem('preferred-locale');
+    if (savedLocale && ['vi', 'en', 'tr'].includes(savedLocale)) {
+      return savedLocale;
+    }
+    
+    // Check browser language
+    const browserLang = navigator.language.split('-')[0];
+    if (['vi', 'en', 'tr'].includes(browserLang)) {
+      return browserLang;
+    }
+  }
+  
+  // Default fallback
+  return 'vi';
+};
+
+// Query Keys with locale-aware caching
 export const HOMEPAGE_QUERY_KEYS = {
-  HOMEPAGE_SETTINGS: ['homepage-settings'],
-  ACTIVE_BANNERS: ['homepage-settings', 'banners'],
-  FEATURED_PRODUCTS: ['homepage-settings', 'featured-products'],
-  LATEST_POSTS: ['homepage-settings', 'latest-posts'],
+  HOMEPAGE_SETTINGS: (locale?: string) => ['homepage-settings', locale || getCurrentLocale()],
+  ACTIVE_BANNERS: (locale?: string) => ['homepage-settings', 'banners', locale || getCurrentLocale()],
+  FEATURED_PRODUCTS: (locale?: string) => ['homepage-settings', 'featured-products', locale || getCurrentLocale()],
+  LATEST_POSTS: (locale?: string) => ['homepage-settings', 'latest-posts', locale || getCurrentLocale()],
 } as const;
 
 // Default configuration for homepage queries
@@ -30,10 +57,11 @@ const defaultHomepageConfig = {
 
 /**
  * Hook to get complete homepage settings with all data
+ * Automatically detects and uses current locale from URL/localStorage/browser
  */
 export const useHomepageSettings = () => {
   return useQuery({
-    queryKey: HOMEPAGE_QUERY_KEYS.HOMEPAGE_SETTINGS,
+    queryKey: HOMEPAGE_QUERY_KEYS.HOMEPAGE_SETTINGS(),
     queryFn: () => homepageSettingsService.getHomepageSettings(),
     ...defaultHomepageConfig,
   });
@@ -41,10 +69,11 @@ export const useHomepageSettings = () => {
 
 /**
  * Hook to get only active banners for hero section
+ * Automatically uses current locale
  */
 export const useActiveBanners = () => {
   return useQuery({
-    queryKey: HOMEPAGE_QUERY_KEYS.ACTIVE_BANNERS,
+    queryKey: HOMEPAGE_QUERY_KEYS.ACTIVE_BANNERS(),
     queryFn: () => homepageSettingsService.getActiveBanners(),
     ...defaultHomepageConfig,
   });
@@ -52,10 +81,11 @@ export const useActiveBanners = () => {
 
 /**
  * Hook to get only featured products
+ * Automatically uses current locale
  */
 export const useFeaturedProducts = () => {
   return useQuery({
-    queryKey: HOMEPAGE_QUERY_KEYS.FEATURED_PRODUCTS,
+    queryKey: HOMEPAGE_QUERY_KEYS.FEATURED_PRODUCTS(),
     queryFn: () => homepageSettingsService.getFeaturedProducts(),
     ...defaultHomepageConfig,
   });
@@ -63,10 +93,11 @@ export const useFeaturedProducts = () => {
 
 /**
  * Hook to get only latest posts
+ * Automatically uses current locale
  */
 export const useLatestPosts = () => {
   return useQuery({
-    queryKey: HOMEPAGE_QUERY_KEYS.LATEST_POSTS,
+    queryKey: HOMEPAGE_QUERY_KEYS.LATEST_POSTS(),
     queryFn: () => homepageSettingsService.getLatestPosts(),
     ...defaultHomepageConfig,
   });
@@ -74,6 +105,7 @@ export const useLatestPosts = () => {
 
 /**
  * Mutation hook for updating homepage settings (Admin only)
+ * Automatically uses current locale for update operation
  */
 export const useUpdateHomepageSettings = () => {
   const queryClient = useQueryClient();
@@ -82,18 +114,18 @@ export const useUpdateHomepageSettings = () => {
     mutationFn: (settings: Partial<HomepageSettings>) => 
       homepageSettingsService.updateHomepageSettings(settings),
     onSuccess: () => {
-      // Invalidate all homepage-related queries
+      // Invalidate all homepage-related queries to refresh with new data
       queryClient.invalidateQueries({ 
-        queryKey: HOMEPAGE_QUERY_KEYS.HOMEPAGE_SETTINGS 
+        queryKey: HOMEPAGE_QUERY_KEYS.HOMEPAGE_SETTINGS() 
       });
       queryClient.invalidateQueries({ 
-        queryKey: HOMEPAGE_QUERY_KEYS.ACTIVE_BANNERS 
+        queryKey: HOMEPAGE_QUERY_KEYS.ACTIVE_BANNERS() 
       });
       queryClient.invalidateQueries({ 
-        queryKey: HOMEPAGE_QUERY_KEYS.FEATURED_PRODUCTS 
+        queryKey: HOMEPAGE_QUERY_KEYS.FEATURED_PRODUCTS() 
       });
       queryClient.invalidateQueries({ 
-        queryKey: HOMEPAGE_QUERY_KEYS.LATEST_POSTS 
+        queryKey: HOMEPAGE_QUERY_KEYS.LATEST_POSTS() 
       });
     },
     onError: (error) => {
@@ -104,6 +136,7 @@ export const useUpdateHomepageSettings = () => {
 
 /**
  * Helper hook to get hero section settings and banners
+ * Automatically uses current locale for localized content
  */
 export const useHeroSection = () => {
   const { data: settings, isLoading, error } = useHomepageSettings();
@@ -119,6 +152,7 @@ export const useHeroSection = () => {
 
 /**
  * Helper hook to get featured topics section
+ * Automatically uses current locale for localized titles and descriptions
  */
 export const useFeaturedTopicsSection = () => {
   const { data: settings, isLoading, error } = useHomepageSettings();
@@ -134,6 +168,7 @@ export const useFeaturedTopicsSection = () => {
 
 /**
  * Helper hook to get latest publications section
+ * Automatically uses current locale for localized content
  */
 export const useLatestPublicationsSection = () => {
   const { data: settings, isLoading, error } = useHomepageSettings();
@@ -149,6 +184,7 @@ export const useLatestPublicationsSection = () => {
 
 /**
  * Helper hook to get data resources section
+ * Automatically uses current locale for localized panel titles and descriptions
  */
 export const useDataResourcesSection = () => {
   const { data: settings, isLoading, error } = useHomepageSettings();
@@ -163,6 +199,7 @@ export const useDataResourcesSection = () => {
 
 /**
  * Helper hook to get contact form section
+ * Automatically uses current locale for localized form labels and messages
  */
 export const useContactFormSection = () => {
   const { data: settings, isLoading, error } = useHomepageSettings();
@@ -178,6 +215,7 @@ export const useContactFormSection = () => {
 
 /**
  * Helper hook to get form submissions statistics
+ * Stats are not localized but the hook maintains consistency with other hooks
  */
 export const useFormSubmissionsStats = () => {
   const { data: settings, isLoading, error } = useHomepageSettings();
@@ -191,6 +229,7 @@ export const useFormSubmissionsStats = () => {
 
 /**
  * Helper hook to get SEO settings for homepage
+ * Automatically uses current locale for localized meta tags
  */
 export const useHomepageSEO = () => {
   const { data: settings, isLoading, error } = useHomepageSettings();

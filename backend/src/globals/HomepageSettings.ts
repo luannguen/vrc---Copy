@@ -188,6 +188,7 @@ export const HomepageSettings: GlobalConfig = {
           label: 'Tiêu đề section',
           type: 'text',
           defaultValue: 'Công cụ & Tài nguyên',
+          localized: true,
           admin: {
             condition: (data) => data.resourcesSection?.isEnabled,
           },
@@ -197,6 +198,7 @@ export const HomepageSettings: GlobalConfig = {
           label: 'Mô tả',
           type: 'textarea',
           defaultValue: 'Truy cập các công cụ tính toán, dữ liệu phân tích và tài nguyên hỗ trợ',
+          localized: true,
           admin: {
             condition: (data) => data.resourcesSection?.isEnabled,
           },
@@ -214,11 +216,13 @@ export const HomepageSettings: GlobalConfig = {
               label: 'Tiêu đề',
               type: 'text',
               defaultValue: 'Dữ liệu & Thống kê năng lượng',
+              localized: true,
             },
             {
               name: 'description',
               label: 'Mô tả',
               type: 'textarea',
+              localized: true,
             },
             {
               name: 'features',
@@ -259,11 +263,13 @@ export const HomepageSettings: GlobalConfig = {
               label: 'Tiêu đề',
               type: 'text',
               defaultValue: 'Công cụ tính toán & Thiết kế',
+              localized: true,
             },
             {
               name: 'description',
               label: 'Mô tả',
               type: 'textarea',
+              localized: true,
             },
             {
               name: 'features',
@@ -329,6 +335,7 @@ export const HomepageSettings: GlobalConfig = {
           name: 'metaTitle',
           label: 'Meta title',
           type: 'text',
+          localized: true,
           admin: {
             description: 'Tiêu đề hiển thị trên kết quả tìm kiếm',
           },
@@ -337,6 +344,7 @@ export const HomepageSettings: GlobalConfig = {
           name: 'metaDescription',
           label: 'Meta description',
           type: 'textarea',
+          localized: true,
           admin: {
             description: 'Mô tả hiển thị trên kết quả tìm kiếm',
           },
@@ -345,6 +353,7 @@ export const HomepageSettings: GlobalConfig = {
           name: 'metaKeywords',
           label: 'Meta keywords',
           type: 'text',
+          localized: true,
           admin: {
             description: 'Từ khóa SEO, phân cách bằng dấu phẩy',
           },

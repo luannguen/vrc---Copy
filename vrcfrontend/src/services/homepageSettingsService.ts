@@ -226,6 +226,37 @@ interface ApiHomepageSettingsResponse {
 }
 
 class HomepageSettingsService {
+  
+  /**
+   * Get current locale from i18n context or browser language
+   */
+  private getCurrentLocale(): string {
+    // Try to get from i18n context first (if available)
+    if (typeof window !== 'undefined') {
+      // Check URL params for locale
+      const urlParams = new URLSearchParams(window.location.search);
+      const localeFromUrl = urlParams.get('locale');
+      if (localeFromUrl && ['vi', 'en', 'tr'].includes(localeFromUrl)) {
+        return localeFromUrl;
+      }
+      
+      // Check localStorage for saved preference
+      const savedLocale = localStorage.getItem('preferred-locale');
+      if (savedLocale && ['vi', 'en', 'tr'].includes(savedLocale)) {
+        return savedLocale;
+      }
+      
+      // Check browser language
+      const browserLang = navigator.language.split('-')[0];
+      if (['vi', 'en', 'tr'].includes(browserLang)) {
+        return browserLang;
+      }
+    }
+    
+    // Default fallback
+    return 'vi';
+  }
+
   /**
    * Convert our HomepageSettings to urlProcessor compatible format
    */
@@ -331,15 +362,21 @@ class HomepageSettingsService {
     };
   }  /**
    * Get homepage settings with all populated data
+   * @param locale - Optional locale parameter (vi, en, tr). Defaults to browser locale or 'vi'
    */
-  async getHomepageSettings(): Promise<HomepageSettings> {
+  async getHomepageSettings(locale?: string): Promise<HomepageSettings> {
     try {
-      // Fetch only homepage settings, featured products are already populated by backend
-      const response = await apiService.get<HomepageSettingsResponse>('/homepage-settings');
+      // Determine locale to use
+      const currentLocale = locale || this.getCurrentLocale();
+      
+      // Fetch homepage settings with locale parameter
+      const response = await apiService.get<HomepageSettingsResponse>(
+        `/homepage-settings?locale=${currentLocale}`
+      );
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch homepage settings');
-      }      // Transform API response to match our interface
+      }// Transform API response to match our interface
       const transformedData = this.transformApiResponse(response.data);
       
       // Process URLs to fix media paths
@@ -356,17 +393,24 @@ class HomepageSettingsService {
       console.error('Error fetching homepage settings:', error);
       throw error;
     }
-  }
-  /**
+  }  /**
    * Update homepage settings (Admin only)
+   * @param settings - Partial settings to update
+   * @param locale - Optional locale parameter (vi, en, tr). Defaults to browser locale or 'vi'
    */
-  async updateHomepageSettings(settings: Partial<HomepageSettings>): Promise<HomepageSettings> {
+  async updateHomepageSettings(settings: Partial<HomepageSettings>, locale?: string): Promise<HomepageSettings> {
     try {
-      const response = await apiService.put<HomepageSettingsResponse>('/homepage-settings', settings);
+      // Determine locale to use
+      const currentLocale = locale || this.getCurrentLocale();
+      
+      const response = await apiService.put<HomepageSettingsResponse>(
+        `/homepage-settings?locale=${currentLocale}`, 
+        settings
+      );
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to update homepage settings');
-      }      // Transform and process the updated data
+      }// Transform and process the updated data
       const transformedData = this.transformApiResponse(response.data);
       const urlProcessorData = this.toUrlProcessorFormat(transformedData);
       const processedData = processHomepageSettings(urlProcessorData);
