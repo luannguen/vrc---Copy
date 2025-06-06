@@ -39,14 +39,13 @@ const LanguageSwitcher = ({ isMobile = false }: LanguageSwitcherProps) => {
 
   if (isMobile) {
     return (
-      <div className="pt-4 border-t border-white/20">
-        <div className="flex flex-col space-y-2">
-          <span className="text-white text-sm">{t('nav.language')}</span>          <select 
+      <div className="pt-4 border-t border-white/20">        <div className="flex flex-col space-y-2">
+          <span className="text-white text-sm">{t('navigation.language')}</span>          <select 
             value={activeLanguage}
             onChange={(e) => handleLanguageChange(e.target.value)}
             className="bg-primary-light/10 text-white border border-white/30 rounded p-2"
-            title={t('nav.language')}
-            aria-label={t('nav.language')}
+            title={t('navigation.language')}
+            aria-label={t('navigation.language')}
           >
             {languageOptions.map(lang => (
               <option key={lang.code} value={lang.code}>

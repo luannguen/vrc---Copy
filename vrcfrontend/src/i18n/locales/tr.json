@@ -1,79 +1,62 @@
 {
-  "nav": {
+  "common": {
+    "readMore": "Daha Fazla Oku",
+    "viewAll": "Tümünü Gör",
+    "contactUs": "Bizimle İletişime Geçin",
+    "learnMore": "Daha Fazla Öğren",
+    "getStarted": "Başlayın",
+    "ourServices": "Hizmetlerimiz",
+    "ourProducts": "Ürünlerimiz",
+    "aboutUs": "Hakkımızda",
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu"
+  },
+  "navigation": {
     "home": "Ana Sayfa",
     "about": "Hakkımızda",
     "services": "Hizmetler",
+    "products": "Ürünler",
     "projects": "Projeler",
+    "technologies": "Teknolojiler",
+    "news": "Haberler",
+    "events": "Etkinlikler",
+    "faq": "SSS",
+    "consulting": "Danışmanlık",
     "contact": "İletişim",
+    "more": "Daha Fazla",
+    "installation": "Kurulum",
+    "maintenance": "Bakım",
+    "repair": "Onarım",
     "language": "Dil"
   },
-  "hero": {
-    "title": "Profesyonel Dijital Çözümler",
-    "subtitle": "İş büyümenizi destekleyen yenilikçi web uygulamaları ve dijital çözümler oluşturuyoruz",
-    "cta": "Başlayın",
-    "learnMore": "Daha Fazla Bilgi"
-  },
-  "about": {
-    "title": "Hakkımızda",
-    "description": "Yüksek kaliteli dijital çözümler sunmaya kendini adamış tutkulu geliştiriciler ve tasarımcılardan oluşan bir ekibiz.",
-    "experience": "Yıllık Deneyim",
-    "projects": "Tamamlanan Proje",
-    "clients": "Memnun Müşteri"
-  },
-  "services": {
-    "title": "Hizmetlerimiz",
-    "subtitle": "Kapsamlı dijital çözümler sunuyoruz",
-    "webDevelopment": {
-      "title": "Web Geliştirme",
-      "description": "Modern teknolojilerle özel web uygulamaları"
-    },
-    "mobileApps": {
-      "title": "Mobil Uygulamalar",
-      "description": "Yerel ve çapraz platform mobil uygulama geliştirme"
-    },
-    "ecommerce": {
-      "title": "E-ticaret Çözümleri",
-      "description": "Tam online mağaza geliştirme ve entegrasyonu"
-    },
-    "consulting": {
-      "title": "BT Danışmanlığı",
-      "description": "İşiniz için stratejik teknoloji danışmanlığı"
-    }
-  },
-  "contact": {
-    "title": "İletişim",
-    "subtitle": "Ekibimizle iletişime geçin",
-    "name": "Ad",
-    "email": "E-posta",
-    "message": "Mesaj",
-    "send": "Mesaj Gönder",
-    "phone": "Telefon",
-    "address": "Adres",
-    "success": "Mesaj başarıyla gönderildi!",
-    "error": "Mesaj gönderilemedi. Lütfen tekrar deneyin."
-  },
   "footer": {
-    "description": "Modern işletmeler için profesyonel dijital çözümler",
-    "quickLinks": "Hızlı Bağlantılar",
+    "quickLinks": "Hızlı Linkler",
     "services": "Hizmetler",
-    "contact": "İletişim Bilgileri",
-    "followUs": "Bizi Takip Edin",
-    "rights": "Tüm hakları saklıdır"
+    "contact": "İletişim",
+    "rights": "Tüm hakları saklıdır",
+    "privacyPolicy": "Gizlilik Politikası",
+    "termsOfService": "Hizmet Şartları",
+    "cookiePolicy": "Çerez Politikası",
+    "sitemap": "Site Haritası",
+    "newsEvents": "Haberler & Etkinlikler",
+    "support": "Destek"
   },
-  "common": {
-    "loading": "Yükleniyor...",
-    "error": "Bir şeyler ters gitti",
-    "retry": "Tekrar Dene",
-    "close": "Kapat",
-    "save": "Kaydet",
-    "cancel": "İptal",
-    "delete": "Sil",
-    "edit": "Düzenle",
-    "view": "Görüntüle",
-    "search": "Ara",
-    "filter": "Filtrele",
-    "sort": "Sırala",
-    "previous": "Önceki",
-    "next": "Sonraki"
+  "seo": {
+    "siteName": "VRC - Vietnam Araştırma ve Danışmanlık",
+    "defaultTitle": "VRC - Vietnam'da Lider Araştırma ve Danışmanlık Şirketi",
+    "defaultDescription": "VRC, işletmelerin sürdürülebilir büyüme sağlamasına yardımcı olmak için profesyonel danışmanlık ve araştırma hizmetleri sunmaktadır."
+  },
+  "multilingualTestSuite": {
+    "title": "VRC Çok Dilli Test Paketi",
+    "description": "Tüm çok dilli özelliklerin kapsamlı testi",
+    "languageSelection": "Dil Seçimi",
+    "testResults": "Test Sonuçları",
+    "localizationFormatting": "Yerelleştirme Formatlaması",
+    "contentFallbackDemo": "İçerik Fallback Demosu",
+    "lazyTranslationDemo": "Lazy Translation Demosu",
+    "sitemapGenerator": "Site Haritası Oluşturucu",
+    "translationManager": "Çeviri Yöneticisi (Admin)",
+    "cacheStatistics": "Çeviri Önbellek İstatistikleri",
+    "rerunTests": "Testleri Yeniden Çalıştır"
   }
 }

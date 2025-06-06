@@ -1,4 +1,8 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { en } from '@payloadcms/translations/languages/en'
+import { vi } from '@payloadcms/translations/languages/vi'
+// Note: tr (Turkish) is not available in default translations
+// We'll need to create custom translations for Turkish
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
@@ -41,7 +45,53 @@ import { getServerSideURL } from './utilities/getURL'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-export default buildConfig({  admin: {
+export default buildConfig({
+  // Admin interface multilingual support
+  i18n: {
+    supportedLanguages: { en, vi },
+    fallbackLanguage: 'vi',
+    translations: {
+      vi: {
+        general: {
+          dashboard: 'Bảng điều khiển',
+          collections: 'Bộ sưu tập',
+          globals: 'Cài đặt chung',
+          users: 'Người dùng',
+          pages: 'Trang',
+          posts: 'Bài viết',
+          media: 'Phương tiện',
+          categories: 'Danh mục',
+          products: 'Sản phẩm',
+          projects: 'Dự án',
+          services: 'Dịch vụ',
+          events: 'Sự kiện',
+          navigation: 'Điều hướng',
+        }
+      }
+    }
+  },
+
+  // Content localization
+  localization: {
+    locales: [
+      {
+        label: 'Tiếng Việt',
+        code: 'vi',
+      },
+      {
+        label: 'English',
+        code: 'en',
+      },
+      {
+        label: 'Türkçe',
+        code: 'tr',
+      }
+    ],
+    defaultLocale: 'vi',
+    fallback: true,
+  },
+
+  admin: {
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.

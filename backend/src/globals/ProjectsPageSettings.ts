@@ -19,6 +19,7 @@ export const ProjectsPageSettings: GlobalConfig = {
           type: 'text',
           required: true,
           defaultValue: 'Dự án tiêu biểu',
+          localized: true,
         },
         {
           name: 'subtitle',
@@ -26,6 +27,7 @@ export const ProjectsPageSettings: GlobalConfig = {
           type: 'textarea',
           required: true,
           defaultValue: 'Những công trình thực tế đã được VRC thiết kế, cung cấp thiết bị và thi công lắp đặt trên khắp cả nước.',
+          localized: true,
         },
         {
           name: 'backgroundImage',
@@ -48,12 +50,14 @@ export const ProjectsPageSettings: GlobalConfig = {
           label: 'Tiêu đề phần',
           type: 'text',
           defaultValue: 'Danh mục dự án',
+          localized: true,
         },
         {
           name: 'description',
           label: 'Mô tả phần',
           type: 'textarea',
           defaultValue: 'VRC tự hào thực hiện các dự án đa dạng với quy mô khác nhau, từ hệ thống điều hòa không khí trung tâm cho tòa nhà thương mại đến các hệ thống làm lạnh công nghiệp phức tạp.',
+          localized: true,
         },
         {
           name: 'enableCategories',

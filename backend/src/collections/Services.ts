@@ -26,6 +26,7 @@ export const Services: CollectionConfig = {
       type: 'text',
       label: 'Tên dịch vụ',
       required: true,
+      localized: true,
     },
     ...slugField('title'),
     {
@@ -68,6 +69,7 @@ export const Services: CollectionConfig = {
       name: 'summary',
       type: 'textarea',
       label: 'Tóm tắt',
+      localized: true,
       admin: {
         description: 'Mô tả ngắn gọn hiển thị trong danh sách dịch vụ',
       },
@@ -94,6 +96,7 @@ export const Services: CollectionConfig = {
       name: 'content',
       type: 'richText',
       label: 'Nội dung chi tiết',
+      localized: true,
     },
     {
       name: 'features',
@@ -105,11 +108,13 @@ export const Services: CollectionConfig = {
           type: 'text',
           label: 'Tên tính năng',
           required: true,
+          localized: true,
         },
         {
           name: 'description',
           type: 'textarea',
           label: 'Mô tả',
+          localized: true,
         },
         {
           name: 'icon',
@@ -131,11 +136,13 @@ export const Services: CollectionConfig = {
           type: 'text',
           label: 'Lợi ích',
           required: true,
+          localized: true,
         },
         {
           name: 'description',
           type: 'textarea',
           label: 'Mô tả',
+          localized: true,
         },
       ],
     },

@@ -152,7 +152,7 @@ export interface Config {
     'about-page-settings': AboutPageSettingsSelect<false> | AboutPageSettingsSelect<true>;
     'projects-page-settings': ProjectsPageSettingsSelect<false> | ProjectsPageSettingsSelect<true>;
   };
-  locale: null;
+  locale: 'vi' | 'en' | 'tr';
   user: User & {
     collection: 'users';
   };

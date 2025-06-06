@@ -59,6 +59,7 @@ export const HomepageSettings: GlobalConfig = {
           label: 'Tiêu đề section',
           type: 'text',
           defaultValue: 'Sản phẩm nổi bật',
+          localized: true,
           admin: {
             condition: (data) => data.featuredSection?.isEnabled,
           },
@@ -68,6 +69,7 @@ export const HomepageSettings: GlobalConfig = {
           label: 'Mô tả',
           type: 'textarea',
           defaultValue: 'Khám phá các giải pháp điện lạnh hàng đầu của chúng tôi',
+          localized: true,
           admin: {
             condition: (data) => data.featuredSection?.isEnabled,
           },
@@ -111,6 +113,7 @@ export const HomepageSettings: GlobalConfig = {
           label: 'Tiêu đề section',
           type: 'text',
           defaultValue: 'Bài viết mới nhất',
+          localized: true,
           admin: {
             condition: (data) => data.publicationsSection?.isEnabled,
           },
@@ -120,6 +123,7 @@ export const HomepageSettings: GlobalConfig = {
           label: 'Mô tả',
           type: 'textarea',
           defaultValue: 'Tham khảo các báo cáo, nghiên cứu và hướng dẫn mới nhất',
+          localized: true,
           admin: {
             condition: (data) => data.publicationsSection?.isEnabled,
           },

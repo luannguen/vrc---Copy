@@ -24,6 +24,7 @@ export const CompanyInfo: GlobalConfig = {
       label: 'Tên công ty',
       type: 'text',
       required: true,
+      localized: true,
       admin: {
         description: 'Tên đầy đủ của công ty (hiển thị trên trang Liên hệ)'
       }
@@ -32,6 +33,7 @@ export const CompanyInfo: GlobalConfig = {
       name: 'companyShortName',
       label: 'Tên viết tắt',
       type: 'text',
+      localized: true,
       admin: {
         description: 'Tên viết tắt hoặc thương hiệu của công ty (VRC)'
       }
@@ -40,6 +42,7 @@ export const CompanyInfo: GlobalConfig = {
       name: 'companyDescription',
       label: 'Mô tả ngắn',
       type: 'textarea',
+      localized: true,
       admin: {
         description: 'Mô tả ngắn gọn về công ty hiển thị trên trang Liên hệ'
       }
@@ -54,6 +57,7 @@ export const CompanyInfo: GlobalConfig = {
           label: 'Địa chỉ',
           type: 'text',
           required: true,
+          localized: true,
         },
         {
           name: 'phone',
@@ -74,6 +78,7 @@ export const CompanyInfo: GlobalConfig = {
           name: 'workingHours',
           label: 'Giờ làm việc',
           type: 'text',
+          localized: true,
         },
         {
           name: 'fax',
@@ -279,7 +284,9 @@ export const CompanyInfo: GlobalConfig = {
       name: 'additionalInfo',
       label: 'Thông tin bổ sung',
       type: 'richText',
-      editor: defaultLexical,    },
+      editor: defaultLexical,
+      localized: true,
+    },
     {
       name: 'logo',
       label: 'Logo công ty',

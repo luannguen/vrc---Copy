@@ -25,18 +25,21 @@ export const Events: CollectionConfig = {
       type: 'text',
       label: 'Tên sự kiện',
       required: true,
+      localized: true,
     },
     {
       name: 'summary',
       type: 'textarea',
       label: 'Tóm tắt',
       required: true,
+      localized: true,
     },
     {
       name: 'content',
       type: 'richText',
       label: 'Nội dung',
       required: true,
+      localized: true,
     },
     {
       name: 'featuredImage',

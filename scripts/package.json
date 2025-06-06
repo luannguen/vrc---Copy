@@ -1,0 +1,13 @@
+{
+  "name": "vrc-multilingual-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Scripts for VRC multilingual implementation",
+  "scripts": {
+    "implement": "node multilingual-implementation.mjs"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.12"
+  }
+}

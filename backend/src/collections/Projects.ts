@@ -20,12 +20,12 @@ export const Projects: CollectionConfig = {
     update: authenticated,
     delete: authenticated,
   },
-  fields: [
-    {
+  fields: [    {
       name: 'title',
       type: 'text',
       label: 'Tên dự án',
       required: true,
+      localized: true,
     },
     ...slugField('title'),
     {
@@ -74,11 +74,11 @@ export const Projects: CollectionConfig = {
           defaultValue: false,
         },
       ],
-    },
-    {
+    },    {
       name: 'summary',
       type: 'textarea',
       label: 'Tóm tắt dự án',
+      localized: true,
       admin: {
         description: 'Mô tả ngắn gọn hiển thị trong danh sách dự án',
       },
@@ -87,6 +87,7 @@ export const Projects: CollectionConfig = {
       name: 'content',
       type: 'richText',
       label: 'Nội dung chi tiết',
+      localized: true,
     },
     {
       name: 'featuredImage',
@@ -106,11 +107,11 @@ export const Projects: CollectionConfig = {
           label: 'Hình ảnh',
           relationTo: 'media',
           required: true,
-        },
-        {
+        },        {
           name: 'caption',
           type: 'text',
           label: 'Chú thích',
+          localized: true,
         },
       ],
     },

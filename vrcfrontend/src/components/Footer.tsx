@@ -168,27 +168,25 @@ const Footer = () => {
             )}
           </div>
           
-          {/* Column 2 */}
-          <div>
+          {/* Column 2 */}          <div>
             <h4 className="text-white font-semibold mb-4">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2">
-              <li><AppLink routeKey="ABOUT" className="footer-link">{t('nav.about')}</AppLink></li>
-              <li><AppLink routeKey="SERVICES" className="footer-link">{t('nav.services')}</AppLink></li>
-              <li><AppLink routeKey="PROJECTS" className="footer-link">{t('nav.projects')}</AppLink></li>
-              <li><AppLink routeKey="NEWS" className="footer-link">News & Events</AppLink></li>
-              <li><AppLink routeKey="CONTACT" className="footer-link">{t('nav.contact')}</AppLink></li>
+              <li><AppLink routeKey="ABOUT" className="footer-link">{t('navigation.about')}</AppLink></li>
+              <li><AppLink routeKey="SERVICES" className="footer-link">{t('navigation.services')}</AppLink></li>
+              <li><AppLink routeKey="PROJECTS" className="footer-link">{t('navigation.projects')}</AppLink></li>
+              <li><AppLink routeKey="NEWS" className="footer-link">{t('footer.newsEvents')}</AppLink></li>
+              <li><AppLink routeKey="CONTACT" className="footer-link">{t('navigation.contact')}</AppLink></li>
             </ul>
           </div>
           
-          {/* Column 3 */}
-          <div>
+          {/* Column 3 */}          <div>
             <h4 className="text-white font-semibold mb-4">{t('footer.services')}</h4>
             <ul className="space-y-2">
-              <li><AppLink routeKey="INSTALLATION" className="footer-link">Installation</AppLink></li>
-              <li><AppLink routeKey="MAINTENANCE" className="footer-link">Maintenance</AppLink></li>
-              <li><AppLink routeKey="REPAIR" className="footer-link">Repair</AppLink></li>
-              <li><AppLink routeKey="CONSULTING" className="footer-link">Consulting</AppLink></li>
-              <li><AppLink routeKey="SERVICE_SUPPORT" className="footer-link">Support</AppLink></li>
+              <li><AppLink routeKey="INSTALLATION" className="footer-link">{t('navigation.installation')}</AppLink></li>
+              <li><AppLink routeKey="MAINTENANCE" className="footer-link">{t('navigation.maintenance')}</AppLink></li>
+              <li><AppLink routeKey="REPAIR" className="footer-link">{t('navigation.repair')}</AppLink></li>
+              <li><AppLink routeKey="CONSULTING" className="footer-link">{t('navigation.consulting')}</AppLink></li>
+              <li><AppLink routeKey="SERVICE_SUPPORT" className="footer-link">{t('footer.support')}</AppLink></li>
             </ul>
           </div>
           
@@ -215,13 +213,12 @@ const Footer = () => {
         <div className="border-t border-white/10 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-300 text-sm mb-4 md:mb-0">
             © {new Date().getFullYear()} {companyName}. {t('footer.rights')}.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
-            <AppLink routeKey="PRIVACY" className="footer-link">Privacy Policy</AppLink>
-            <AppLink routeKey="TERMS" className="footer-link">Terms of Service</AppLink>
-            <AppLink routeKey="COOKIES" className="footer-link">Cookie Policy</AppLink>
-            <AppLink routeKey="SITEMAP" className="footer-link">Sitemap</AppLink>
-          </div>        </div>
+          </p>          <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm">
+            <AppLink routeKey="PRIVACY" className="footer-link">{t('footer.privacyPolicy')}</AppLink>
+            <AppLink routeKey="TERMS" className="footer-link">{t('footer.termsOfService')}</AppLink>
+            <AppLink routeKey="COOKIES" className="footer-link">{t('footer.cookiePolicy')}</AppLink>
+            <AppLink routeKey="SITEMAP" className="footer-link">{t('footer.sitemap')}</AppLink>
+          </div></div>
       </div>
       
       {/* Zalo Chat Widget */}

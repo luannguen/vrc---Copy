@@ -138,12 +138,14 @@ export const Products: CollectionConfig = {
       type: 'text',
       label: 'Tên sản phẩm',
       required: true,
+      localized: true,
     },
     ...slugField('name'),
     {
       name: 'excerpt',
       type: 'textarea',
       label: 'Mô tả ngắn',
+      localized: true,
       admin: {
         description: 'Mô tả ngắn gọn hiển thị trong danh sách sản phẩm',
       },
@@ -152,6 +154,7 @@ export const Products: CollectionConfig = {
       name: 'description',
       type: 'richText',
       label: 'Mô tả chi tiết',
+      localized: true,
     },
     {
       name: 'mainImage',
@@ -176,6 +179,7 @@ export const Products: CollectionConfig = {
           name: 'caption',
           type: 'text',
           label: 'Chú thích',
+          localized: true,
         },
       ],
     },{
@@ -238,12 +242,14 @@ export const Products: CollectionConfig = {
           type: 'text' as const,
           label: 'Tên thông số',
           required: true,
+          localized: true,
         },
         {
           name: 'value',
           type: 'text' as const,
           label: 'Giá trị',
           required: true,
+          localized: true,
         },
       ],
     },
@@ -258,6 +264,7 @@ export const Products: CollectionConfig = {
           type: 'text',
           label: 'Tên tài liệu',
           required: true,
+          localized: true,
         },
         {
           name: 'file',
@@ -327,11 +334,13 @@ export const Products: CollectionConfig = {
           name: 'title',
           type: 'text',
           label: 'Meta Title',
+          localized: true,
         },
         {
           name: 'description',
           type: 'textarea',
           label: 'Meta Description',
+          localized: true,
         },
         {
           name: 'image',

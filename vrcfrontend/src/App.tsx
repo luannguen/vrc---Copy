@@ -62,6 +62,9 @@ import ProjectDetail from "./pages/ProjectDetail";
 import ProjectCategory from "./pages/ProjectCategory";
 import AllProjects from "./pages/AllProjects";
 
+// Test page for multilingual features
+import TestPage from "./pages/TestPage";
+
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -129,6 +132,7 @@ const App = () => (
           <Route path="legal/sitemap" element={<Sitemap />} />
           <Route path="data/statistics" element={<Statistics />} />
           <Route path="data/tools" element={<Tools />} />
+          <Route path="test" element={<TestPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

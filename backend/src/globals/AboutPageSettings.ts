@@ -18,6 +18,7 @@ export const AboutPageSettings: GlobalConfig = {
           label: 'Tiêu đề chính',
           type: 'text',
           required: true,
+          localized: true,
           admin: {
             description: 'Tiêu đề lớn hiển thị trên banner',
           },
@@ -26,6 +27,7 @@ export const AboutPageSettings: GlobalConfig = {
           name: 'subtitle',
           label: 'Tiêu đề phụ',
           type: 'text',
+          localized: true,
           admin: {
             description: 'Mô tả ngắn dưới tiêu đề chính',
           },
@@ -51,11 +53,13 @@ export const AboutPageSettings: GlobalConfig = {
           label: 'Tiêu đề',
           type: 'text',
           required: true,
+          localized: true,
         },
         {
           name: 'description',
           label: 'Mô tả',
           type: 'richText',
+          localized: true,
           admin: {
             description: 'Nội dung chi tiết về lịch sử phát triển',
           },
