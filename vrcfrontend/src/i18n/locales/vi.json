@@ -58,5 +58,100 @@
     "translationManager": "Quản Lý Dịch (Admin)",
     "cacheStatistics": "Thống Kê Cache Dịch",
     "rerunTests": "Chạy Lại Test"
+  },
+  "faq": {
+    "title": "Câu hỏi thường gặp",
+    "subtitle": "Tìm câu trả lời cho những thắc mắc phổ biến",
+    "searchPlaceholder": "Tìm kiếm câu hỏi...",
+    "noResults": "Không tìm thấy câu hỏi nào",
+    "popular": "Câu hỏi phổ biến",
+    "featured": "Câu hỏi nổi bật",
+    "allFaqs": "Tất cả câu hỏi",
+    "loadMore": "Tải thêm",
+    "helpful": "Hữu ích",
+    "notHelpful": "Không hữu ích",
+    "wasThisHelpful": "Câu trả lời này có hữu ích không?",
+    "thankYou": "Cảm ơn phản hồi của bạn!",
+    "hero": {
+      "title": "Câu hỏi thường gặp",
+      "subtitle": "Tìm câu trả lời cho mọi thắc mắc về sản phẩm và dịch vụ của VRC",
+      "badge": "150+ câu hỏi được giải đáp"
+    },
+    "stats": {
+      "totalTitle": "Tổng số FAQ",
+      "totalDescription": "Câu hỏi được cập nhật thường xuyên",
+      "categoriesTitle": "Danh mục",
+      "categoriesDescription": "Phân loại theo chủ đề",
+      "helpfulTitle": "Tỷ lệ hữu ích",
+      "helpfulDescription": "Khách hàng thấy hữu ích"
+    },
+    "search": {
+      "title": "Tìm kiếm và lọc",
+      "placeholder": "Nhập từ khóa để tìm kiếm...",
+      "sortBy": "Sắp xếp theo",
+      "sortOptions": {
+        "priority": "Thứ tự ưu tiên",
+        "newest": "Mới nhất",
+        "oldest": "Cũ nhất",
+        "aToZ": "A-Z",
+        "zToA": "Z-A"
+      }
+    },
+    "sidebar": {
+      "categoriesTitle": "Danh mục"
+    },
+    "content": {
+      "allTitle": "Tất cả câu hỏi thường gặp",
+      "categoryTitle": "FAQ {{category}}",
+      "questionsAbout": "Câu hỏi về {{category}}"
+    },
+    "quickLinks": {
+      "title": "Liên kết nhanh",
+      "description": "Các trang có thể hữu ích cho bạn",
+      "products": "Xem sản phẩm",
+      "services": "Dịch vụ",
+      "projects": "Dự án",
+      "contact": "Liên hệ"
+    },
+    "cta": {
+      "title": "Không tìm thấy câu trả lời?",
+      "description": "Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với đội ngũ chuyên gia của VRC để được tư vấn chi tiết.",
+      "contactButton": "Liên hệ ngay",
+      "consultingButton": "Tư vấn miễn phí"
+    },
+    "empty": {
+      "message": "Chưa có câu hỏi thường gặp nào."
+    },
+    "categories": {
+      "all": {
+        "label": "Tất cả",
+        "description": "Xem tất cả câu hỏi thường gặp"
+      },
+      "products": {
+        "label": "Sản phẩm",
+        "description": "Câu hỏi về các sản phẩm điều hòa, thiết bị"
+      },
+      "services": {
+        "label": "Dịch vụ", 
+        "description": "Câu hỏi về dịch vụ lắp đặt, bảo trì, sửa chữa"
+      },
+      "general": {
+        "label": "Chung",
+        "description": "Câu hỏi về công ty, chính sách, thông tin chung"
+      },
+      "technical": {
+        "label": "Kỹ thuật",
+        "description": "Câu hỏi về thông số kỹ thuật, vận hành"
+      },
+      "projects": {
+        "label": "Dự án",
+        "description": "Câu hỏi về các dự án, thi công"
+      }
+    },
+    "errors": {
+      "loadFailed": "Không thể tải câu hỏi thường gặp",
+      "searchFailed": "Lỗi tìm kiếm",
+      "tryAgain": "Thử lại"
+    }
   }
 }

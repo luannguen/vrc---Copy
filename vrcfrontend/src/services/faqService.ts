@@ -13,6 +13,9 @@ const ENDPOINTS = {
   FAQS: '/api/faqs',
   FAQ_BY_ID: (id: string) => `/api/faqs/${id}`,
   FAQS_BY_CATEGORY: (category: string) => `/api/faqs?where[category][equals]=${category}`,
+  FAQS_POPULAR: '/api/faqs/popular',
+  FAQS_FEATURED: '/api/faqs/featured',
+  FAQS_CATEGORIES: '/api/faqs/categories',
 } as const;
 
 /**
@@ -82,6 +85,26 @@ export class FAQService {  /**
   }
 
   /**
+   * Get all FAQs with locale support
+   */
+  async getFAQsWithLocale(params: FAQQueryParams & { locale?: string } = {}, signal?: AbortSignal): Promise<FAQ[]> {
+    try {
+      const queryString = this.buildQueryStringWithLocale(params);
+      const endpoint = `${ENDPOINTS.FAQS}${queryString}`;
+      const response: ApiResponse<FAQApiResponse> = await apiService.get(endpoint, signal);
+      
+      if (!response.data || !Array.isArray(response.data.docs)) {
+        throw new Error('Invalid FAQs response format');
+      }
+
+      return transformApiFAQsToFAQs(response.data.docs);
+    } catch (error) {
+      console.error('Error fetching FAQs with locale:', error);
+      throw this.createFAQError(error, 'Không thể tải danh sách FAQ');
+    }
+  }
+
+  /**
    * Get FAQ by ID
    */
   async getFAQById(id: string, signal?: AbortSignal): Promise<FAQ> {
@@ -98,7 +121,29 @@ export class FAQService {  /**
       console.error('Error fetching FAQ:', error);
       throw this.createFAQError(error, 'Không thể tải FAQ');
     }
-  }  /**
+  }
+
+  /**
+   * Get FAQ by ID with locale support
+   */
+  async getFAQByIdWithLocale(id: string, locale?: string, signal?: AbortSignal): Promise<FAQ> {
+    try {
+      const queryString = locale ? `?locale=${locale}` : '';
+      const endpoint = `${ENDPOINTS.FAQ_BY_ID(id)}${queryString}`;
+      const response: ApiResponse<{ success: boolean; data: ApiFAQ }> = 
+        await apiService.get(endpoint, signal);
+      
+      if (!response.data || !response.data.success || !response.data.data) {
+        throw new Error('FAQ not found');
+      }
+
+      return transformApiFAQToFAQ(response.data.data);
+    } catch (error) {
+      console.error('Error fetching FAQ with locale:', error);
+      throw this.createFAQError(error, 'Không thể tải FAQ');
+    }
+  }
+  /**
    * Get FAQs by category
    */
   async getFAQsByCategory(category: string, signal?: AbortSignal): Promise<FAQ[]> {
@@ -118,6 +163,150 @@ export class FAQService {  /**
   }
 
   /**
+   * Get FAQs by category with locale support
+   */
+  async getFAQsByCategoryWithLocale(category: string, locale?: string, signal?: AbortSignal): Promise<FAQ[]> {
+    try {
+      const queryString = locale ? `?category=${category}&locale=${locale}` : `?category=${category}`;
+      const endpoint = `${ENDPOINTS.FAQS}${queryString}`;
+      const response: ApiResponse<FAQApiResponse> = 
+        await apiService.get(endpoint, signal);
+      
+      if (!response.data || !Array.isArray(response.data.docs)) {
+        throw new Error('Invalid FAQs response format');
+      }
+
+      return transformApiFAQsToFAQs(response.data.docs);
+    } catch (error) {
+      console.error('Error fetching FAQs by category with locale:', error);
+      throw this.createFAQError(error, 'Không thể tải FAQ theo danh mục');
+    }
+  }
+
+  /**
+   * Get popular FAQs
+   */
+  async getPopularFAQs(params: FAQQueryParams = {}, signal?: AbortSignal): Promise<FAQ[]> {
+    try {
+      const queryString = this.buildQueryString(params);
+      const endpoint = `${ENDPOINTS.FAQS_POPULAR}${queryString}`;
+      const response: ApiResponse<{ success: boolean; data: ApiFAQ[] }> = 
+        await apiService.get(endpoint, signal);
+      
+      if (!response.data || !response.data.success || !Array.isArray(response.data.data)) {
+        throw new Error('Invalid popular FAQs response format');
+      }
+
+      return transformApiFAQsToFAQs(response.data.data);
+    } catch (error) {
+      console.error('Error fetching popular FAQs:', error);
+      throw this.createFAQError(error, 'Không thể tải FAQ phổ biến');
+    }
+  }
+
+  /**
+   * Get popular FAQs with locale support
+   */
+  async getPopularFAQsWithLocale(params: FAQQueryParams & { locale?: string } = {}, signal?: AbortSignal): Promise<FAQ[]> {
+    try {
+      const queryString = this.buildQueryStringWithLocale(params);
+      const endpoint = `${ENDPOINTS.FAQS_POPULAR}${queryString}`;
+      const response: ApiResponse<{ success: boolean; data: ApiFAQ[] }> = 
+        await apiService.get(endpoint, signal);
+      
+      if (!response.data || !response.data.success || !Array.isArray(response.data.data)) {
+        throw new Error('Invalid popular FAQs response format');
+      }
+
+      return transformApiFAQsToFAQs(response.data.data);
+    } catch (error) {
+      console.error('Error fetching popular FAQs with locale:', error);
+      throw this.createFAQError(error, 'Không thể tải FAQ phổ biến');
+    }
+  }
+
+  /**
+   * Get featured FAQs
+   */
+  async getFeaturedFAQs(params: FAQQueryParams = {}, signal?: AbortSignal): Promise<FAQ[]> {
+    try {
+      const queryString = this.buildQueryString(params);
+      const endpoint = `${ENDPOINTS.FAQS_FEATURED}${queryString}`;
+      const response: ApiResponse<{ success: boolean; data: ApiFAQ[] }> = 
+        await apiService.get(endpoint, signal);
+      
+      if (!response.data || !response.data.success || !Array.isArray(response.data.data)) {
+        throw new Error('Invalid featured FAQs response format');
+      }
+
+      return transformApiFAQsToFAQs(response.data.data);
+    } catch (error) {
+      console.error('Error fetching featured FAQs:', error);
+      throw this.createFAQError(error, 'Không thể tải FAQ nổi bật');
+    }
+  }
+
+  /**
+   * Get featured FAQs with locale support
+   */
+  async getFeaturedFAQsWithLocale(params: FAQQueryParams & { locale?: string } = {}, signal?: AbortSignal): Promise<FAQ[]> {
+    try {
+      const queryString = this.buildQueryStringWithLocale(params);
+      const endpoint = `${ENDPOINTS.FAQS_FEATURED}${queryString}`;
+      const response: ApiResponse<{ success: boolean; data: ApiFAQ[] }> = 
+        await apiService.get(endpoint, signal);
+      
+      if (!response.data || !response.data.success || !Array.isArray(response.data.data)) {
+        throw new Error('Invalid featured FAQs response format');
+      }
+
+      return transformApiFAQsToFAQs(response.data.data);
+    } catch (error) {
+      console.error('Error fetching featured FAQs with locale:', error);
+      throw this.createFAQError(error, 'Không thể tải FAQ nổi bật');
+    }
+  }
+
+  /**
+   * Get all categories
+   */
+  async getAllCategories(signal?: AbortSignal): Promise<string[]> {
+    try {
+      const response: ApiResponse<{ success: boolean; data: string[] }> = await apiService.get(ENDPOINTS.FAQS_CATEGORIES, signal);
+      
+      if (!response.data || !response.data.success || !Array.isArray(response.data.data)) {
+        throw new Error('Categories not found');
+      }
+
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw this.createFAQError(error, 'Không thể tải danh sách danh mục');
+    }
+  }
+
+  /**
+   * Get FAQ categories
+   */
+  async getFAQCategories(locale?: string, signal?: AbortSignal): Promise<string[]> {
+    try {
+      const queryString = locale ? `?locale=${locale}` : '';
+      const endpoint = `${ENDPOINTS.FAQS_CATEGORIES}${queryString}`;
+      const response: ApiResponse<{ success: boolean; data: string[] }> = 
+        await apiService.get(endpoint, signal);
+      
+      if (!response.data || !response.data.success || !Array.isArray(response.data.data)) {
+        throw new Error('Invalid FAQ categories response format');
+      }
+
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching FAQ categories:', error);
+      throw this.createFAQError(error, 'Không thể tải danh mục FAQ');
+    }
+  }
+
+  /**
    * Build query string from parameters
    */
   private buildQueryString(params: FAQQueryParams): string {
@@ -132,6 +321,26 @@ export class FAQService {  /**
       query.set('where[status][equals]', status);
     }
     if (params.sort) query.set('sort', params.sort);
+    
+    return query.toString() ? `?${query.toString()}` : '';
+  }
+
+  /**
+   * Build query string from parameters with locale support
+   */
+  private buildQueryStringWithLocale(params: FAQQueryParams & { locale?: string }): string {
+    const query = new URLSearchParams();
+    
+    if (params.page) query.set('page', params.page.toString());
+    if (params.limit) query.set('limit', params.limit.toString());
+    if (params.category) query.set('where[category][equals]', params.category);
+    if (params.isActive !== undefined) {
+      // Convert isActive boolean to status value for Payload CMS
+      const status = params.isActive ? 'published' : 'draft';
+      query.set('where[status][equals]', status);
+    }
+    if (params.sort) query.set('sort', params.sort);
+    if (params.locale) query.set('locale', params.locale);
     
     return query.toString() ? `?${query.toString()}` : '';
   }

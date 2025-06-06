@@ -58,5 +58,100 @@
     "translationManager": "Çeviri Yöneticisi (Admin)",
     "cacheStatistics": "Çeviri Önbellek İstatistikleri",
     "rerunTests": "Testleri Yeniden Çalıştır"
+  },
+  "faq": {
+    "title": "Sık Sorulan Sorular",
+    "subtitle": "Yaygın sorulara yanıtlar bulun",
+    "searchPlaceholder": "Soru ara...",
+    "noResults": "Hiç soru bulunamadı",
+    "popular": "Popüler Sorular",
+    "featured": "Öne Çıkan Sorular",
+    "allFaqs": "Tüm Sorular",
+    "loadMore": "Daha Fazla Yükle",
+    "helpful": "Yararlı",
+    "notHelpful": "Yararlı Değil",
+    "wasThisHelpful": "Bu yanıt yararlı oldu mu?",
+    "thankYou": "Geri bildiriminiz için teşekkürler!",
+    "hero": {
+      "title": "Sık Sorulan Sorular",
+      "subtitle": "VRC ürün ve hizmetleri hakkındaki tüm sorularınıza yanıt bulun",
+      "badge": "150+ soru yanıtlandı"
+    },
+    "stats": {
+      "totalTitle": "Toplam SSS",
+      "totalDescription": "Düzenli olarak güncellenen sorular",
+      "categoriesTitle": "Kategoriler",
+      "categoriesDescription": "Konuya göre organize edilmiş",
+      "helpfulTitle": "Yararlılık Oranı",
+      "helpfulDescription": "Müşteriler yararlı buluyor"
+    },
+    "search": {
+      "title": "Arama ve Filtrele",
+      "placeholder": "Aramak için anahtar kelimeler girin...",
+      "sortBy": "Sırala",
+      "sortOptions": {
+        "priority": "Öncelik",
+        "newest": "En Yeni",
+        "oldest": "En Eski",
+        "aToZ": "A-Z",
+        "zToA": "Z-A"
+      }
+    },
+    "sidebar": {
+      "categoriesTitle": "Kategoriler"
+    },
+    "content": {
+      "allTitle": "Tüm Sık Sorulan Sorular",
+      "categoryTitle": "SSS {{category}}",
+      "questionsAbout": "{{category}} hakkında sorular"
+    },
+    "quickLinks": {
+      "title": "Hızlı Bağlantılar",
+      "description": "Yararlı olabilecek sayfalar",
+      "products": "Ürünleri Görüntüle",
+      "services": "Hizmetler",
+      "projects": "Projeler",
+      "contact": "İletişim"
+    },
+    "cta": {
+      "title": "Yanıt bulamadınız mı?",
+      "description": "Size yardımcı olmak için buradayız. Detaylı danışmanlık için uzman ekibimizle iletişime geçin.",
+      "contactButton": "Şimdi İletişime Geç",
+      "consultingButton": "Ücretsiz Danışmanlık"
+    },
+    "empty": {
+      "message": "Henüz sık sorulan soru yok."
+    },
+    "categories": {
+      "all": {
+        "label": "Tümü",
+        "description": "Tüm sık sorulan soruları görüntüle"
+      },
+      "products": {
+        "label": "Ürünler",
+        "description": "Klima ürünleri ve ekipmanları hakkında sorular"
+      },
+      "services": {
+        "label": "Hizmetler", 
+        "description": "Kurulum, bakım, onarım hizmetleri hakkında sorular"
+      },
+      "general": {
+        "label": "Genel",
+        "description": "Şirket, politikalar, genel bilgiler hakkında sorular"
+      },
+      "technical": {
+        "label": "Teknik",
+        "description": "Teknik özellikler ve işletim hakkında sorular"
+      },
+      "projects": {
+        "label": "Projeler",
+        "description": "Projeler ve inşaat hakkında sorular"
+      }
+    },
+    "errors": {
+      "loadFailed": "SSS yüklenemedi",
+      "searchFailed": "Arama hatası",
+      "tryAgain": "Tekrar Dene"
+    }
   }
 }

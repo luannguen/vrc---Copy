@@ -1,5 +1,9 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
-import configPromise from './src/payload.config.ts';
+import configPromise from '@/payload.config';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Sample FAQ data cho tất cả 3 ngôn ngữ
 const faqsData = [
@@ -19,8 +23,8 @@ const faqsData = [
       en: 'services, software, website, application, consulting',
       tr: 'hizmetler, yazılım, web sitesi, uygulama, danışmanlık'
     },
-    category: 'services',
-    status: 'published',
+    category: 'services' as const,
+    status: 'published' as const,
     featured: true,
     isPopular: true,
     helpfulCount: 25,
@@ -42,35 +46,62 @@ const faqsData = [
       en: 'contact, email, phone, address',
       tr: 'iletişim, e-posta, telefon, adres'
     },
-    category: 'general',
-    status: 'published',
+    category: 'general' as const,
+    status: 'published' as const,
     featured: false,
     isPopular: true,
     helpfulCount: 18,
     order: 2
+  },
+  {
+    question: {
+      vi: 'Chi phí dịch vụ của VRC Tech như thế nào?',
+      en: 'What are VRC Tech service costs?',
+      tr: 'VRC Tech hizmet maliyetleri nasıl?'
+    },
+    answer: {
+      vi: 'Chi phí dịch vụ của chúng tôi được tính dựa trên độ phức tạp, thời gian thực hiện và yêu cầu cụ thể của từng dự án. Vui lòng liên hệ để được tư vấn báo giá chi tiết.',
+      en: 'Our service costs are calculated based on complexity, implementation time, and specific requirements of each project. Please contact us for detailed consultation and quotation.',
+      tr: 'Hizmet maliyetlerimiz karmaşıklık, uygulama süresi ve her projenin özel gereksinimlerine göre hesaplanmaktadır. Ayrıntılı danışmanlık ve teklif için lütfen bizimle iletişime geçin.'
+    },
+    searchKeywords: {
+      vi: 'chi phí, giá, báo giá, tiền',
+      en: 'cost, price, quotation, money',
+      tr: 'maliyet, fiyat, teklif, para'
+    },
+    category: 'payment' as const,
+    status: 'published' as const,
+    featured: true,
+    isPopular: false,
+    helpfulCount: 12,
+    order: 3
   }
 ];
 
-async function seedFAQs() {
-  const payload = await getPayload({ config: configPromise });
-
-  console.log('🚀 Bắt đầu tạo dữ liệu mẫu FAQs...');
-
+export async function POST(_req: NextRequest) {
   try {
-    // Kiểm tra xem đã có FAQs nào chưa
+    const payload = await getPayload({ config: configPromise });
+
+    // Xóa tất cả FAQs hiện có trước
     const existingFAQs = await payload.find({
       collection: 'faqs',
-      limit: 1,
+      limit: 1000
     });
 
-    if (existingFAQs.totalDocs > 0) {
-      console.log('⚠️ Đã có dữ liệu FAQs, bỏ qua seed...');
-      return;
+    if (existingFAQs.docs.length > 0) {
+      for (const faq of existingFAQs.docs) {
+        await payload.delete({
+          collection: 'faqs',
+          id: faq.id
+        });
+      }
     }
 
-    // Tạo FAQs mới cho từng locale
+    const results = [];
+
+    // Tạo FAQs mới - tạo một document cho mỗi FAQ rồi update với các locale khác
     for (const faqData of faqsData) {
-      // Tạo FAQ với locale vi (default)
+      // Tạo document với locale mặc định (vi)
       const createdFAQ = await payload.create({
         collection: 'faqs',
         data: {
@@ -83,11 +114,12 @@ async function seedFAQs() {
           isPopular: faqData.isPopular,
           helpfulCount: faqData.helpfulCount,
           order: faqData.order,
+          viewCount: 0
         },
-        locale: 'vi',
+        locale: 'vi'
       });
 
-      // Cập nhật với locale en
+      // Update với locale en
       await payload.update({
         collection: 'faqs',
         id: createdFAQ.id,
@@ -96,10 +128,10 @@ async function seedFAQs() {
           answer: faqData.answer.en,
           searchKeywords: faqData.searchKeywords.en,
         },
-        locale: 'en',
+        locale: 'en'
       });
 
-      // Cập nhật với locale tr
+      // Update với locale tr
       await payload.update({
         collection: 'faqs',
         id: createdFAQ.id,
@@ -108,32 +140,33 @@ async function seedFAQs() {
           answer: faqData.answer.tr,
           searchKeywords: faqData.searchKeywords.tr,
         },
-        locale: 'tr',
+        locale: 'tr'
       });
 
-      console.log(`✅ Đã tạo FAQ: ${faqData.question.vi}`);
+      results.push(createdFAQ);
     }
 
-    console.log(`🎉 Hoàn thành! Đã tạo ${faqsData.length} FAQs với 3 ngôn ngữ.`);
+    return NextResponse.json({
+      success: true,
+      message: `Đã tạo thành công ${results.length} FAQs với dữ liệu đa ngôn ngữ`,
+      data: {
+        count: results.length,
+        localesCount: 3, // vi, en, tr
+        itemsPerLocale: faqsData.length,
+        faqs: results.map(r => ({
+          id: r.id,
+          question: r.question,
+          category: r.category
+        }))
+      }
+    });
 
   } catch (error) {
-    console.error('❌ Lỗi khi tạo dữ liệu FAQs:', error);
-    throw error;
+    console.error('Error seeding FAQs:', error);
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to seed FAQs',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
-
-async function runFAQSeed() {
-  try {
-    console.log('🚀 Bắt đầu seed dữ liệu FAQs...');
-
-    await seedFAQs();
-
-    console.log('🎉 Hoàn thành seed FAQs!');
-    process.exit(0);
-  } catch (error) {
-    console.error('❌ Lỗi khi seed FAQs:', error);
-    process.exit(1);
-  }
-}
-
-runFAQSeed();

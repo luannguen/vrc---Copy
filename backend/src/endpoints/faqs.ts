@@ -26,14 +26,17 @@ export const getFAQsEndpoint: Endpoint = {
         popular,
         search,
         tags,
-        language = 'vi',
+        locale = 'vi',
         sort = 'order',
       } = query;
+
+      // Validate locale
+      const validLocales = ['vi', 'en', 'tr'];
+      const currentLocale = validLocales.includes(locale as string) ? (locale as 'vi' | 'en' | 'tr') : 'vi';
 
       // Build where clause
       const where: Where = {
         status: { equals: 'published' },
-        language: { equals: language },
       };
 
       if (category) {
@@ -66,6 +69,7 @@ export const getFAQsEndpoint: Endpoint = {
         page: parseInt(page as string),
         limit: parseInt(limit as string),
         sort: sort as string,
+        locale: currentLocale,
       });
 
       return Response.json({
@@ -87,16 +91,20 @@ export const getFAQCategoriesEndpoint: Endpoint = {
   handler: async (req) => {
     try {
       const { payload, query } = req;
-      const { language = 'vi' } = query;
+      const { locale = 'vi' } = query;
+
+      // Validate locale
+      const validLocales = ['vi', 'en', 'tr'];
+      const currentLocale = validLocales.includes(locale as string) ? (locale as 'vi' | 'en' | 'tr') : 'vi';
 
       // Lấy unique categories từ FAQs đã publish
       const result = await payload.find({
         collection: 'faqs',
         where: {
           status: { equals: 'published' },
-          language: { equals: language },
         },
         limit: 1000, // Lấy nhiều để đảm bảo có tất cả categories
+        locale: currentLocale,
       });
 
       // Nhóm theo category và đếm số lượng
@@ -150,17 +158,21 @@ export const getPopularFAQsEndpoint: Endpoint = {
   handler: async (req) => {
     try {
       const { payload, query } = req;
-      const { limit = 5, language = 'vi' } = query;
+      const { limit = 5, locale = 'vi' } = query;
+
+      // Validate locale
+      const validLocales = ['vi', 'en', 'tr'];
+      const currentLocale = validLocales.includes(locale as string) ? (locale as 'vi' | 'en' | 'tr') : 'vi';
 
       const result = await payload.find({
         collection: 'faqs',
         where: {
           status: { equals: 'published' },
-          language: { equals: language },
           isPopular: { equals: true },
         },
         limit: parseInt(limit as string),
         sort: '-helpfulCount',
+        locale: currentLocale,
       });
 
       return Response.json({
@@ -182,17 +194,21 @@ export const getFeaturedFAQsEndpoint: Endpoint = {
   handler: async (req) => {
     try {
       const { payload, query } = req;
-      const { limit = 6, language = 'vi' } = query;
+      const { limit = 6, locale = 'vi' } = query;
+
+      // Validate locale
+      const validLocales = ['vi', 'en', 'tr'];
+      const currentLocale = validLocales.includes(locale as string) ? (locale as 'vi' | 'en' | 'tr') : 'vi';
 
       const result = await payload.find({
         collection: 'faqs',
         where: {
           status: { equals: 'published' },
-          language: { equals: language },
           featured: { equals: true },
         },
         limit: parseInt(limit as string),
         sort: 'order',
+        locale: currentLocale,
       });
 
       return Response.json({
@@ -218,7 +234,7 @@ export const searchFAQsEndpoint: Endpoint = {
         q,
         page = 1,
         limit = 10,
-        language = 'vi',
+        locale = 'vi',
         category,
         sort = '-helpfulCount',
       } = query;
@@ -227,9 +243,12 @@ export const searchFAQsEndpoint: Endpoint = {
         throw new APIError('Search query is required', 400);
       }
 
+      // Validate locale
+      const validLocales = ['vi', 'en', 'tr'];
+      const currentLocale = validLocales.includes(locale as string) ? (locale as 'vi' | 'en' | 'tr') : 'vi';
+
       const where: Where = {
         status: { equals: 'published' },
-        language: { equals: language },
         or: [
           { question: { contains: q } },
           { searchKeywords: { contains: q } },
@@ -247,6 +266,7 @@ export const searchFAQsEndpoint: Endpoint = {
         page: parseInt(page as string),
         limit: parseInt(limit as string),
         sort: sort as string,
+        locale: currentLocale,
       });
 
       return Response.json({

@@ -94,6 +94,87 @@ export const useMultilingualCategories = (locale?: string) => {
   });
 };
 
+export const useMultilingualFAQs = (locale?: string) => {
+  const { i18n } = useTranslation();
+  const currentLocale = locale || i18n.language;
+  
+  return useQuery({
+    queryKey: ['faqs', currentLocale],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/api/faqs?locale=${currentLocale}`);
+      if (!response.ok) throw new Error('Failed to fetch FAQs');
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
+export const useMultilingualFAQsPopular = (locale?: string) => {
+  const { i18n } = useTranslation();
+  const currentLocale = locale || i18n.language;
+  
+  return useQuery({
+    queryKey: ['faqs', 'popular', currentLocale],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/api/faqs/popular?locale=${currentLocale}`);
+      if (!response.ok) throw new Error('Failed to fetch popular FAQs');
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
+export const useMultilingualFAQsFeatured = (locale?: string) => {
+  const { i18n } = useTranslation();
+  const currentLocale = locale || i18n.language;
+  
+  return useQuery({
+    queryKey: ['faqs', 'featured', currentLocale],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/api/faqs/featured?locale=${currentLocale}`);
+      if (!response.ok) throw new Error('Failed to fetch featured FAQs');
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+};
+
+export const useMultilingualFAQsCategories = (locale?: string) => {
+  const { i18n } = useTranslation();
+  const currentLocale = locale || i18n.language;
+  
+  return useQuery({
+    queryKey: ['faqs', 'categories', currentLocale],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/api/faqs/categories?locale=${currentLocale}`);
+      if (!response.ok) throw new Error('Failed to fetch FAQ categories');
+      return response.json();
+    },
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
+};
+
+export const useMultilingualFAQsByCategory = (category: string, locale?: string) => {
+  const { i18n } = useTranslation();
+  const currentLocale = locale || i18n.language;
+  
+  return useQuery({
+    queryKey: ['faqs', 'category', category, currentLocale],
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/api/faqs?category=${category}&locale=${currentLocale}`);
+      if (!response.ok) throw new Error(`Failed to fetch FAQs for category ${category}`);
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: !!category, // Only fetch if category is provided
+  });
+};
+
 // General API hook for fetching various content types
 export const useMultilingualAPI = () => {
   const { i18n } = useTranslation();

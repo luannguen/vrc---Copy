@@ -1994,7 +1994,6 @@ export interface Faq {
    * Số lượt đánh giá hữu ích
    */
   helpfulCount?: number | null;
-  language: 'vi' | 'en';
   updatedAt: string;
   createdAt: string;
 }
@@ -3202,7 +3201,6 @@ export interface FaqsSelect<T extends boolean = true> {
   searchKeywords?: T;
   viewCount?: T;
   helpfulCount?: T;
-  language?: T;
   updatedAt?: T;
   createdAt?: T;
 }

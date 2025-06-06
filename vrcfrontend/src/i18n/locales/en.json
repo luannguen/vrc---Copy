@@ -58,5 +58,100 @@
     "translationManager": "Translation Manager (Admin)",
     "cacheStatistics": "Translation Cache Statistics",
     "rerunTests": "Re-run Tests"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions",
+    "searchPlaceholder": "Search questions...",
+    "noResults": "No questions found",
+    "popular": "Popular Questions",
+    "featured": "Featured Questions",
+    "allFaqs": "All Questions",
+    "loadMore": "Load More",
+    "helpful": "Helpful",
+    "notHelpful": "Not Helpful",
+    "wasThisHelpful": "Was this answer helpful?",
+    "thankYou": "Thank you for your feedback!",
+    "hero": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Find answers to all your questions about VRC products and services",
+      "badge": "150+ questions answered"
+    },
+    "stats": {
+      "totalTitle": "Total FAQs",
+      "totalDescription": "Questions updated regularly",
+      "categoriesTitle": "Categories",
+      "categoriesDescription": "Organized by topic",
+      "helpfulTitle": "Helpful Rate",
+      "helpfulDescription": "Customers find helpful"
+    },
+    "search": {
+      "title": "Search and Filter",
+      "placeholder": "Enter keywords to search...",
+      "sortBy": "Sort by",
+      "sortOptions": {
+        "priority": "Priority",
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "aToZ": "A-Z",
+        "zToA": "Z-A"
+      }
+    },
+    "sidebar": {
+      "categoriesTitle": "Categories"
+    },
+    "content": {
+      "allTitle": "All Frequently Asked Questions",
+      "categoryTitle": "FAQ {{category}}",
+      "questionsAbout": "Questions about {{category}}"
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "description": "Pages that might be helpful",
+      "products": "View Products",
+      "services": "Services",
+      "projects": "Projects",
+      "contact": "Contact"
+    },
+    "cta": {
+      "title": "Can't find an answer?",
+      "description": "We're here to help. Contact our team of experts for detailed consultation.",
+      "contactButton": "Contact Now",
+      "consultingButton": "Free Consultation"
+    },
+    "empty": {
+      "message": "No frequently asked questions yet."
+    },
+    "categories": {
+      "all": {
+        "label": "All",
+        "description": "View all frequently asked questions"
+      },
+      "products": {
+        "label": "Products",
+        "description": "Questions about air conditioning products and equipment"
+      },
+      "services": {
+        "label": "Services", 
+        "description": "Questions about installation, maintenance, repair services"
+      },
+      "general": {
+        "label": "General",
+        "description": "Questions about company, policies, general information"
+      },
+      "technical": {
+        "label": "Technical",
+        "description": "Questions about technical specifications and operations"
+      },
+      "projects": {
+        "label": "Projects",
+        "description": "Questions about projects and construction"
+      }
+    },
+    "errors": {
+      "loadFailed": "Failed to load FAQ",
+      "searchFailed": "Search error",
+      "tryAgain": "Try Again"
+    }
   }
 }

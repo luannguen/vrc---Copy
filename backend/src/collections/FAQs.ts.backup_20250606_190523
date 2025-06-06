@@ -25,7 +25,6 @@ export const FAQs: CollectionConfig = {
       type: 'text',
       label: 'Câu hỏi',
       required: true,
-      localized: true,
       admin: {
         description: 'Câu hỏi của khách hàng',
       },
@@ -35,7 +34,6 @@ export const FAQs: CollectionConfig = {
       type: 'textarea',
       label: 'Trả lời',
       required: true,
-      localized: true,
       admin: {
         description: 'Câu trả lời chi tiết',
       },
@@ -184,7 +182,6 @@ export const FAQs: CollectionConfig = {
       name: 'searchKeywords',
       type: 'text',
       label: 'Từ khóa tìm kiếm',
-      localized: true,
       admin: {
         description: 'Từ khóa để tăng khả năng tìm kiếm (cách nhau bằng dấu phẩy)',
       },
@@ -209,6 +206,26 @@ export const FAQs: CollectionConfig = {
         position: 'sidebar',
         readOnly: true,
         description: 'Số lượt đánh giá hữu ích',
+      },
+    },
+    {
+      name: 'language',
+      type: 'select',
+      label: 'Ngôn ngữ',
+      required: true,
+      defaultValue: 'vi',
+      options: [
+        {
+          label: 'Tiếng Việt',
+          value: 'vi',
+        },
+        {
+          label: 'English',
+          value: 'en',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
       },
     },
   ],

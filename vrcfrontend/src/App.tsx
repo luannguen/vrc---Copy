@@ -10,6 +10,7 @@ import MainLayout from "./components/layouts/MainLayout";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import Projects from "./pages/Projects";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
@@ -89,6 +90,7 @@ const App = () => (
           <Route index element={<Index />} />
           <Route path="about" element={<About />} />
           <Route path="products" element={<Products />} />
+          <Route path="products/:slug" element={<ProductDetail />} />
           <Route path="products/industrial" element={<IndustrialProducts />} />
           <Route path="products/commercial" element={<CommercialProducts />} />
           <Route path="products/residential" element={<ResidentialProducts />} />

@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { HelpCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useFAQ } from '../hooks/useFAQ';
+import { useMultilingualFAQs, useMultilingualFAQsByCategory } from '../hooks/useMultilingualAPI';
 import { FAQ as FAQType } from '../types/FAQ';
 
 /**
@@ -77,34 +78,39 @@ const FAQSkeleton: React.FC = () => (
  */
 export const FAQ: React.FC<FAQProps> = ({
   category,
-  title = "Câu hỏi thường gặp",
+  title,
   showTitle = true,
   maxItems,
   className = "",
 }) => {
-  const { faqs, loading, error, retry } = useFAQ({
-    initialParams: {
-      category,
-      status: 'published',
-      sort: 'order',
-      limit: maxItems,
-    },
-    autoLoad: true,
-    retryAttempts: 3,
-  });
+  const { t } = useTranslation();
+  
+  // Always call hooks in the same order
+  const allFAQsQuery = useMultilingualFAQs();
+  const categoryFAQsQuery = useMultilingualFAQsByCategory(category || 'products');
+  
+  // Use the appropriate query based on category
+  const { data: faqsData, isLoading, error, refetch } = category 
+    ? categoryFAQsQuery
+    : allFAQsQuery;
 
+  // Extract FAQs from API response
+  const faqs = faqsData?.data?.docs || faqsData?.data || [];
+  
   // Filter and limit FAQs if needed
   const displayFAQs = maxItems ? faqs.slice(0, maxItems) : faqs;
-
+  
+  // Get translated title
+  const displayTitle = title || t('faq.title');
   // Error state
-  if (error && !loading) {
+  if (error && !isLoading) {
     return (
       <Card className={`w-full ${className}`}>
         {showTitle && (
           <CardHeader className="text-center pb-4">
             <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
               <HelpCircle className="w-6 h-6 text-blue-600" />
-              {title}
+              {displayTitle}
             </CardTitle>
           </CardHeader>
         )}
@@ -112,15 +118,15 @@ export const FAQ: React.FC<FAQProps> = ({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
-              <span>{error.message}</span>
+              <span>{t('faq.errors.loadFailed')}</span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={retry}
+                onClick={() => refetch()}
                 className="ml-2"
               >
                 <RefreshCw className="w-4 h-4 mr-1" />
-                Thử lại
+                {t('faq.errors.tryAgain')}
               </Button>
             </AlertDescription>
           </Alert>
@@ -130,14 +136,14 @@ export const FAQ: React.FC<FAQProps> = ({
   }
 
   // Loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className={`w-full ${className}`}>
         {showTitle && (
           <CardHeader className="text-center pb-4">
             <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
               <HelpCircle className="w-6 h-6 text-blue-600" />
-              {title}
+              {displayTitle}
             </CardTitle>
           </CardHeader>
         )}
@@ -156,14 +162,14 @@ export const FAQ: React.FC<FAQProps> = ({
           <CardHeader className="text-center pb-4">
             <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
               <HelpCircle className="w-6 h-6 text-blue-600" />
-              {title}
+              {displayTitle}
             </CardTitle>
           </CardHeader>
         )}
         <CardContent>
           <div className="text-center py-8">
             <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Chưa có câu hỏi thường gặp nào.</p>
+            <p className="text-gray-500">{t('faq.empty.message')}</p>
           </div>
         </CardContent>
       </Card>
@@ -177,10 +183,10 @@ export const FAQ: React.FC<FAQProps> = ({
         <CardHeader className="text-center pb-6">
           <CardTitle className="flex items-center justify-center gap-2 text-2xl font-bold text-gray-900">
             <HelpCircle className="w-6 h-6 text-blue-600" />
-            {title}
+            {displayTitle}
           </CardTitle>
           <p className="text-gray-600 mt-2">
-            Tìm câu trả lời cho những thắc mắc phổ biến
+            {t('faq.subtitle')}
           </p>
         </CardHeader>
       )}
