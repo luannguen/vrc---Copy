@@ -32,6 +32,7 @@ import { Tools } from './collections/Tools'
 import { Resources } from './collections/Resources'
 import { Banners } from './collections/Banners'
 import { FAQs } from './collections/FAQs'
+import { AdminGuides } from './collections/AdminGuides'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { CompanyInfo } from './globals/CompanyInfo'
@@ -101,7 +102,7 @@ export default buildConfig({
       // Add only essential UI components to avoid conflicts with bulk operations
       afterNavLinks: ['@/components/AdminUI/DynamicLogout'],
       // Add custom admin styles for better UI including react-select styling
-      afterDashboard: ['@/components/AdminUI/DynamicAdminStyles']
+      afterDashboard: ['@/components/AdminUI/DynamicAdminStyles', '@/components/AdminDashboard/AdminGuideWidgetSimple']
     },
     importMap: {
       baseDir: path.resolve(dirname),
@@ -168,6 +169,7 @@ export default buildConfig({
     Resources,
     Banners,
     FAQs,
+    AdminGuides,
   ],cors: {
     origins: process.env.NODE_ENV === 'production'
       ? [

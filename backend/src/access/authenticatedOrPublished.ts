@@ -6,9 +6,6 @@ export const authenticatedOrPublished: Access = ({ req: { user } }) => {
   }
 
   return {
-    _status: {
-      equals: 'published',
-    },
     status: {
       equals: 'published',
     },

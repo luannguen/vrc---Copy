@@ -90,6 +90,7 @@ export interface Config {
     resources: Resource;
     banners: Banner;
     faqs: Faq;
+    'admin-guides': AdminGuide;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -124,6 +125,7 @@ export interface Config {
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     banners: BannersSelect<false> | BannersSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
+    'admin-guides': AdminGuidesSelect<false> | AdminGuidesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1998,6 +2000,144 @@ export interface Faq {
   createdAt: string;
 }
 /**
+ * Quản lý tài liệu hướng dẫn sử dụng admin dashboard
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-guides".
+ */
+export interface AdminGuide {
+  id: string;
+  /**
+   * Tiêu đề chính của hướng dẫn
+   */
+  title: string;
+  /**
+   * Mô tả ngắn gọn về nội dung hướng dẫn
+   */
+  summary: string;
+  /**
+   * Phân loại hướng dẫn theo chức năng
+   */
+  category:
+    | 'getting-started'
+    | 'collections'
+    | 'globals'
+    | 'dashboard'
+    | 'settings'
+    | 'media'
+    | 'development'
+    | 'advanced'
+    | 'troubleshooting';
+  /**
+   * Mức độ khó của hướng dẫn
+   */
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  /**
+   * Nội dung hướng dẫn chi tiết với định dạng rich text
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Danh sách các bước thực hiện theo thứ tự
+   */
+  steps?:
+    | {
+        stepTitle: string;
+        stepDescription: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        /**
+         * Code ví dụ cho bước này (nếu có)
+         */
+        codeExample?: string | null;
+        /**
+         * Ảnh chụp màn hình minh họa cho bước này
+         */
+        screenshot?: (string | null) | Media;
+        /**
+         * Mẹo và lưu ý quan trọng cho bước này
+         */
+        tips?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Thư viện ảnh minh họa cho hướng dẫn
+   */
+  screenshots?:
+    | {
+        image: string | Media;
+        caption?: string | null;
+        /**
+         * Mô tả ảnh cho accessibility
+         */
+        altText: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Các từ khóa để tìm kiếm hướng dẫn
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Các hướng dẫn liên quan khác
+   */
+  relatedGuides?: (string | AdminGuide)[] | null;
+  /**
+   * Hiển thị trong danh sách hướng dẫn nổi bật
+   */
+  featured?: boolean | null;
+  /**
+   * Thời gian dự kiến để hoàn thành hướng dẫn (tính bằng phút)
+   */
+  estimatedTime?: number | null;
+  /**
+   * Số thứ tự để sắp xếp hướng dẫn (số nhỏ hơn hiển thị trước)
+   */
+  order?: number | null;
+  status: 'draft' | 'published' | 'hidden';
+  /**
+   * Ngày review và cập nhật nội dung lần cuối
+   */
+  lastReviewed?: string | null;
+  /**
+   * Phiên bản Payload CMS mà hướng dẫn này áp dụng
+   */
+  version?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -2262,6 +2402,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faqs';
         value: string | Faq;
+      } | null)
+    | ({
+        relationTo: 'admin-guides';
+        value: string | AdminGuide;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -3201,6 +3345,50 @@ export interface FaqsSelect<T extends boolean = true> {
   searchKeywords?: T;
   viewCount?: T;
   helpfulCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-guides_select".
+ */
+export interface AdminGuidesSelect<T extends boolean = true> {
+  title?: T;
+  summary?: T;
+  category?: T;
+  difficulty?: T;
+  content?: T;
+  steps?:
+    | T
+    | {
+        stepTitle?: T;
+        stepDescription?: T;
+        codeExample?: T;
+        screenshot?: T;
+        tips?: T;
+        id?: T;
+      };
+  screenshots?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        altText?: T;
+        id?: T;
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  relatedGuides?: T;
+  featured?: T;
+  estimatedTime?: T;
+  order?: T;
+  status?: T;
+  lastReviewed?: T;
+  version?: T;
   updatedAt?: T;
   createdAt?: T;
 }
